@@ -1,0 +1,1451 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skills For Real Engineers</title>
+    <meta
+      name="description"
+      content="mattpocock-skills — Claude Code 용 엔지니어링 스킬 25종의 구조·설치·사용 사례·현장 팁 발표 자료."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    />
+    <style>
+      /* ---------- tokens : light (bare :root = 완전한 팔레트) ---------- */
+      :root {
+        --paper: #f1f2f4;
+        --panel: #ffffff;
+        --panel-2: #e7e9ed;
+        --ink: #1b2028;
+        --ink-2: #3d4552;
+        --muted: #5d6673;
+        --line: #d5d9df;
+        --line-strong: #b9c0c9;
+        --accent: #ce4a28;
+        --accent-ink: #a63a1e;
+        --accent-soft: #f7e4dd;
+        --green: #2e6f5c;
+        --green-soft: #dcebe5;
+        --shadow: 0 1px 2px rgba(27, 32, 40, 0.06), 0 8px 24px rgba(27, 32, 40, 0.06);
+
+        --font-display: "Bricolage Grotesque", "IBM Plex Sans KR", system-ui, sans-serif;
+        --font-body: "IBM Plex Sans", "IBM Plex Sans KR", system-ui, sans-serif;
+        --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+        --step-0: clamp(0.95rem, 0.9rem + 0.2vw, 1.0625rem);
+        --step-1: clamp(1.1rem, 1rem + 0.4vw, 1.3rem);
+        --step-2: clamp(1.4rem, 1.2rem + 0.9vw, 2rem);
+        --step-3: clamp(1.9rem, 1.4rem + 2.2vw, 3rem);
+        --step-4: clamp(2.4rem, 1.6rem + 4vw, 4.4rem);
+
+        --rail: 232px;
+        --pad-x: clamp(1.25rem, 4vw, 4.5rem);
+        color-scheme: light;
+      }
+
+      /* ---------- tokens : dark ---------- */
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --paper: #14181d;
+          --panel: #1a1f26;
+          --panel-2: #222932;
+          --ink: #e7eaee;
+          --ink-2: #b3bcc7;
+          --muted: #8a94a1;
+          --line: #2c333c;
+          --line-strong: #3d4650;
+          --accent: #ff7550;
+          --accent-ink: #ff9271;
+          --accent-soft: #3a241d;
+          --green: #5faf95;
+          --green-soft: #1c2e29;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35);
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme="dark"] {
+        --paper: #14181d;
+        --panel: #1a1f26;
+        --panel-2: #222932;
+        --ink: #e7eaee;
+        --ink-2: #b3bcc7;
+        --muted: #8a94a1;
+        --line: #2c333c;
+        --line-strong: #3d4650;
+        --accent: #ff7550;
+        --accent-ink: #ff9271;
+        --accent-soft: #3a241d;
+        --green: #5faf95;
+        --green-soft: #1c2e29;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35);
+        color-scheme: dark;
+      }
+
+      /* ---------- base ---------- */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font-body);
+        font-size: var(--step-0);
+        line-height: 1.62;
+        -webkit-font-smoothing: antialiased;
+        /* 한글은 어절 단위로 끊는다 — keep-all 이 없으면 단어 중간에서 줄이 바뀐다 */
+        word-break: keep-all;
+        overflow-wrap: break-word;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-display);
+        text-wrap: balance;
+        word-break: keep-all;
+        margin: 0;
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0;
+      }
+      a {
+        color: var(--accent-ink);
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+      }
+      code,
+      kbd {
+        font-family: var(--font-mono);
+        font-size: 0.88em;
+      }
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+      /* ---------- deck / slides ---------- */
+      .slide {
+        padding: clamp(3.5rem, 7vh, 6rem) var(--pad-x) clamp(3rem, 6vh, 5rem)
+          calc(var(--pad-x) + var(--rail));
+        border-bottom: 1px solid var(--line);
+        scroll-snap-align: start;
+      }
+      .slide > .inner {
+        max-width: 1180px;
+        margin: 0 auto;
+        display: grid;
+        gap: clamp(1.25rem, 2.4vh, 2rem);
+        align-content: center;
+        min-height: calc(100svh - clamp(6.5rem, 13vh, 11rem));
+      }
+      @media (min-width: 880px) and (min-height: 620px) {
+        html {
+          scroll-snap-type: y proximity;
+        }
+      }
+      @media (max-width: 879px) {
+        .slide {
+          padding-left: var(--pad-x);
+          padding-top: clamp(3rem, 8vh, 4rem);
+          scroll-margin-top: 3.25rem;
+        }
+        .slide > .inner {
+          min-height: 0;
+        }
+      }
+
+      /* ---------- rail ---------- */
+      .rail {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: var(--rail);
+        padding: clamp(1.5rem, 4vh, 3rem) 0 clamp(1.5rem, 4vh, 3rem) clamp(1rem, 2.4vw, 2rem);
+        display: flex;
+        flex-direction: column;
+        justify-content: safe center;
+        gap: 2px;
+        z-index: 20;
+        border-right: 1px solid var(--line);
+        background: color-mix(in srgb, var(--paper) 88%, transparent);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+      .rail a {
+        display: grid;
+        grid-template-columns: 2.1rem 1fr;
+        align-items: baseline;
+        gap: 0.35rem;
+        padding: 0.3rem 0.5rem 0.3rem 0;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.775rem;
+        line-height: 1.35;
+        border-radius: 3px;
+        transition: color 0.15s ease;
+      }
+      .rail a .n {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      .rail a:hover {
+        color: var(--ink);
+      }
+      .rail a[aria-current="true"] {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .rail a[aria-current="true"] .n {
+        color: var(--accent-ink);
+      }
+      .rail .brand {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent-ink);
+        margin-bottom: 1rem;
+        padding-left: 0.1rem;
+      }
+      .progress {
+        display: none;
+      }
+      .counter {
+        display: none;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+      @media (max-width: 879px) {
+        .rail {
+          position: sticky;
+          inset: 0 auto auto 0;
+          width: 100%;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.75rem;
+          padding: 0.65rem var(--pad-x);
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .rail a {
+          display: none;
+        }
+        .rail .brand {
+          margin: 0;
+        }
+        .progress {
+          display: block;
+          flex: 1;
+          height: 3px;
+          background: var(--panel-2);
+          border-radius: 2px;
+          overflow: hidden;
+          max-width: 60%;
+        }
+        .progress i {
+          display: block;
+          height: 100%;
+          width: 0%;
+          background: var(--accent);
+        }
+        .counter {
+          display: inline;
+        }
+      }
+
+      /* ---------- type helpers ---------- */
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent-ink);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .eyebrow::after {
+        content: "";
+        height: 1px;
+        flex: 1;
+        background: var(--line);
+        max-width: 5rem;
+      }
+      h2 {
+        font-size: var(--step-3);
+        font-weight: 800;
+      }
+      h3 {
+        font-size: var(--step-1);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .lede {
+        font-size: var(--step-1);
+        color: var(--ink-2);
+        max-width: 62ch;
+        line-height: 1.5;
+      }
+      .note {
+        color: var(--muted);
+        font-size: 0.9rem;
+        max-width: 68ch;
+      }
+      .mono {
+        font-family: var(--font-mono);
+      }
+      strong {
+        font-weight: 600;
+      }
+
+      /* ---------- cover ---------- */
+      .cover .inner {
+        gap: clamp(1.5rem, 3vh, 2.5rem);
+      }
+      .cover h1 {
+        font-size: var(--step-4);
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        max-width: 18ch;
+      }
+      .cover h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .cover .kicker {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: clamp(1.5rem, 5vw, 3.5rem);
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--line);
+      }
+      .facts div {
+        display: grid;
+        gap: 0.1rem;
+      }
+      .facts b {
+        font-family: var(--font-display);
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+      .facts span {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* ---------- grids ---------- */
+      .grid {
+        display: grid;
+        gap: clamp(0.75rem, 1.6vw, 1.25rem);
+      }
+      .g2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .g3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .g4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .split {
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+        align-items: start;
+      }
+      @media (max-width: 900px) {
+        .g3,
+        .g4,
+        .split {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 620px) {
+        .g2,
+        .g3,
+        .g4,
+        .split {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      /* ---------- cards : 역할별로만 테두리·면을 쓴다 ---------- */
+      .card {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: clamp(0.9rem, 1.5vw, 1.25rem);
+        display: grid;
+        gap: 0.5rem;
+        align-content: start;
+      }
+      .card h3 {
+        font-size: 1.02rem;
+      }
+      :where(.card) p {
+        color: var(--ink-2);
+        font-size: 0.93rem;
+        line-height: 1.55;
+      }
+      .card .cmd,
+      .plain .cmd {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--accent-ink);
+        word-break: break-all;
+      }
+      .plain {
+        display: grid;
+        gap: 0.45rem;
+        align-content: start;
+        padding-top: 0.85rem;
+        border-top: 2px solid var(--ink);
+      }
+      .plain h3 {
+        font-size: 1rem;
+      }
+      :where(.plain) p {
+        color: var(--ink-2);
+        font-size: 0.92rem;
+        line-height: 1.55;
+      }
+      .quote {
+        border-left: 2px solid var(--accent);
+        padding-left: 0.9rem;
+        color: var(--ink-2);
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+      .quote cite {
+        display: block;
+        font-style: normal;
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin-top: 0.35rem;
+      }
+
+      /* ---------- tier badges ---------- */
+      .tag {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.15rem 0.42rem;
+        border: 1px solid currentColor;
+        border-radius: 2px;
+        white-space: nowrap;
+      }
+      .tag.user {
+        color: var(--accent-ink);
+        background: var(--accent-soft);
+      }
+      .tag.model {
+        color: var(--green);
+        background: var(--green-soft);
+      }
+
+      /* ---------- code ---------- */
+      .code {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        font-family: var(--font-mono);
+        font-size: 0.83rem;
+        line-height: 1.75;
+        padding: 0.9rem 1rem;
+        overflow-x: auto;
+        white-space: pre;
+        color: var(--ink);
+        tab-size: 2;
+      }
+      .code .c {
+        color: var(--muted);
+      }
+      .code .k {
+        color: var(--accent-ink);
+      }
+      .code .g {
+        color: var(--green);
+      }
+
+      /* ---------- table ---------- */
+      .tablewrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        background: var(--panel);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 560px;
+        font-size: 0.9rem;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      th {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 500;
+        background: var(--panel-2);
+      }
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+      td.mono {
+        white-space: nowrap;
+      }
+
+      /* ---------- flow diagram ---------- */
+      .flow {
+        display: grid;
+        gap: 0;
+      }
+      .step {
+        display: grid;
+        grid-template-columns: 1.9rem minmax(0, 1fr);
+        gap: 0.85rem;
+        align-items: start;
+        padding-bottom: 1.05rem;
+      }
+      .step:last-child {
+        padding-bottom: 0;
+      }
+      .step .dot {
+        position: relative;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+      }
+      .step .dot::before {
+        content: "";
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-top: 0.42rem;
+        z-index: 1;
+      }
+      .step:not(:last-child) .dot::after {
+        content: "";
+        position: absolute;
+        top: 0.9rem;
+        bottom: -0.55rem;
+        width: 1px;
+        background: var(--line-strong);
+      }
+      .step.alt .dot::before {
+        background: var(--green);
+      }
+      .step h3 {
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .step p {
+        color: var(--ink-2);
+        font-size: 0.91rem;
+        margin-top: 0.2rem;
+      }
+      .branch {
+        margin-top: 0.5rem;
+        display: grid;
+        gap: 0.35rem;
+        border-left: 1px dashed var(--line-strong);
+        padding-left: 0.85rem;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+
+      /* ---------- misc ---------- */
+      ul.tight {
+        margin: 0;
+        padding-left: 1.05rem;
+        display: grid;
+        gap: 0.3rem;
+        color: var(--ink-2);
+        font-size: 0.92rem;
+      }
+      ul.tight li::marker {
+        color: var(--line-strong);
+      }
+      .kbd {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        border: 1px solid var(--line-strong);
+        border-bottom-width: 2px;
+        border-radius: 3px;
+        padding: 0.05rem 0.32rem;
+        color: var(--ink-2);
+      }
+      .hint {
+        position: fixed;
+        right: clamp(0.75rem, 2vw, 1.5rem);
+        bottom: clamp(0.75rem, 2vw, 1.5rem);
+        z-index: 20;
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--muted);
+        background: color-mix(in srgb, var(--paper) 85%, transparent);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        padding: 0.3rem 0.5rem;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        font-variant-numeric: tabular-nums;
+      }
+      @media (max-width: 879px) {
+        .hint {
+          display: none;
+        }
+      }
+      .foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.25rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+        padding-top: 0.9rem;
+      }
+
+      @media print {
+        :root,
+        :root[data-theme="dark"] {
+          color-scheme: light;
+          --paper: #ffffff;
+          --panel: #ffffff;
+          --panel-2: #f2f2f2;
+          --ink: #111111;
+          --ink-2: #333333;
+          --muted: #555555;
+          --line: #bbbbbb;
+          --line-strong: #888888;
+          --accent: #a63a1e;
+          --accent-ink: #a63a1e;
+          --accent-soft: #f7e4dd;
+          --green: #2e6f5c;
+          --green-soft: #dcebe5;
+        }
+        .rail,
+        .hint {
+          display: none;
+        }
+        .slide {
+          padding: 1.5cm;
+          break-after: page;
+          border: 0;
+        }
+        .slide > .inner {
+          min-height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="rail" aria-label="슬라이드 목차">
+      <span class="brand">mattpocock-skills</span>
+      <div class="progress" aria-hidden="true"><i></i></div>
+      <span class="counter" role="status" aria-live="polite" aria-atomic="true">01 / 11</span>
+      <a href="#s1"><span class="n">01</span><span>개요</span></a>
+      <a href="#s2"><span class="n">02</span><span>왜 존재하나</span></a>
+      <a href="#s3"><span class="n">03</span><span>구조: 두 부류</span></a>
+      <a href="#s4"><span class="n">04</span><span>설치</span></a>
+      <a href="#s5"><span class="n">05</span><span>메인 플로우</span></a>
+      <a href="#s6"><span class="n">06</span><span>정렬: grilling</span></a>
+      <a href="#s7"><span class="n">07</span><span>구현: tdd</span></a>
+      <a href="#s8"><span class="n">08</span><span>검증: code-review</span></a>
+      <a href="#s9"><span class="n">09</span><span>막혔을 때</span></a>
+      <a href="#s10"><span class="n">10</span><span>현장 팁</span></a>
+      <a href="#s11"><span class="n">11</span><span>정리</span></a>
+    </nav>
+
+    <div class="hint" aria-hidden="true">
+      <span class="kbd">↑</span><span class="kbd">↓</span>
+      <span>슬라이드 이동</span>
+    </div>
+
+    <main>
+      <!-- 01 ------------------------------------------------------------->
+      <section class="slide cover" id="s1">
+        <div class="inner">
+          <span class="kicker">Claude Code plugin · v1.2.3 · MIT</span>
+          <h1>바이브 코딩이 아니라 <em>진짜 엔지니어링</em>을 하는 에이전트 스킬</h1>
+          <p class="lede">
+            Matt Pocock 이 매일 쓰는 스킬 25종. GSD·BMAD·Spec-Kit 처럼 프로세스를 통째로 가져가는
+            대신, 작게 쪼개져 서로 조합되는 규율을 준다. 이 발표는 그 스킬들을 언제 어떻게 꺼내
+            쓰는지에 대한 것이다.
+          </p>
+          <div class="facts">
+            <div><b>25</b><span>skills</span></div>
+            <div><b>14</b><span>user-invoked</span></div>
+            <div><b>11</b><span>model-invoked</span></div>
+            <div><b>1</b><span>main flow</span></div>
+          </div>
+          <p class="note">
+            공식 마켓플레이스에 올라와 있어 별도 등록 없이 <code>/plugin install</code> 한 줄로
+            들어온다. 원본 저장소는 <span class="mono">github.com/mattpocock/skills</span>.
+          </p>
+        </div>
+      </section>
+
+      <!-- 02 ------------------------------------------------------------->
+      <section class="slide" id="s2">
+        <div class="inner">
+          <span class="eyebrow">02 — 왜 존재하나</span>
+          <h2>에이전트가 망하는 네 가지 방식</h2>
+          <p class="lede">
+            저자는 이 스킬들을 "기능"이 아니라 "실패 모드에 대한 처방"으로 설계했다. 네 가지 실패와
+            각각의 처방이 곧 스킬 목록의 뼈대다.
+          </p>
+          <div class="grid g4">
+            <article class="plain">
+              <h3>1. 내가 원한 걸 안 만든다</h3>
+              <div class="quote">
+                "No-one knows exactly what they want"
+                <cite>David Thomas &amp; Andrew Hunt, The Pragmatic Programmer</cite>
+              </div>
+              <p>사람과 에이전트 사이의 소통 격차. 처방은 <strong>착수 전 심문</strong>이다.</p>
+              <p class="cmd mono">grill-me · grill-with-docs</p>
+            </article>
+            <article class="plain">
+              <h3>2. 말이 너무 장황하다</h3>
+              <div class="quote">
+                "With a ubiquitous language, conversations among developers and expressions
+                of the code are all derived from the same domain model."
+                <cite>Eric Evans, Domain-Driven Design</cite>
+              </div>
+              <p>
+                용어를 모르니 한 단어로 될 걸 스무 단어로 쓴다. 처방은
+                <strong>공유 언어(CONTEXT.md)</strong>다.
+              </p>
+              <p class="cmd mono">domain-modeling</p>
+            </article>
+            <article class="plain">
+              <h3>3. 코드가 동작하지 않는다</h3>
+              <div class="quote">
+                "The rate of feedback is your speed limit."
+                <cite>David Thomas &amp; Andrew Hunt, The Pragmatic Programmer</cite>
+              </div>
+              <p>피드백 루프 없이 날아가는 중. 처방은 <strong>red → green 루프</strong>다.</p>
+              <p class="cmd mono">tdd · diagnosing-bugs</p>
+            </article>
+            <article class="plain">
+              <h3>4. 진흙 덩어리가 됐다</h3>
+              <div class="quote">
+                "The best modules are deep."
+                <cite>John Ousterhout, A Philosophy of Software Design</cite>
+              </div>
+              <p>에이전트는 코딩만 빨라진 게 아니라 <strong>엔트로피도</strong> 빨라진다. 처방은 <strong>깊은 모듈</strong>이다.</p>
+              <p class="cmd mono">codebase-design · improve-codebase-architecture</p>
+            </article>
+          </div>
+          <p class="note">
+            공유 언어는 장황함을 줄이는 데서 그치지 않는다. 변수·함수·파일 이름이 같은 어휘로 붙고,
+            코드베이스 탐색이 쉬워지고, 에이전트가 생각에 쓰는 토큰도 줄어든다.
+          </p>
+        </div>
+      </section>
+
+      <!-- 03 ------------------------------------------------------------->
+      <section class="slide" id="s3">
+        <div class="inner">
+          <span class="eyebrow">03 — 구조</span>
+          <h2>누가 부를 수 있는가로 갈린다</h2>
+          <div class="grid split">
+            <div class="grid" style="gap: 1rem">
+              <p class="lede">
+                25종은 한 축으로만 나뉜다. <strong>내가 직접 쳐야만 열리는 것</strong>과
+                <strong>에이전트가 알아서도 집는 것</strong>. 전자는 흐름을 지휘하고, 후자는 재사용
+                가능한 규율을 담는다.
+              </p>
+              <div class="code"><span class="c">--- skills/productivity/grill-me/SKILL.md</span>
+name: grill-me
+description: A relentless interview to sharpen a plan or design.
+<span class="k">disable-model-invocation: true</span>   <span class="c"># ← 슬래시 전용</span></div>
+              <p class="note">
+                이 한 줄이 붙으면 에이전트의 스킬 목록에서 사라진다. 그래서 설치 직후
+                "11개뿐인데?" 로 보이지만 실제로는 25종이 다 들어와 있다. user-invoked 스킬은
+                model-invoked 를 부를 수 있지만, user-invoked 끼리는 서로 부르지 않는다.
+              </p>
+            </div>
+            <div class="grid" style="gap: 0.75rem">
+              <article class="card">
+                <h3><span class="tag user">user-invoked</span> 14종 · 지휘</h3>
+                <p class="mono" style="font-size: 0.83rem; line-height: 1.9">
+                  setup-matt-pocock-skills · ask-matt · grill-me · grill-with-docs · to-spec ·
+                  to-tickets · implement · triage · wayfinder ·
+                  improve-codebase-architecture · handoff · to-questionnaire · wait-what · teach
+                </p>
+              </article>
+              <article class="card">
+                <h3><span class="tag model">model-invoked</span> 11종 · 규율</h3>
+                <p class="mono" style="font-size: 0.83rem; line-height: 1.9">
+                  grilling · tdd · diagnosing-bugs · code-review · codebase-design ·
+                  domain-modeling · prototype · research · resolving-merge-conflicts · wizard ·
+                  writing-for-agents
+                </p>
+              </article>
+              <p class="note">
+                플러그인으로 깔면 호출 이름에 접두사가 붙는다 —
+                <code>/mattpocock-skills:grill-with-docs</code>. 저장소 README 의
+                <code>/grill-me</code> 표기는 파일 복사 방식으로 설치했을 때 기준이다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 ------------------------------------------------------------->
+      <section class="slide" id="s4">
+        <div class="inner">
+          <span class="eyebrow">04 — 설치</span>
+          <h2>세 줄이면 끝난다</h2>
+          <div class="grid split">
+            <div class="grid" style="gap: 1rem">
+              <div class="code"><span class="c"># 1. 설치 — 공식 마켓플레이스라 등록 절차가 없다</span>
+<span class="k">/plugin install</span> mattpocock-skills
+
+<span class="c"># 2. 이미 떠 있는 세션이면 스킬 목록 갱신</span>
+<span class="k">/reload-plugins</span>
+
+<span class="c"># 3. 저장소당 한 번 — 이슈 트래커·라벨·문서 배치를 기록</span>
+<span class="k">/mattpocock-skills:setup-matt-pocock-skills</span></div>
+              <div class="code"><span class="c"># Codex 등 다른 에이전트, 또는 스킬을 직접 고쳐 쓰고 싶을 때</span>
+<span class="g">npx</span> skills@latest add mattpocock/skills
+<span class="c"># 설치기에서 setup-matt-pocock-skills 를 반드시 같이 고른다</span></div>
+              <p class="note">
+                두 방식은 철학이 다르다. 플러그인은 <strong>구독</strong>(읽기 전용 묶음, 저자가
+                올리면 자동 갱신), <code>skills.sh</code> 는 <strong>포크</strong>(내 저장소에
+                파일로 들어와 마음대로 수정). 둘 다 깔면 스킬이 두 벌이 된다.
+              </p>
+            </div>
+            <div class="grid" style="gap: 0.75rem">
+              <article class="card">
+                <h3>setup 이 정하는 것 — 셋</h3>
+                <ul class="tight">
+                  <li><strong>이슈 트래커</strong> — GitHub / GitLab / 로컬 마크다운 / 직접 서술</li>
+                  <li><strong>triage 라벨</strong> — 표준 5종을 쓸지, 기존 어휘에 매핑할지</li>
+                  <li><strong>도메인 문서 배치</strong> — 기본은 단일 컨텍스트, 모노레포 신호가 있을 때만 멀티를 묻는다</li>
+                </ul>
+              </article>
+              <article class="card">
+                <h3>setup 이 남기는 것</h3>
+                <ul class="tight">
+                  <li><code>docs/agents/issue-tracker.md</code> — 이슈 조작 명령 규약</li>
+                  <li><code>docs/agents/triage-labels.md</code> — 역할 → 실제 라벨 매핑표</li>
+                  <li><code>docs/agents/domain.md</code> — 탐색 전 읽을 문서와 그 규칙</li>
+                  <li><code>CLAUDE.md</code>(없으면 <code>AGENTS.md</code>)의 <code>## Agent skills</code> 블록 — 위 셋으로 가는 포인터</li>
+                </ul>
+              </article>
+              <p class="note">
+                모두 평범한 마크다운이다. 나중에 직접 고치면 되고, 트래커를 바꾸거나 처음부터 다시
+                할 때만 setup 을 다시 돌리면 된다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 ------------------------------------------------------------->
+      <section class="slide" id="s5">
+        <div class="inner">
+          <span class="eyebrow">05 — 메인 플로우</span>
+          <h2>아이디어에서 배포까지, 한 줄기</h2>
+          <div class="grid split">
+            <div class="flow">
+              <div class="step">
+                <span class="dot"></span>
+                <div>
+                  <h3>grill-with-docs <span class="tag user">user</span></h3>
+                  <p>
+                    심문으로 아이디어를 깎는다. 작업 디렉터리가 있으면 무조건 여기서 시작 — 배운 것을
+                    <code>CONTEXT.md</code> 와 ADR 로 남긴다.
+                  </p>
+                  <div class="branch">
+                    대화로 안 풀리는 질문(상태 모델·비즈니스 로직·눈으로 봐야 할 UI)은
+                    <code>handoff → prototype → handoff</code> 로 우회
+                  </div>
+                </div>
+              </div>
+              <div class="step">
+                <span class="dot"></span>
+                <div>
+                  <h3>to-spec → to-tickets <span class="tag user">user</span></h3>
+                  <p>
+                    여러 세션짜리 작업이면 대화를 스펙으로 굳히고, 서로의 선행 관계를 선언한
+                    tracer-bullet 티켓으로 쪼갠다. 한 세션이면 이 단계를 건너뛴다.
+                  </p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="dot"></span>
+                <div>
+                  <h3>implement <span class="tag user">user</span></h3>
+                  <p>
+                    티켓 하나에 세션 하나. 각 티켓이 자기 완결적이라 직전 컨텍스트는 버려도 된다.
+                  </p>
+                </div>
+              </div>
+              <div class="step alt">
+                <span class="dot"></span>
+                <div>
+                  <h3>tdd → code-review <span class="tag model">model</span></h3>
+                  <p>
+                    implement 가 내부에서 돌리는 두 규율. 슬라이스마다 red → green, 마지막에 두 축
+                    리뷰를 거쳐 커밋한다.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="grid" style="gap: 0.75rem">
+              <article class="card">
+                <h3>온램프 — 여기서 합류한다</h3>
+                <ul class="tight">
+                  <li>
+                    <strong>쌓인 버그·요청</strong> → <code>triage</code>. 단, 내가 만들지 않은
+                    이슈만. to-tickets 가 뽑은 티켓은 이미 에이전트용이라 <code>triage</code> 를 돌리지 않는다.
+                  </li>
+                  <li><strong>뭔가 깨졌다</strong> → <code>diagnosing-bugs</code></li>
+                  <li>
+                    <strong>한 세션에 안 들어가는 안개 같은 과제</strong> →
+                    <code>wayfinder</code>. 결정 티켓의 지도를 만들어 하나씩 해소하고, 안개가
+                    걷히면 <em>만들지 않고</em> to-spec 으로 넘긴다.
+                  </li>
+                </ul>
+              </article>
+              <article class="card">
+                <h3>컨텍스트 위생</h3>
+                <p>
+                  grill-with-docs → to-spec → to-tickets 는 <strong>한 컨텍스트 안에서</strong> 끊지 않는다.
+                  셋이 같은 사고 위에 쌓여야 한다. 한계는 모델이 또렷하게 추론하는 구간(smart
+                  zone, 최신 모델 기준 약 150k 토큰) — 그 전에 차면 무리하지 말고 단계 경계에서
+                  <code>/compact</code> 한다.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 ------------------------------------------------------------->
+      <section class="slide" id="s6">
+        <div class="inner">
+          <span class="eyebrow">06 — 정렬: grilling</span>
+          <h2>정렬: 만들기 전에 심문당하기</h2>
+          <div class="grid split">
+            <div class="grid" style="gap: 1rem">
+              <p class="lede">
+                저자가 가장 많이 쓰이는 스킬로 꼽는 것. 설계 트리의 모든 가지가 닫힐 때까지 질문을
+                던진다. <strong>사실 확인은 에이전트 몫, 결정은 내 몫</strong>이라는 규칙이 이 스킬의
+                핵심이다.
+              </p>
+              <article class="card">
+                <h3>같은 심문, 두 갈래</h3>
+                <ul class="tight">
+                  <li>
+                    <code>grill-me</code> — 상태를 남기지 않는다. 저장소가 없는 곳(계획·글·설계
+                    아이디어)에서 쓴다.
+                  </li>
+                  <li>
+                    <code>grill-with-docs</code> — 같은 심문에 흔적이 남는다. 용어는
+                    <code>CONTEXT.md</code> <strong>용어집</strong>으로, 되돌리기 힘든 결정은 ADR 로.
+                    <strong>저장소 안이면 항상 이쪽이 낫다.</strong>
+                  </li>
+                </ul>
+              </article>
+              <p class="note">
+                <code>grilling</code> 은 이 심문 자체를 담은 model-invoked <strong>기본 단위</strong>이고,
+                <code>triage</code>·<code>wayfinder</code>·<code>improve-codebase-architecture</code>
+                도 내부에서 같은 기본 단위를 돌린다.
+              </p>
+            </div>
+            <div class="grid" style="gap: 0.75rem">
+              <article class="card">
+                <h3>공유 언어가 만드는 차이</h3>
+                <div class="grid" style="gap: 0.6rem">
+                  <div>
+                    <p class="mono" style="font-size: 0.7rem; color: var(--muted)">BEFORE</p>
+                    <p>
+                      "코스의 섹션 안에 있는 레슨이 '실체화'될 때(즉 파일 시스템에 자리를 받을 때)
+                      문제가 생긴다"
+                    </p>
+                  </div>
+                  <div>
+                    <p class="mono" style="font-size: 0.7rem; color: var(--accent)">AFTER</p>
+                    <p style="color: var(--ink)">"materialization cascade 에 문제가 있다"</p>
+                  </div>
+                </div>
+                <p class="note" style="margin-top: 0.2rem">
+                  저자의 실제 <code>CONTEXT.md</code> 예시. 이 한 줄 압축이 세션마다 되풀이해서 제 값을 한다.
+                </p>
+              </article>
+              <article class="card">
+                <h3>곁가지로 붙는 것들</h3>
+                <ul class="tight">
+                  <li><code>research</code> — 1차 출처를 백그라운드로 조사해 <strong>출처를 인용한 마크다운</strong>을 남긴다</li>
+                  <li>
+                    <code>to-questionnaire</code> — 막힌 답이 내 머리도 코드도 아닌
+                    <em>다른 사람</em> 안에 있을 때, 그 사람에게 보낼 질문지를 만든다
+                  </li>
+                  <li>
+                    <code>wait-what</code> — 방금 들은 말이 이해되지 않을 때. 빠진 맥락을 채워
+                    평범한 말로 다시 설명한다
+                  </li>
+                </ul>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 ------------------------------------------------------------->
+      <section class="slide" id="s7">
+        <div class="inner">
+          <span class="eyebrow">07 — 구현: tdd</span>
+          <h2>구현: 슬라이스 하나씩</h2>
+          <div class="grid split">
+            <div class="grid" style="gap: 1rem">
+              <p class="lede">
+                <code>implement</code> 자체는 다섯 줄짜리 껍데기다 — 스펙대로 만들고, 가능한 곳은
+                tdd 로, 타입체크와 단일 테스트는 자주·전체 스위트는 마지막에 한 번, 끝나면
+                code-review, 그리고 현재 브랜치에 커밋. 알맹이는 <code>tdd</code> 에 있다.
+              </p>
+              <article class="card">
+                <h3>seam 을 먼저 합의한다</h3>
+                <p>
+                  seam 은 내부를 들여다보지 않고 동작을 관찰하는 공개 경계다. 테스트는 seam 에만
+                  놓는다. <strong>합의되지 않은 seam 에는 테스트를 쓰지 않는다</strong> — 모든 걸
+                  테스트할 수 없으니, 테스트할 힘을 임계 경로와 복잡한 로직에 먼저 몰아주기 위한 규칙이다.
+                </p>
+              </article>
+              <div class="code"><span class="c"># 루프의 규칙</span>
+red before green    <span class="c"># 실패하는 테스트 먼저, 통과할 만큼만 구현</span>
+one slice at a time <span class="c"># seam 하나, 테스트 하나, 최소 구현 하나</span>
+refactor ∉ loop     <span class="c"># 리팩터링은 리뷰 단계의 일</span></div>
+            </div>
+            <div class="grid" style="gap: 0.75rem">
+              <article class="card">
+                <h3>안티패턴 셋</h3>
+                <ul class="tight">
+                  <li>
+                    <strong>구현 결합</strong> — 내부 협력자를 <code>mock</code> 으로 막거나 DB 를 직접
+                    조회해 검증한다. 증상: 동작은 그대로인데 리팩터링하면 테스트가 깨진다.
+                  </li>
+                  <li>
+                    <strong>동어반복</strong> —
+                    <code>expect(add(a, b)).toBe(a + b)</code>. 코드와 같은 방식으로 기대값을 다시
+                    계산하니 구조상 항상 통과한다. 기대값은 독립된 출처(알려진 리터럴·손으로 푼
+                    예제·스펙)에서 와야 한다.
+                  </li>
+                  <li>
+                    <strong>수평 분할</strong> — 테스트를 몰아 쓰고 구현을 몰아 쓴다. 상상한 동작의
+                    <em>모양</em>만 검증하게 된다. 수직 슬라이스로: 테스트 하나 → 구현 하나 → 반복.
+                  </li>
+                </ul>
+              </article>
+              <article class="card">
+                <h3>인터페이스 모양이 의심스러우면</h3>
+                <p>
+                  <code>codebase-design</code> 을 참조로 끌어온다. 모듈·인터페이스·깊이·seam·어댑터·
+                  레버리지·지역성 어휘의 정본이며, 돌리는 세션이 아니라 <strong>읽는 참조</strong>다.
+                  좋은 모듈은 깊다 — 작은 인터페이스 뒤에 많은 동작.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 ------------------------------------------------------------->
+      <section class="slide" id="s8">
+        <div class="inner">
+          <span class="eyebrow">08 — 검증: code-review</span>
+          <h2>검증: 두 축을 따로 본다</h2>
+          <div class="grid split">
+            <div class="grid" style="gap: 1rem">
+              <p class="lede">
+                고정점(커밋·브랜치·태그·머지베이스)부터 <code>HEAD</code> 까지의 diff 를 두 축으로
+                본다. 두 축은 <strong>병렬 서브에이전트</strong>로 돌려 서로의 컨텍스트를 오염시키지
+                않는다.
+              </p>
+              <div class="grid g2" style="gap: 0.75rem">
+                <article class="card">
+                  <h3>Standards</h3>
+                  <p>이 저장소가 문서화한 코딩 규칙을 지켰나. 거기에 Fowler 냄새 기준선이 얹힌다.</p>
+                </article>
+                <article class="card">
+                  <h3>Spec</h3>
+                  <p>
+                    원 이슈·스펙이 시킨 걸 충실히 구현했나. 커밋 메시지의
+                    <code>#123</code> 을 따라가 트래커에서 원문을 가져온다.
+                  </p>
+                </article>
+              </div>
+              <p class="note">
+                <strong>Spec 축</strong>이 <code>docs/agents/issue-tracker.md</code> 를 읽는다. 파일이 없으면
+                스킬이 여기서 멈추고 setup 을 돌리라고 말한다.
+              </p>
+            </div>
+            <div class="grid" style="gap: 0.75rem">
+              <article class="card">
+                <h3>냄새 기준선 — <em>Refactoring</em> 3장 <span style="color: var(--muted)">12종 중 6종</span></h3>
+                <div class="tablewrap" tabindex="0" role="region" aria-label="리팩터링 냄새 기준선">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th scope="col">냄새</th>
+                        <th scope="col">처방</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Mysterious Name</td><td>이름을 바꾼다. 정직한 이름이 안 나오면 설계가 흐린 것이다</td></tr>
+                      <tr><td>Duplicated Code</td><td>공통 모양을 추출해 양쪽에서 호출한다</td></tr>
+                      <tr><td>Feature Envy</td><td>탐내는 데이터 쪽으로 메서드를 옮긴다</td></tr>
+                      <tr><td>Data Clumps</td><td>같이 다니는 필드를 한 타입으로 묶는다</td></tr>
+                      <tr><td>Primitive Obsession</td><td>도메인 개념에 자기 타입을 준다</td></tr>
+                      <tr><td>Repeated Switches</td><td>다형성으로 바꾸거나 두 곳이 공유하는 맵으로 바꾼다</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="note">
+                  나머지 여섯은 Shotgun Surgery · Divergent Change · Speculative Generality · Message
+                  Chains · Middle Man · Refused Bequest 다. 두 규칙이 이 기준선을 묶는다 —
+                  <strong>저장소 문서가 이긴다</strong>(저장소가 허용한
+                  걸 냄새로 잡지 않는다), 그리고 <strong>항상 판단의 문제</strong>다("Feature Envy
+                  가능성"이지 위반 확정이 아니다). 툴링이 이미 강제하는 건 건너뛴다.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 09 ------------------------------------------------------------->
+      <section class="slide" id="s9">
+        <div class="inner">
+          <span class="eyebrow">09 — 막혔을 때</span>
+          <h2>막혔을 때 꺼내는 것들</h2>
+          <div class="grid g2">
+            <article class="card">
+              <h3><span class="tag model">model</span> diagnosing-bugs</h3>
+              <p>
+                첫눈에 안 보이는 버그, 간헐적 flake, 두 정상 지점 사이에 스며든 회귀용. 이 스킬의
+                전부는 <strong>이 버그에서 실제로 red 가 뜨는 명령 하나</strong>를 확보하기 전에는
+                가설 세우기를 거부한다는 것이다.
+              </p>
+              <p class="cmd">피드백 루프 → 최소화 → 가설 → 계측 → 수정 → 회귀 테스트</p>
+              <p class="note">
+                회귀 테스트를 놓을 <strong>올바른 seam 이 없으면 그 사실 자체가 결론</strong>이다 — 얕은 seam 에
+                쓴 테스트는 거짓 안심만 준다. 그 결론은 <code>improve-codebase-architecture</code> 로
+                이어진다.
+              </p>
+            </article>
+            <article class="card">
+              <h3><span class="tag model">model</span> wizard</h3>
+              <p>
+                사람만 할 수 있는 절차 — 인프라 프로비저닝, 자격증명·CI 시크릿 등록, 낯선 서드파티
+                대시보드 클릭, 일회성 마이그레이션. URL 을 열고 값을 받아
+                <code>.env</code> 와 GitHub secret 에 써넣는 대화형 bash 를 만들어준다.
+              </p>
+              <p class="note">에이전트가 직접 할 수 있는 일이면 이걸 쓰지 않는다.</p>
+            </article>
+            <article class="card">
+              <h3><span class="tag model">model</span> prototype</h3>
+              <p>
+                설계 질문 하나에 답하는 버릴 코드. 상태·로직 질문이면 공유 가능한 HTML 한 장, UI
+                질문이면 한 라우트에서 토글되는 여러 변형. <strong>버린다는 건 코드를 쓰는
+                방식에 대한 제약</strong>이지 파기 약속이 아니다 — 결론은 실제 코드에 반영되고,
+                프로토타입 자체는 <code>prototype/&lt;name&gt;</code> 브랜치에 1차 출처로 남는다.
+              </p>
+            </article>
+            <article class="card">
+              <h3><span class="tag model">model</span> resolving-merge-conflicts</h3>
+              <p>
+                진행 중인 merge·rebase 충돌을 헝크 단위로. 줄을 골라 붙이는 게 아니라 양쪽의 1차
+                출처까지 거슬러 <strong>의도</strong>로 해소하고 작업을 끝낸다.
+                <code>--abort</code> 는 하지 않는다.
+              </p>
+            </article>
+          </div>
+          <p class="note">
+            <code>improve-codebase-architecture</code> 는 기능 작업이 아니라 유지보수다. 며칠에 한
+            번 돌려 깊게 만들 후보를 리포트로 받고, 고른 하나를 그대로 심문으로 이어간다. 오래된
+            코드베이스에서 진짜 후보를 찾아주지만 <strong>진흙을 대신 치워주지는 않는다</strong>.
+          </p>
+        </div>
+      </section>
+
+      <!-- 10 ------------------------------------------------------------->
+      <section class="slide" id="s10">
+        <div class="inner">
+          <span class="eyebrow">10 — 현장 팁</span>
+          <h2>깔고 나서 부딪히는 것들</h2>
+          <div class="grid g3">
+            <article class="plain">
+              <h3>이미 떠 있는 세션엔 자동 반영되지 않는다</h3>
+              <p>
+                스킬은 세션 시작 시 로드된다. 다른 창에서는 <code>/reload-plugins</code>. 반대로
+                <code>docs/agents/*.md</code> 는 스킬이 실행될 때 그때 읽으므로 즉시 반영된다.
+              </p>
+            </article>
+            <article class="plain">
+              <h3>이름이 겹친다</h3>
+              <p>
+                Claude Code 내장 <code>/code-review</code> 와 별개다. 내장은 버그 사냥, 이쪽의
+                값어치는 <strong>Spec 축</strong> — 이슈가 시킨 걸 했는지는 내장 리뷰가 보지 않는다.
+              </p>
+            </article>
+            <article class="plain">
+              <h3>implement 를 통째로 믿지 않는다</h3>
+              <p>
+                마지막 줄이 "현재 브랜치에 커밋"이다. 커밋 분류·제목 규칙·로컬 게이트가 있는
+                저장소라면 <code>tdd</code> 와 <code>code-review</code> 만 낱개로 끼워 넣는 게 낫다.
+              </p>
+            </article>
+            <article class="plain">
+              <h3>triage 는 라벨을 만들지 않는다</h3>
+              <p>
+                표준 5종(<code>needs-triage</code>·<code>needs-info</code>·<code>ready-for-agent</code>·
+                <code>ready-for-human</code>·<code>wontfix</code>)이 트래커에 없으면 내가 먼저
+                <code>gh label create</code> 로 만들어 둬야 한다 — 스킬은 붙이기만 한다. 이미
+                라벨 자동화가 있는 저장소면 매핑표의 오른쪽 열을 기존 어휘로 바꾸는 쪽이 안전하다.
+              </p>
+            </article>
+            <article class="plain">
+              <h3>나만 쓰고 싶다면</h3>
+              <p>
+                설정을 팀 <code>CLAUDE.md</code> 대신 추적하지 않는
+                <code>CLAUDE.local.md</code> 에 넣고, 산출물 경로를
+                <code>.git/info/exclude</code>(클론 로컬)에 적는다. 공유 트리에 아무 변경도 남지
+                않는다.
+              </p>
+            </article>
+            <article class="plain">
+              <h3>뭘 써야 할지 모르겠으면</h3>
+              <p>
+                <code>/mattpocock-skills:ask-matt</code> 가 상황을 듣고 스킬과 경로를 골라준다. 25종을 다 외우고 있으라는
+                전제 자체가 없는 설계다.
+              </p>
+            </article>
+          </div>
+          <div class="code"><span class="c"># 기존 워크플로우가 굳어 있는 저장소에 끼워 넣는 법 — 낱개로</span>
+<span class="g">enter-issue</span> 42                  <span class="c"># 기존 진입 절차 그대로</span>
+  ↓ 구현 중
+<span class="k">tdd</span>                             <span class="c"># seam 합의 → red → green, 슬라이스 단위</span>
+  ↓ 마무리 직전
+<span class="k">/mattpocock-skills:code-review</span>  <span class="c"># 고정점 = main. Spec 축이 이슈 #42 를 읽는다</span>
+  ↓
+<span class="g">close-issue</span>                     <span class="c"># 기존 게이트·PR 플로우</span></div>
+        </div>
+      </section>
+
+      <!-- 11 ------------------------------------------------------------->
+      <section class="slide" id="s11">
+        <div class="inner">
+          <span class="eyebrow">11 — 정리</span>
+          <h2>프로세스를 뺏지 않는 도구</h2>
+          <div class="grid split">
+            <div class="grid" style="gap: 1rem">
+              <p class="lede">
+                이 스킬들이 파는 건 자동화가 아니라 <strong>규율</strong>이다. 만들기 전에 심문하고,
+                용어를 합의하고, 피드백 루프를 먼저 세우고, 설계를 매일 손본다. 소프트웨어
+                엔지니어링의 기본기가 에이전트 시대에 더 중요해졌다는 게 저자의 주장이다.
+              </p>
+              <article class="card">
+                <h3>오늘 당장 해볼 것 셋</h3>
+                <ul class="tight">
+                  <li>
+                    저장소에서 <code>/mattpocock-skills:setup-matt-pocock-skills</code> 를 한 번 돌려본다
+                  </li>
+                  <li>
+                    다음 작업을 <code>/mattpocock-skills:grill-with-docs</code> 로 시작해
+                    <code>CONTEXT.md</code> 를 만들어본다
+                  </li>
+                  <li>
+                    PR 올리기 전에 <code>/mattpocock-skills:code-review</code> 로 Spec 축을 한 번 돌려본다
+                  </li>
+                </ul>
+              </article>
+            </div>
+            <div class="grid" style="gap: 0.75rem">
+              <article class="card">
+                <h3>레퍼런스</h3>
+                <ul class="tight">
+                  <li>
+                    저장소 —
+                    <a href="https://github.com/mattpocock/skills">github.com/mattpocock/skills</a>
+                  </li>
+                  <li>
+                    설치기 — <a href="https://skills.sh/mattpocock/skills">skills.sh/mattpocock/skills</a>
+                  </li>
+                  <li>
+                    플러그인 문서 —
+                    <a href="https://code.claude.com/docs/en/plugins">code.claude.com/docs/en/plugins</a>
+                  </li>
+                </ul>
+              </article>
+              <p class="note">
+                작게 쪼개져 있고 고치기 쉽고 조합된다. 어떤 모델에서도 돌아간다. 마음대로
+                해킹해서 내 것으로 만들라는 게 저자의 안내다. 고칠 때 참고할 정본은
+                <code>writing-for-agents</code> — 스킬과 <code>CLAUDE.md</code> 처럼 에이전트가 읽는
+                문서를 쓰는 법이 거기 있다.
+              </p>
+            </div>
+          </div>
+          <div class="foot">
+            <span>mattpocock-skills v1.2.3 · MIT</span>
+            <span>Matt Pocock · aihero.dev</span>
+            <span>발표 자료 · 2026-09</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+        var links = Array.prototype.slice.call(document.querySelectorAll(".rail a"));
+        var counter = document.querySelector(".counter");
+        var bar = document.querySelector(".progress i");
+        var current = 0;
+
+        function setActive(i) {
+          current = i;
+          links.forEach(function (a, n) {
+            if (n === i) a.setAttribute("aria-current", "true");
+            else a.removeAttribute("aria-current");
+          });
+          var label = String(i + 1).padStart(2, "0") + " / " + String(slides.length).padStart(2, "0");
+          if (counter) counter.textContent = label;
+          if (bar) bar.style.width = ((i + 1) / slides.length) * 100 + "%";
+        }
+
+        var pending = -1;
+
+        if ("IntersectionObserver" in window) {
+          var io = new IntersectionObserver(
+            function (entries) {
+              var best = null;
+              entries.forEach(function (e) {
+                if (e.isIntersecting && (!best || e.intersectionRatio > best.intersectionRatio))
+                  best = e;
+              });
+              if (!best) return;
+              var i = slides.indexOf(best.target);
+              /* 프로그램 스크롤 중에는 목적지에 도착할 때까지 중간 슬라이드를 무시한다 */
+              if (pending >= 0 && i !== pending) return;
+              pending = -1;
+              setActive(i);
+            },
+            { rootMargin: "-45% 0px -45% 0px" }
+          );
+          slides.forEach(function (s) {
+            io.observe(s);
+          });
+        }
+        setActive(0);
+
+        function jump(i) {
+          pending = i;
+          slides[i].scrollIntoView({ block: "start" });
+          setActive(i);
+        }
+
+        function go(delta) {
+          var next = Math.min(slides.length - 1, Math.max(0, current + delta));
+          if (next === current) return;
+          jump(next);
+        }
+
+        /* 현재 슬라이드가 화면보다 길면 남은 부분을 다 보여준 뒤에야 다음 장으로 넘어간다 */
+        function atEdge(dir) {
+          var r = slides[current].getBoundingClientRect();
+          return dir > 0 ? r.bottom <= window.innerHeight + 2 : r.top >= -2;
+        }
+
+        document.addEventListener("keydown", function (e) {
+          var t = e.target;
+          if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+          if (t && t.closest && t.closest(".tablewrap, .code")) return;
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+          if (e.key === "Home") {
+            e.preventDefault();
+            jump(0);
+            return;
+          }
+          if (e.key === "End") {
+            e.preventDefault();
+            jump(slides.length - 1);
+            return;
+          }
+
+          var dir = 0;
+          if (e.key === "ArrowDown" || e.key === "PageDown") dir = 1;
+          else if (e.key === "ArrowUp" || e.key === "PageUp") dir = -1;
+          else if (e.key === " " || e.key === "Spacebar") dir = e.shiftKey ? -1 : 1;
+          if (!dir) return;
+
+          /* 슬라이드 안에 읽을 게 남았거나 양 끝이면 브라우저 기본 스크롤에 맡긴다 */
+          if (!atEdge(dir)) return;
+          if (current + dir < 0 || current + dir > slides.length - 1) return;
+
+          e.preventDefault();
+          go(dir);
+        });
+      })();
+    </script>
+  </body>
+</html>
