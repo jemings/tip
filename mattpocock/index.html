@@ -815,9 +815,10 @@ name: grill-me
 description: A relentless interview to sharpen a plan or design.
 <span class="k">disable-model-invocation: true</span>   <span class="c"># ← 슬래시 전용</span></div>
               <p class="note">
-                이 한 줄이 붙으면 에이전트의 스킬 목록에서 사라진다. 그래서 설치 직후
-                "11개뿐인데?" 로 보이지만 실제로는 25종이 다 들어와 있다. user-invoked 스킬은
-                model-invoked 를 부를 수 있지만, user-invoked 끼리는 서로 부르지 않는다.
+                이 한 줄은 <strong>에이전트가 보는 목록에서만</strong> 스킬을 빼낸다. 그래서 빠지는
+                쪽이 user-invoked 14종이고, 거기 남는 건 model-invoked 11종이다. 사람이 슬래시로
+                부를 수 있는 건 25종 전부다 — 사라진 14종도 이름을 치면 그대로 열린다. user-invoked
+                스킬은 model-invoked 를 부를 수 있지만, user-invoked 끼리는 서로 부르지 않는다.
               </p>
             </div>
             <div class="grid" style="gap: 0.75rem">
