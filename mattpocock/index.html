@@ -30,6 +30,8 @@
         --accent-soft: #f7e4dd;
         --green: #2e6f5c;
         --green-soft: #dcebe5;
+        --gh-open: #1a7f37;
+        --gh-done: #8250df;
         --shadow: 0 1px 2px rgba(27, 32, 40, 0.06), 0 8px 24px rgba(27, 32, 40, 0.06);
 
         --font-display: "Bricolage Grotesque", "IBM Plex Sans KR", system-ui, sans-serif;
@@ -63,6 +65,8 @@
           --accent-soft: #3a241d;
           --green: #5faf95;
           --green-soft: #1c2e29;
+          --gh-open: #3fb950;
+          --gh-done: #a371f7;
           --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35);
           color-scheme: dark;
         }
@@ -81,6 +85,8 @@
         --accent-soft: #3a241d;
         --green: #5faf95;
         --green-soft: #1c2e29;
+        --gh-open: #3fb950;
+        --gh-done: #a371f7;
         --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35);
         color-scheme: dark;
       }
@@ -604,6 +610,103 @@
         color: var(--muted);
       }
 
+      /* ---------- github 이슈 목록 재현 ---------- */
+      .gh {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        align-content: start;
+      }
+      .gh > header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.3rem 0.9rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--panel-2);
+        border-bottom: 1px solid var(--line);
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        color: var(--muted);
+      }
+      .gh > header b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .gh > header .src {
+        margin-left: auto;
+        word-break: break-all;
+      }
+      .gh ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .gh li {
+        display: grid;
+        grid-template-columns: 0.95rem minmax(0, 1fr);
+        gap: 0.5rem;
+        padding: 0.42rem 0.75rem;
+        border-top: 1px solid var(--line);
+      }
+      .gh ol > li:first-child {
+        border-top: 0;
+      }
+      .gh svg {
+        width: 13px;
+        height: 13px;
+        margin-top: 0.3rem;
+        fill: currentColor;
+      }
+      .gh .open {
+        color: var(--gh-open);
+      }
+      .gh .done {
+        color: var(--gh-done);
+      }
+      .gh .t {
+        font-size: 0.83rem;
+        line-height: 1.5;
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .gh .n {
+        font-family: var(--font-mono);
+        font-style: normal;
+        font-weight: 400;
+        font-size: 0.74rem;
+        color: var(--muted);
+        margin-right: 0.3rem;
+      }
+      /* 라벨만 알약 모양을 지킨다 — GitHub 목록임을 알아보게 하는 유일한 신호다 */
+      .lab {
+        display: inline-block;
+        vertical-align: 1px;
+        margin-left: 0.3rem;
+        font-family: var(--font-mono);
+        font-size: 0.63rem;
+        line-height: 1.5;
+        padding: 0 0.45rem;
+        border-radius: 999px;
+        white-space: nowrap;
+        border: 1px solid color-mix(in srgb, var(--lc) 50%, transparent);
+        background: color-mix(in srgb, var(--lc) 14%, transparent);
+        color: color-mix(in srgb, var(--lc) 40%, var(--ink));
+      }
+      .gh .mark {
+        padding: 0.42rem 0.75rem;
+        border-top: 1px dashed var(--accent);
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--accent) 7%, transparent);
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        line-height: 1.5;
+        color: var(--accent-ink);
+      }
+      /* 두 번째 목록의 첫 행은 .mark 가 이미 경계를 그어 준다 */
+      .gh .mark + ol > li:first-child {
+        border-top: 0;
+      }
+
       /* ---------- misc ---------- */
       ul.tight {
         margin: 0;
@@ -677,6 +780,8 @@
           --accent-soft: #f7e4dd;
           --green: #2e6f5c;
           --green-soft: #dcebe5;
+          --gh-open: #1a7f37;
+          --gh-done: #6639ba;
         }
         .rail,
         .hint {
@@ -697,7 +802,7 @@
     <nav class="rail" aria-label="슬라이드 목차">
       <span class="brand">mattpocock-skills</span>
       <div class="progress" aria-hidden="true"><i></i></div>
-      <span class="counter" role="status" aria-live="polite" aria-atomic="true">01 / 11</span>
+      <span class="counter" role="status" aria-live="polite" aria-atomic="true">01 / 13</span>
       <a href="#s1"><span class="n">01</span><span>개요</span></a>
       <a href="#s2"><span class="n">02</span><span>왜 존재하나</span></a>
       <a href="#s3"><span class="n">03</span><span>구조: 두 부류</span></a>
@@ -707,14 +812,27 @@
       <a href="#s7"><span class="n">07</span><span>구현: tdd</span></a>
       <a href="#s8"><span class="n">08</span><span>검증: code-review</span></a>
       <a href="#s9"><span class="n">09</span><span>막혔을 때</span></a>
-      <a href="#s10"><span class="n">10</span><span>현장 팁</span></a>
-      <a href="#s11"><span class="n">11</span><span>정리</span></a>
+      <a href="#s10"><span class="n">10</span><span>사용예: 열린 쪽</span></a>
+      <a href="#s11"><span class="n">11</span><span>사용예: 닫힌 쪽</span></a>
+      <a href="#s12"><span class="n">12</span><span>현장 팁</span></a>
+      <a href="#s13"><span class="n">13</span><span>정리</span></a>
     </nav>
 
     <div class="hint" aria-hidden="true">
       <span class="kbd">↑</span><span class="kbd">↓</span>
       <span>슬라이드 이동</span>
     </div>
+
+    <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden">
+      <symbol id="i-open" viewBox="0 0 16 16">
+        <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
+        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z" />
+      </symbol>
+      <symbol id="i-done" viewBox="0 0 16 16">
+        <path d="M11.28 6.78a.75.75 0 0 0-1.06-1.06L7.25 8.69 5.78 7.22a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l3.5-3.5Z" />
+        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0Zm-1.5 0a6.5 6.5 0 1 0-13 0 6.5 6.5 0 0 0 13 0Z" />
+      </symbol>
+    </svg>
 
     <main>
       <!-- 01 ------------------------------------------------------------->
@@ -1231,7 +1349,149 @@ refactor ∉ loop     <span class="c"># 리팩터링은 리뷰 단계의 일</sp
       <!-- 10 ------------------------------------------------------------->
       <section class="slide" id="s10">
         <div class="inner">
-          <span class="eyebrow">10 — 현장 팁</span>
+          <span class="eyebrow">10 — 실제 사용예 ①</span>
+          <h2>실제로 돌려 본 저장소 하나</h2>
+          <p class="lede">
+            <span class="mono">dev-team-404/MyAvatar</span> — Tauri + Rust 데스크톱 앱에 이 스킬들을
+            깔고 돌린 결과다. 이 장과 다음 장의 목록은 <strong>2026-09-09 기준 스냅숏</strong>을
+            <code>gh issue list</code> 출력 그대로 옮겨 그린 것이고, 링크를 지금 열면 이미 달라져 있다.
+          </p>
+          <div class="grid split">
+            <div class="gh">
+              <header>
+                <span><b>5</b> Open</span>
+                <a class="src" href="https://github.com/dev-team-404/MyAvatar/issues">/issues</a>
+              </header>
+              <ol>
+                  <li>
+                    <svg class="open" aria-hidden="true"><use href="#i-open" /></svg>
+                    <span class="t"><i class="n">#29</i>용어집의 '전역 따름' 과 화면의 '전역 설정 따름' 이 어긋남 — 화면 쪽으로 통일<span class="lab" style="--lc: #fbca04">needs-triage</span></span>
+                  </li>
+                  <li>
+                    <svg class="open" aria-hidden="true"><use href="#i-open" /></svg>
+                    <span class="t"><i class="n">#28</i>스킬 설치가 npx 대신 claude plugin marketplace 설치를 대안 경로로 시도하게 하기<span class="lab" style="--lc: #a2eeef">enhancement</span><span class="lab" style="--lc: #fbca04">needs-triage</span></span>
+                  </li>
+                  <li>
+                    <svg class="open" aria-hidden="true"><use href="#i-open" /></svg>
+                    <span class="t"><i class="n">#27</i>LLM 진단이 실제 max_output_tokens 대신 고정 64토큰으로 확인해 reasoning 모델에서 오탐<span class="lab" style="--lc: #d73a4a">bug</span><span class="lab" style="--lc: #fbca04">needs-triage</span></span>
+                  </li>
+                  <li>
+                    <svg class="open" aria-hidden="true"><use href="#i-open" /></svg>
+                    <span class="t"><i class="n">#26</i>설정 창 '예약 실행 자동 응답 기본값 — LLM 판정·작성 사용' 체크박스 문구가 켜짐/꺼짐을 반대로 읽히게 함<span class="lab" style="--lc: #fbca04">needs-triage</span></span>
+                  </li>
+                  <li>
+                    <svg class="open" aria-hidden="true"><use href="#i-open" /></svg>
+                    <span class="t"><i class="n">#25</i>스킬 설치가 WSL 배포본에 Node.js(npx)가 없으면 전부 exit 127로 실패하고 원인이 사용자에게 안 보인다<span class="lab" style="--lc: #d73a4a">bug</span><span class="lab" style="--lc: #0e8a16">ready-for-agent</span></span>
+                  </li>
+              </ol>
+            </div>
+            <article class="card">
+              <h3>열린 쪽 — triage 가 훑기 전 대기함</h3>
+              <ul class="tight">
+                <li>
+                  5건 중 4건이 <code>needs-triage</code> 다. 이슈를 열 때 자동으로 붙는 게 아니라,
+                  <code>triage</code> 를 아직 안 돌린 상태로 쌓여 있는 것이다.
+                </li>
+                <li>
+                  혼자 <code>ready-for-agent</code> 인 <strong>#25</strong> 는 본문에 재현 로그와
+                  <code>settings.json</code> 까지 붙어 있다 — "완전히 명세됐다"의 기준이 이 정도다.
+                </li>
+                <li>
+                  <strong>#29</strong> 는 <code>CONTEXT.md</code> 용어집의 '전역 따름' 과 화면 문구
+                  '전역 설정 따름' 이 어긋난다는 이슈다. 공유 언어를 문서로 박아 두니 어긋남이
+                  <em>이슈로 잡힌다</em>.
+                </li>
+              </ul>
+            </article>
+          </div>
+          <p class="note" style="max-width: 104ch">
+            저장소에 남은 것도 슬라이드 04 가 말한 그대로다 — PR #8 이 <code>docs/agents/</code> 에
+            <code>issue-tracker.md</code> · <code>triage-labels.md</code> · <code>domain.md</code> 세
+            파일을 넣었고, 루트에 <code>CONTEXT.md</code>, <code>docs/adr/</code> 에 ADR 4건이 쌓여
+            있다. 라벨은 표준 5종을 그대로 쓴다 — <code>triage-labels.md</code> 의 오른쪽 열이 왼쪽
+            열과 같다. 단, 그 라벨 자체는 손으로 먼저 만들어 둔 것이다(슬라이드 12).
+          </p>
+        </div>
+      </section>
+
+      <!-- 11 ------------------------------------------------------------->
+      <section class="slide" id="s11">
+        <div class="inner">
+          <span class="eyebrow">11 — 실제 사용예 ②</span>
+          <h2>닫힌 11건에 남은 순서</h2>
+          <div class="gh">
+            <header>
+              <span><b>11</b> Closed</span>
+              <a class="src" href="https://github.com/dev-team-404/MyAvatar/issues?q=is%3Aissue%20state%3Aclosed"
+                >/issues?q=is:issue state:closed</a
+              >
+            </header>
+            <ol>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#17</i>[사내] on-prem LLM 게이트웨이 엔드포인트·인증·수용 파라미터 확인<span class="lab" style="--lc: #1d76db">ready-for-human</span></span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#16</i>예약 실행의 무한 증가 결함 2건 수정: run-logs 정리 미연결, 자동 응답 라운드 상한 없음<span class="lab" style="--lc: #d73a4a">bug</span><span class="lab" style="--lc: #0e8a16">ready-for-agent</span></span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#15</i>실행 결과 화면 LLM 개선 4종과 트랜스크립트 자동 닫기 조건<span class="lab" style="--lc: #a2eeef">enhancement</span><span class="lab" style="--lc: #0e8a16">ready-for-agent</span></span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#14</i>"바로 실행" 기본 예약 메시지를 LLM 이 작성하게 한다<span class="lab" style="--lc: #a2eeef">enhancement</span><span class="lab" style="--lc: #0e8a16">ready-for-agent</span></span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#13</i>예약 실행 자동 응답을 LLM 판정·작성으로 교체<span class="lab" style="--lc: #a2eeef">enhancement</span><span class="lab" style="--lc: #0e8a16">ready-for-agent</span></span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#12</i>LLM 클라이언트 기반 구축<span class="lab" style="--lc: #a2eeef">enhancement</span><span class="lab" style="--lc: #0e8a16">ready-for-agent</span></span>
+              </li>
+            </ol>
+            <div class="mark">↑ 여기 위부터 triage 라벨이 붙는다 — 스킬로 이슈를 내기 시작한 뒤</div>
+            <ol>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#10</i>docs: release.md를 release CI 버전 주입(#7) + release-dispatch 반영으로 갱신</span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#7</i>[사내] tauri.conf.json version을 릴리스 CI 주입으로 전환</span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#5</i>공유 파일 divergence 해소 + 파일별 소유권 모델 제안 (release.yml, tauri.conf.json, release.sh)</span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#2</i>CLAUDE.md 추가: 사외/사내 fork 동기화 정책</span>
+              </li>
+              <li>
+                <svg class="done" aria-hidden="true"><use href="#i-done" /></svg>
+                <span class="t"><i class="n">#1</i>파일 모드: 임포트된 트리의 131개 파일이 전부 0755</span>
+              </li>
+            </ol>
+          </div>
+          <p class="note" style="max-width: 104ch">
+            사내망에서만 관측되는 값을 <code>ready-for-human</code> <strong>#17</strong> 로 떼어 먼저
+            닫고 — 코드 변경 없이 코멘트 하나가 산출물이다 — 그 관측 결과를 본문에 담은
+            <strong>#12</strong> 가 tracer bullet 로 선다. <strong>#13 · #14 · #15</strong> 는 본문 첫
+            줄이 <span class="mono">선행: #12</span> 다. 코드가 붙은 다섯 건
+            <strong>#12 · #13 · #14 · #15 · #16</strong> 이 PR #20~#24 로 나갔고, #17 은 PR 없이 닫혔다.
+            구분선 아래 다섯 건은 손으로 낸 이슈다 — setup 이 끝난 뒤에 낸 <strong>#10</strong> 도
+            라벨이 없다. 라벨은 스킬이 이슈를 <em>낼 때</em> 붙는다.
+          </p>
+        </div>
+      </section>
+
+      <!-- 12 ------------------------------------------------------------->
+      <section class="slide" id="s12">
+        <div class="inner">
+          <span class="eyebrow">12 — 현장 팁</span>
           <h2>깔고 나서 부딪히는 것들</h2>
           <div class="grid g3">
             <article class="plain">
@@ -1292,10 +1552,10 @@ refactor ∉ loop     <span class="c"># 리팩터링은 리뷰 단계의 일</sp
         </div>
       </section>
 
-      <!-- 11 ------------------------------------------------------------->
-      <section class="slide" id="s11">
+      <!-- 13 ------------------------------------------------------------->
+      <section class="slide" id="s13">
         <div class="inner">
-          <span class="eyebrow">11 — 정리</span>
+          <span class="eyebrow">13 — 정리</span>
           <h2>프로세스를 뺏지 않는 도구</h2>
           <div class="grid split">
             <div class="grid" style="gap: 1rem">
