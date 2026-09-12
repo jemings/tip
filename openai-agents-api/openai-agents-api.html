@@ -1,0 +1,392 @@
+\
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenAI Agents API — Study Notes</title>
+  <meta name="description" content="OpenAI Agents API 공개 베타를 중심으로 Agent Runtime, Codex Harness, Hosted Sandbox, Sessions, Subagents, MCP, Skills와 ACP의 차이를 정리한 스터디 자료." />
+  <style>
+    :root {
+      --paper:#f1f2f4; --panel:#fff; --panel2:#e7e9ed; --ink:#1b2028; --ink2:#3d4552;
+      --muted:#5d6673; --line:#d5d9df; --line2:#b9c0c9; --accent:#10a37f; --accent2:#087f63;
+      --soft:#e0f2ed; --amber:#9a6700; --amber-soft:#fff1c7; --shadow:0 1px 2px rgba(27,32,40,.06),0 8px 24px rgba(27,32,40,.06);
+      --display:Inter,"IBM Plex Sans KR","Noto Sans KR",system-ui,sans-serif;
+      --body:"IBM Plex Sans KR",Inter,system-ui,sans-serif;
+      --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+      --rail:230px; --pad:clamp(1.25rem,4vw,4.5rem);
+      color-scheme:light;
+    }
+    @media (prefers-color-scheme:dark){
+      :root:not([data-theme="light"]){--paper:#14181d;--panel:#1a1f26;--panel2:#222932;--ink:#e7eaee;--ink2:#b3bcc7;--muted:#8a94a1;--line:#2c333c;--line2:#3d4650;--accent:#35d6aa;--accent2:#5ee6c0;--soft:#19352e;--amber:#f0bf54;--amber-soft:#352d18;color-scheme:dark;}
+    }
+    :root[data-theme="dark"]{--paper:#14181d;--panel:#1a1f26;--panel2:#222932;--ink:#e7eaee;--ink2:#b3bcc7;--muted:#8a94a1;--line:#2c333c;--line2:#3d4650;--accent:#35d6aa;--accent2:#5ee6c0;--soft:#19352e;--amber:#f0bf54;--amber-soft:#352d18;color-scheme:dark;}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:clamp(.95rem,.9rem+.2vw,1.06rem);line-height:1.62;word-break:keep-all}
+    h1,h2,h3{font-family:var(--display);margin:0;line-height:1.08;letter-spacing:-.025em}
+    h1{font-size:clamp(2.6rem,5vw,5rem);font-weight:800;max-width:17ch}
+    h2{font-size:clamp(2rem,3.4vw,3.2rem);font-weight:800}
+    h3{font-size:1.03rem}
+    p{margin:0}
+    a{color:var(--accent2);text-underline-offset:3px}
+    code,kbd,.mono{font-family:var(--mono)}
+    .rail{position:fixed;inset:0 auto 0 0;width:var(--rail);padding:2rem 0 2rem 1.6rem;display:flex;flex-direction:column;justify-content:center;gap:2px;border-right:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);z-index:10;overflow:auto}
+    .brand{font:600 .7rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem}
+    .rail a{display:grid;grid-template-columns:2.1rem 1fr;gap:.35rem;padding:.3rem .5rem  .3rem 0;color:var(--muted);text-decoration:none;font-size:.76rem;line-height:1.35}
+    .rail a:hover,.rail a[aria-current="true"]{color:var(--ink)}
+    .rail a[aria-current="true"]{font-weight:600}.rail .n{font: .68rem var(--mono);color:var(--muted)}.rail a[aria-current="true"] .n{color:var(--accent2)}
+    .slide{padding:clamp(3.5rem,7vh,6rem) var(--pad) clamp(3rem,6vh,5rem) calc(var(--pad) + var(--rail));border-bottom:1px solid var(--line);scroll-snap-align:start}
+    .inner{max-width:1180px;margin:0 auto;display:grid;gap:clamp(1.1rem,2.4vh,2rem);align-content:center;min-height:calc(100svh - 10rem)}
+    .cover .inner{gap:2rem}.kicker,.eyebrow{font:500 .72rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent2)}
+    .kicker{font-size:.76rem}.lede{font-size:clamp(1.1rem,1rem+.4vw,1.3rem);color:var(--ink2);max-width:64ch;line-height:1.5}
+    .note{font-size:.88rem;color:var(--muted);max-width:75ch}
+    .facts{display:flex;flex-wrap:wrap;gap:1.5rem 3.4rem;border-top:1px solid var(--line);padding-top:.7rem}.facts b{display:block;font-size:clamp(1.6rem,3vw,2.5rem);font-weight:800}.facts span{font:.67rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .grid{display:grid;gap:clamp(.7rem,1.5vw,1.1rem)}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.split{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+    .card{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;display:grid;gap:.5rem;box-shadow:var(--shadow)}.card p{color:var(--ink2);font-size:.92rem;line-height:1.52}
+    .plain{border-top:2px solid var(--ink);padding-top:.8rem;display:grid;gap:.45rem}.plain p{color:var(--ink2);font-size:.92rem}
+    .quote{border-left:2px solid var(--accent);padding-left:.9rem;color:var(--ink2);font-size:.91rem}
+    .quote cite{display:block;margin-top:.3rem;color:var(--muted);font: .7rem var(--mono)}
+    .tag{display:inline-block;border:1px solid currentColor;border-radius:2px;padding:.1rem .4rem;font: .64rem var(--mono);letter-spacing:.08em;text-transform:uppercase;vertical-align:2px}
+    .tag.api{color:var(--accent2);background:var(--soft)}.tag.beta{color:var(--amber);background:var(--amber-soft)}
+    .code{border:1px solid var(--line);background:var(--panel);padding:.9rem 1rem;font:.8rem/1.75 var(--mono);white-space:pre-wrap;overflow:auto}
+    .code .c{color:var(--muted)}.code .k{color:var(--accent2)}
+    .flow{display:grid;gap:0}.step{display:grid;grid-template-columns:1.8rem 1fr;gap:.8rem;position:relative;padding-bottom:1rem}.dot{position:relative;display:flex;justify-content:center}.dot:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:.45rem;z-index:1}.step:not(:last-child) .dot:after{content:"";position:absolute;top:.9rem;bottom:-.55rem;width:1px;background:var(--line2)}
+    .step h3{display:flex;gap:.45rem;align-items:center;flex-wrap:wrap}.step p{color:var(--ink2);font-size:.9rem;margin-top:.15rem}
+    table{border-collapse:collapse;width:100%;font-size:.88rem;background:var(--panel);border:1px solid var(--line)}th,td{text-align:left;padding:.6rem .75rem;border-bottom:1px solid var(--line);vertical-align:top}th{font:500 .68rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--panel2)}tr:last-child td{border-bottom:0}
+    .pill-row{display:flex;flex-wrap:wrap;gap:.5rem}.pill{border:1px solid var(--line2);padding:.28rem .55rem;border-radius:999px;font:.72rem var(--mono);background:var(--panel)}
+    .callout{border-left:3px solid var(--accent);background:var(--soft);padding:.9rem 1rem}.callout strong{font-weight:700}
+    .source-list{display:grid;gap:.55rem;font-size:.8rem}.source-list a{text-decoration:none}.source-list small{color:var(--muted)}
+    .footer{padding:1rem 0 0;border-top:1px solid var(--line);margin-top:.4rem;color:var(--muted);font:.72rem var(--mono)}
+    .hint{position:fixed;right:1rem;bottom:1rem;z-index:10;padding:.3rem .5rem;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);font:.7rem var(--mono);color:var(--muted)}
+    @media(max-width:900px){.rail{position:sticky;top:0;width:100%;height:auto;flex-direction:row;align-items:center;justify-content:space-between;padding:.65rem var(--pad);border-right:0;border-bottom:1px solid var(--line)}.rail a{display:none}.brand{margin:0}.slide{padding-left:var(--pad)}.inner{min-height:0}.g3,.g4,.split{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.g2,.g3,.g4,.split{grid-template-columns:1fr}.hint{display:none}}
+    @media print{.rail,.hint{display:none}.slide{padding:1.5cm;break-after:page}.inner{min-height:0}}
+  </style>
+</head>
+<body>
+  <nav class="rail" aria-label="슬라이드 목차">
+    <span class="brand">openai-agents-api</span>
+    <a href="#s1"><span class="n">01</span><span>한 줄 정의</span></a>
+    <a href="#s2"><span class="n">02</span><span>왜 지금인가</span></a>
+    <a href="#s3"><span class="n">03</span><span>무엇을 해결하나</span></a>
+    <a href="#s4"><span class="n">04</span><span>전체 구조</span></a>
+    <a href="#s5"><span class="n">05</span><span>Codex Harness</span></a>
+    <a href="#s6"><span class="n">06</span><span>Session & Context</span></a>
+    <a href="#s7"><span class="n">07</span><span>Execution Environment</span></a>
+    <a href="#s8"><span class="n">08</span><span>Tools · MCP</span></a>
+    <a href="#s9"><span class="n">09</span><span>Subagents</span></a>
+    <a href="#s10"><span class="n">10</span><span>Skills · Plugins</span></a>
+    <a href="#s11"><span class="n">11</span><span>ACP와 무엇이 다른가</span></a>
+    <a href="#s12"><span class="n">12</span><span>어디에 쓰나</span></a>
+    <a href="#s13"><span class="n">13</span><span>핵심 정리</span></a>
+    <a href="#s14"><span class="n">14</span><span>Sources</span></a>
+  </nav>
+
+  <main>
+    <section class="slide" id="s1">
+      <div class="inner">
+        <span class="kicker">OpenAI API · Public Beta · 2026-09-10</span>
+        <h1>Agent를 직접 만드는 대신, <em style="color:var(--accent)">실행 환경까지 맡긴다</em></h1>
+        <p class="lede">OpenAI Agents API는 Codex를 구동해 온 agent harness를 API로 제공한다. 개발자는 모델 호출 loop와 장시간 세션 관리에 덜 신경 쓰고, Agent의 도구·지식·업무 흐름에 집중한다.</p>
+        <div class="facts">
+          <div><b>Beta</b><span>public beta</span></div>
+          <div><b>Codex</b><span>harness foundation</span></div>
+          <div><b>Session</b><span>durable execution</span></div>
+          <div><b>MCP</b><span>custom tool ecosystem</span></div>
+        </div>
+        <p class="note">기준일: 2026년 9월 13일. Agents API는 2026년 9월 10일 public beta로 공개됐다. [OpenAI Agents API announcement; Release Notes]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s2">
+      <div class="inner">
+        <span class="eyebrow">02 — 왜 지금인가</span>
+        <h2>LLM 호출 → Agent 실행으로 추상화 수준이 올라갔다</h2>
+        <div class="grid g3">
+          <article class="plain">
+            <h3>기존 API 접근</h3>
+            <p>애플리케이션이 모델을 호출하고, tool loop·state·retry·context 관리 등을 직접 조합한다.</p>
+          </article>
+          <article class="plain">
+            <h3>Codex에서 얻은 교훈</h3>
+            <p>긴 작업에는 강한 모델만으로 부족하다. context, tools, subagents, 실행 환경을 묶는 harness가 필요하다.</p>
+          </article>
+          <article class="plain">
+            <h3>Agents API의 방향</h3>
+            <p>그 harness와 인프라를 서비스로 노출해 “Agent를 만드는 일”의 기본 실행 루프를 표준화한다.</p>
+          </article>
+        </div>
+        <div class="callout"><strong>핵심 변화:</strong> “어떤 모델을 호출할까?”보다 “Agent가 며칠 동안 안정적으로 일을 계속하게 하려면 어떤 runtime이 필요한가?”에 초점이 이동한다. [OpenAI Agents API announcement; Harness engineering]</div>
+      </div>
+    </section>
+
+    <section class="slide" id="s3">
+      <div class="inner">
+        <span class="eyebrow">03 — 문제 정의</span>
+        <h2>OpenAI가 대신 가져가는 것은 “Agent 운영의 귀찮은 부분”</h2>
+        <div class="grid g2">
+          <article class="card"><h3>Session orchestration</h3><p>여러 턴에 걸친 Agent 실행을 관리하고 진행 상황을 스트리밍한다.</p></article>
+          <article class="card"><h3>Context compaction</h3><p>긴 세션이 context limit에 가까워지면 이전 context를 자동으로 압축해 계속 작업할 수 있게 한다.</p></article>
+          <article class="card"><h3>Recovery</h3><p>장시간 실행에서 필요한 복구 경로를 harness 차원에서 제공한다.</p></article>
+          <article class="card"><h3>Tool orchestration</h3><p>Agent가 도구를 사용하고 여러 단계의 작업을 수행하는 실행 loop를 managed harness가 담당한다.</p></article>
+        </div>
+        <p class="note">공식 소개가 명시적으로 session orchestration, context compaction, recovery를 Agents API의 관리 기능으로 제시한다. [OpenAI Release Notes; Agents API announcement]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s4">
+      <div class="inner">
+        <span class="eyebrow">04 — 전체 구조</span>
+        <h2>Agent = 설정 + Session + Environment + Tools</h2>
+        <div class="grid split">
+          <div class="code"><span class="c">Application</span>
+   │
+   ▼
+<span class="k">Agents API</span>
+   │
+   ├── Agent configuration
+   │    ├─ model
+   │    ├─ instructions
+   │    └─ reasoning / metadata
+   │
+   ├── Session
+   │    ├─ durable state
+   │    ├─ streamed events
+   │    └─ long-running workflow
+   │
+   └── Environment
+        ├─ files
+        ├─ packages
+        ├─ network policy
+        ├─ skills / plugins
+        └─ code execution</div>
+          <div class="grid">
+            <article class="card"><h3>Agent</h3><p>재사용 가능한 설정 단위. 현재 API에는 model, instructions, metadata, multi-agent 설정 등이 포함된다.</p></article>
+            <article class="card"><h3>Session</h3><p>실제 업무를 수행하는 실행 단위. 초기 입력과 environment를 연결해 Agent를 돌린다.</p></article>
+            <article class="card"><h3>Environment</h3><p>Agent가 파일을 다루고 코드를 실행할 공간. OpenAI hosted 또는 자체/파트너 sandbox를 선택할 수 있다.</p></article>
+          </div>
+        </div>
+        <p class="note">Agent 생성 API와 Session 생성 API가 각각 별도 리소스로 정의되어 있고, environment는 session 실행에 붙는다. [OpenAI API Reference: Agent; Session]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s5">
+      <div class="inner">
+        <span class="eyebrow">05 — Codex Harness</span>
+        <h2>가장 중요한 것은 “OpenAI가 무엇을 재사용했는가?”</h2>
+        <div class="grid g2">
+          <article class="plain"><h3>Codex와 같은 기반</h3><p>Agents API는 Codex를 오랫동안 운영하며 다듬은 agent harness와 인프라를 개발자에게 제공한다.</p></article>
+          <article class="plain"><h3>Versioned capability</h3><p>모델 출시와 함께 harness도 진화시키며, 개발자가 매번 orchestration을 다시 설계하지 않도록 한다.</p></article>
+        </div>
+        <div class="grid g3">
+          <div class="card"><h3>Long sessions</h3><p>수시간~수일 작업을 전제로 context 관리를 강화.</p></div>
+          <div class="card"><h3>More tools</h3><p>도구를 많이 붙였을 때의 사용 효율을 harness에서 개선.</p></div>
+          <div class="card"><h3>Parallel subagents</h3><p>한 Agent가 여러 subagent에게 작업을 나눠 병렬 처리 가능.</p></div>
+        </div>
+        <div class="callout"><strong>관전 포인트:</strong> OpenAI가 Agents API를 단순 SDK가 아니라 “Codex harness를 제품화한 것”으로 설명한다는 점이 핵심이다. [OpenAI Agents API announcement; Unlocking the Codex harness]</div>
+      </div>
+    </section>
+
+    <section class="slide" id="s6">
+      <div class="inner">
+        <span class="eyebrow">06 — Session & Context</span>
+        <h2>“한 번의 request”에서 “계속 일하는 세션”으로</h2>
+        <div class="grid split">
+          <div class="flow">
+            <div class="step"><div class="dot"></div><div><h3>Session 생성</h3><p>Agent 설정과 실행 environment를 연결하고 초기 input을 보낸다.</p></div></div>
+            <div class="step"><div class="dot"></div><div><h3>Tool-driven execution</h3><p>모델 호출 → tool 실행 → 결과 반영을 반복한다.</p></div></div>
+            <div class="step"><div class="dot"></div><div><h3>Stream progress</h3><p>실행 중 이벤트를 받아 UI나 orchestrator가 현재 상태를 표시한다.</p></div></div>
+            <div class="step"><div class="dot"></div><div><h3>Context compaction</h3><p>긴 작업에서 이전 context를 압축해 흐름을 유지한다.</p></div></div>
+          </div>
+          <div class="grid">
+            <article class="card"><h3>왜 중요한가?</h3><p>실제 업무는 “한 질문에 한 답”보다 조사→수정→검증→대기→재개가 많다. Agent API의 핵심 차별점은 이 상태ful runtime을 API 표면으로 끌어왔다는 점이다.</p></article>
+            <article class="card"><h3>API 관점</h3><p><code>POST /agents</code>로 재사용 Agent를 만들고, <code>POST /agents/sessions</code>로 managed session을 실행하는 리소스 구조가 제공된다.</p></article>
+          </div>
+        </div>
+        <p class="note">Session 생성 API는 initial input, agent 설정, execution environment를 연결하고 stream 옵션을 제공한다. [OpenAI API Reference: Create an agent session]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s7">
+      <div class="inner">
+        <span class="eyebrow">07 — Execution Environment</span>
+        <h2>Agent에게 “손과 작업대”까지 준다</h2>
+        <div class="grid g3">
+          <article class="card"><h3>OpenAI-hosted sandbox</h3><p>OpenAI가 sandbox를 프로비저닝·관리한다. 파일, 코드 실행, artifact 생성이 가능하다.</p></article>
+          <article class="card"><h3>Your infrastructure</h3><p>자체 인프라에서 Agent가 코드와 파일을 다루게 하는 선택지도 제공한다.</p></article>
+          <article class="card"><h3>Sandbox partners</h3><p>지원되는 외부 sandbox provider와도 연결할 수 있다.</p></article>
+        </div>
+        <div class="grid split">
+          <div class="code"><span class="c">Environment template</span>
+{
+  files: [...],
+  packages: { npm: [...], python: [...], system: [...] },
+  network: { access, allowed_domains },
+  skills: [...],
+  plugins: [...],
+  setup_commands: [...]
+}</div>
+          <div class="grid">
+            <p class="lede">특히 environment template은 매 session마다 새 환경을 만들 수 있는 재사용 가능한 실행 환경 구성이다.</p>
+            <p class="note">공식 API reference에는 packages, network policy, setup commands, skills, plugins, files가 environment template의 구성 요소로 정의돼 있다. [OpenAI API Reference: Environment template]</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="s8">
+      <div class="inner">
+        <span class="eyebrow">08 — Tools · MCP</span>
+        <h2>Agent의 능력은 Tools, 외부 확장은 MCP로 연결한다</h2>
+        <div class="grid g2">
+          <article class="plain"><h3>Built-in / custom tools</h3><p>Agent가 실제로 호출할 수 있는 capability를 도구로 구성한다. 애플리케이션의 내부 시스템도 custom tool로 연결할 수 있다.</p></article>
+          <article class="plain"><h3>MCP servers</h3><p>기존 MCP 생태계를 활용해 외부 데이터와 도구를 Agent의 작업 공간에 연결한다.</p></article>
+        </div>
+        <div class="pill-row">
+          <span class="pill">filesystem / code</span><span class="pill">internal APIs</span><span class="pill">MCP</span><span class="pill">web/data tools</span><span class="pill">domain workflows</span>
+        </div>
+        <div class="callout"><strong>구분:</strong> Agents API는 MCP 자체가 아니다. Agents API는 Agent runtime을 제공하고, MCP는 그 runtime이 외부 capability와 연결되는 한 가지 표준 경로다. 공식 소개에서도 “connect your own tools and MCP servers”를 명시한다. [OpenAI Release Notes; Agents API announcement]</div>
+      </div>
+    </section>
+
+    <section class="slide" id="s9">
+      <div class="inner">
+        <span class="eyebrow">09 — Subagents</span>
+        <h2>하나의 Agent가 모든 일을 하지 않아도 된다</h2>
+        <div class="grid split">
+          <div class="code">Main Agent
+   │
+   ├── Research Agent
+   │      └─ 조사 / 자료 수집
+   │
+   ├── Coding Agent
+   │      └─ 구현 / 테스트
+   │
+   └── Review Agent
+          └─ 검토 / 검증</div>
+          <div class="grid">
+            <article class="card"><h3>왜 필요한가?</h3><p>독립적인 작업을 병렬화하거나 역할별 context를 분리해 한 세션의 복잡도를 낮출 수 있다.</p></article>
+            <article class="card"><h3>API 수준 지원</h3><p>Agent 생성 API에는 명시적으로 <code>multi_agent</code> 설정과 <code>max_concurrent_subagents</code>가 존재한다.</p></article>
+          </div>
+        </div>
+        <p class="note">OpenAI는 Agents API의 최근 harness 개선 예로 subagent 병렬화를 명시하고, API reference에서도 multi-agent configuration을 제공한다. [OpenAI Agents API announcement; Create an agent]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s10">
+      <div class="inner">
+        <span class="eyebrow">10 — Skills · Plugins</span>
+        <h2>“Agent에게 무엇을 가르칠 것인가”도 Environment에 들어온다</h2>
+        <div class="grid g2">
+          <article class="card"><h3>Skills</h3><p>재사용 가능한 업무 지식·절차를 Agent가 활용하도록 environment에 연결할 수 있다.</p></article>
+          <article class="card"><h3>Plugins</h3><p>환경에 함께 넣어야 할 기능이나 확장물을 패키지 형태로 제공할 수 있다.</p></article>
+        </div>
+        <div class="code"><span class="c">A useful mental model</span>
+
+<span class="k">Model</span>      = reasoning capability
+<span class="k">Agent</span>      = reusable behavior/configuration
+<span class="k">Session</span>    = ongoing work
+<span class="k">Environment</span> = place to act
+<span class="k">Tools/MCP</span>  = capabilities
+<span class="k">Skills</span>     = domain/workflow knowledge</div>
+        <p class="note">공식 environment schema가 skills와 plugins를 명시적으로 포함하고 있으며, hosted skill은 ID reference 또는 inline ZIP 형태로 제공할 수 있다. [OpenAI API Reference: Environment template / hosted skills]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s11">
+      <div class="inner">
+        <span class="eyebrow">11 — ACP와 비교</span>
+        <h2>비슷해 보이지만 “경계”가 다르다</h2>
+        <table>
+          <thead><tr><th>구분</th><th>ACP</th><th>OpenAI Agents API</th><th>MCP</th></tr></thead>
+          <tbody>
+            <tr><td>핵심 문제</td><td>Client ↔ Agent 연결</td><td>Agent 실행·운영</td><td>Agent ↔ Tool/Data 연결</td></tr>
+            <tr><td>정체</td><td>Protocol</td><td>API + managed runtime</td><td>Protocol</td></tr>
+            <tr><td>대표 경계</td><td>IDE / editor ↔ coding agent</td><td>Application ↔ agent runtime</td><td>Agent ↔ external capability</td></tr>
+            <tr><td>주요 가치</td><td>상호운용성</td><td>orchestration / sessions / environment</td><td>도구·데이터 표준 연결</td></tr>
+          </tbody>
+        </table>
+        <div class="grid g3">
+          <div class="plain"><h3>ACP</h3><p>“어떤 client에서 어떤 agent를 사용할까?”</p></div>
+          <div class="plain"><h3>Agents API</h3><p>“그 agent가 어떻게 오래 일하고 도구를 쓰게 할까?”</p></div>
+          <div class="plain"><h3>MCP</h3><p>“그 agent가 바깥의 무엇과 연결될까?”</p></div>
+        </div>
+        <p class="note">이 비교에서 Agents API는 OpenAI가 managed Codex harness를 API로 제공한다는 공식 설명에 기반한다. ACP와 MCP의 세부 사양 자체는 별도 프로젝트의 표준이므로, 이 자료에서는 관계를 개념적 계층으로 설명한다. [OpenAI Agents API announcement; Unlocking the Codex harness]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s12">
+      <div class="inner">
+        <span class="eyebrow">12 — Use cases</span>
+        <h2>어떤 업무에서 특히 의미가 커지는가?</h2>
+        <div class="grid g3">
+          <article class="card"><h3>Long-running coding</h3><p>repo 분석 → 수정 → 테스트 → 후속 작업처럼 수시간 이상 걸리는 개발 작업.</p></article>
+          <article class="card"><h3>Research & analysis</h3><p>자료 수집, 파일 처리, 반복 계산과 검증이 이어지는 조사형 업무.</p></article>
+          <article class="card"><h3>Operational automation</h3><p>사내 API, DB, 문서, CI 등을 연결해 업무를 끝까지 수행하는 자동화.</p></article>
+        </div>
+        <div class="grid split">
+          <div class="callout"><strong>좋은 후보:</strong> 사람이 직접 매번 “다음에 무엇을 해야 하지?”라고 orchestration해야 하는 업무.</div>
+          <div class="callout"><strong>덜 필요한 경우:</strong> 한 번의 응답만으로 끝나는 단순 Q&A나 단발성 생성 작업.</div>
+        </div>
+        <p class="note">OpenAI의 소개는 Agents API를 특히 long-running work, files/code, tools, subagents를 요구하는 Agent workload에 맞춘 기반으로 설명한다. [OpenAI Agents API announcement]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s13">
+      <div class="inner">
+        <span class="eyebrow">13 — Takeaways</span>
+        <h2>이번 발표에서 가져갈 세 가지</h2>
+        <div class="grid g3">
+          <article class="plain"><h3>1. Agent의 핵심은 모델만이 아니다</h3><p>긴 작업에서는 context, tools, execution environment, recovery를 묶는 harness가 성능과 안정성을 좌우한다.</p></article>
+          <article class="plain"><h3>2. Agents API는 “runtime을 API화”한다</h3><p>OpenAI가 Codex에서 다듬은 실행 구조를 managed service로 제공하는 것이 본질이다.</p></article>
+          <article class="plain"><h3>3. ACP / MCP와는 다른 층이다</h3><p>ACP는 client↔agent, MCP는 agent↔capability, Agents API는 application↔agent runtime 쪽에 가깝다.</p></article>
+        </div>
+        <div class="callout"><strong>한 문장:</strong> <span class="mono">Responses API가 “모델에게 요청하는 API”라면, Agents API는 “일을 맡길 실행 환경까지 포함한 API”에 가깝다.</span></div>
+        <p class="note">다만 현재는 <span class="tag beta">public beta</span>다. OpenAI가 베타 동안 빠르게 반복 개선하겠다고 밝히고 있으므로 실제 도입 시 API 안정성과 운영 비용을 별도로 확인해야 한다. [OpenAI Agents API announcement]</p>
+      </div>
+    </section>
+
+    <section class="slide" id="s14">
+      <div class="inner">
+        <span class="eyebrow">14 — References</span>
+        <h2>공식 자료 중심으로 더 보기</h2>
+        <div class="source-list">
+          <div>① <a href="https://openai.com/index/introducing-the-agents-api/" target="_blank" rel="noreferrer">Introducing the Agents API</a><small> — OpenAI · 2026-09-10 · public beta announcement</small></div>
+          <div>② <a href="https://developers.openai.com/api/reference/typescript/resources/beta/subresources/agents/methods/create" target="_blank" rel="noreferrer">Create an agent</a><small> — OpenAI API Reference</small></div>
+          <div>③ <a href="https://developers.openai.com/api/reference/go/resources/beta/subresources/agents/subresources/sessions/methods/create" target="_blank" rel="noreferrer">Create an agent session</a><small> — OpenAI API Reference</small></div>
+          <div>④ <a href="https://developers.openai.com/api/reference/typescript/resources/beta/subresources/agents/subresources/environments/subresources/templates/methods/create" target="_blank" rel="noreferrer">Create an agent environment template</a><small> — OpenAI API Reference</small></div>
+          <div>⑤ <a href="https://openai.com/index/unlocking-the-codex-harness/" target="_blank" rel="noreferrer">Unlocking the Codex harness</a><small> — OpenAI · 2026-02-04</small></div>
+          <div>⑥ <a href="https://openai.com/index/harness-engineering/" target="_blank" rel="noreferrer">Harness engineering: leveraging Codex in an agent-first world</a><small> — OpenAI · 2026-02-11</small></div>
+          <div>⑦ <a href="https://openai.com/ko-KR/products/release-notes/" target="_blank" rel="noreferrer">OpenAI Release Notes</a><small> — Agents API public beta entry · 2026-09-10</small></div>
+        </div>
+        <div class="footer">Study deck · prepared for internal discussion · Content checked against official OpenAI sources on 2026-09-13</div>
+      </div>
+    </section>
+  </main>
+
+  <div class="hint">↑ ↓  슬라이드 이동</div>
+
+  <script>
+    const links = [...document.querySelectorAll('.rail a')];
+    const sections = [...document.querySelectorAll('.slide')];
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          links.forEach(a => a.setAttribute('aria-current', 'false'));
+          const a = document.querySelector(`.rail a[href="#${e.target.id}"]`);
+          if (a) a.setAttribute('aria-current', 'true');
+        }
+      });
+    }, {threshold:.45});
+    sections.forEach(s => obs.observe(s));
+    addEventListener('keydown', e => {
+      if (!['ArrowDown','ArrowUp','PageDown','PageUp'].includes(e.key)) return;
+      e.preventDefault();
+      const i = sections.findIndex(s => s.getBoundingClientRect().top > -50);
+      const idx = e.key === 'ArrowDown' || e.key === 'PageDown' ? Math.min(sections.length-1, i+1) : Math.max(0, i-1);
+      sections[idx].scrollIntoView({behavior:'smooth'});
+    });
+  </script>
+</body>
+</html>
