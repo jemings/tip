@@ -1663,11 +1663,12 @@
 
             <div class="lane cloud">
               <span class="chip cloud">Agents API × Codex</span>
-              <h3>세션 한살이 — 4단계</h3>
+              <h3>세션 다루기 — 5단계</h3>
               <div class="flow">
                 <div class="step"><span class="dot"></span><div><h3>만들기</h3><p><code>POST /v1/agents/sessions</code> → session_id</p></div></div>
                 <div class="step"><span class="dot"></span><div><h3>지켜보기</h3><p>스트림 <code>GET …/events?stream=true</code>, 또는 상태가 바뀔 때 webhook</p></div></div>
                 <div class="step"><span class="dot"></span><div><h3>말 걸기</h3><p><code>POST …/events</code> — message(쉬면 새 턴, 일하는 중이면 방향 바꾸기) · cancel · tool_result</p></div></div>
+                <div class="step"><span class="dot"></span><div><h3>이어받기</h3><p>다른 프로그램이든 재시작한 내 앱이든 — 스트림을 <strong>먼저</strong> 열고 <code>GET …/sessions/{id}</code>로 대기 중인 action을, <code>GET …/items</code>로 지금까지를 읽는다. 히스토리는 다시 보내지 않는다</p></div></div>
                 <div class="step"><span class="dot"></span><div><h3>치우기</h3><p><code>DELETE …/sessions/{id}</code></p></div></div>
               </div>
               <h3>주방(environment)은 셋 중 하나</h3>
@@ -1680,7 +1681,8 @@
               </table>
               <p class="note">
                 self_hosted는 주방만 내 쪽이고, 요리사(루프)는 OpenAI에서 돈다. 그래서 스트림을 닫아도 작업은 취소되지 않고, 놓친 이벤트는
-                다시 오지 않는다 — 세션과 items를 조회해 복구한다.
+                다시 오지 않는다 — 세션과 items를 조회해 복구한다. 다만 <strong>이어받는 건 대화까지다</strong> — 세션마다 executor가 따로
+                필요하고, 같은 environment ID로 다시 붙어도 주방의 파일은 복원되지 않는다.
               </p>
               <p class="quote">“Closing an event stream does not cancel the task.”<cite>Agents API 공식 문서</cite></p>
             </div>
