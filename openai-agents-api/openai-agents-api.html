@@ -516,11 +516,14 @@
       ul.tight li::marker {
         color: var(--line-strong);
       }
-      .quote {
-        border-left: 2px solid var(--line-strong);
+      /* 인용은 설명이 아니라 근거다. .lane p · .plain p 가 (0,1,1) 로 .quote 를 덮어
+         크기·색이 바로 위 문단과 같아지므로, 같은 우선순위인 p.quote 로 한 단계 낮춘다.
+         세로 줄도 --line-strong 은 어두운 모드에서 대비가 1.7:1 이라 --muted 로 올린다. */
+      p.quote {
+        border-left: 2px solid var(--muted);
         padding-left: 0.9rem;
-        color: var(--ink-2);
-        font-size: 0.92rem;
+        color: var(--muted);
+        font-size: 0.86rem;
         line-height: 1.5;
       }
       .quote cite {
