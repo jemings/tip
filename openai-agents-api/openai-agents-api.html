@@ -1173,7 +1173,7 @@
       <a href="#five"><span class="n">09</span><span>다섯 질문</span></a>
       <a href="#shape"><span class="n">10</span><span>요청의 모양</span></a>
       <a href="#server"><span class="n">11</span><span>서버에서 ACP?</span></a>
-      <span class="act">3막 · 언제 쓰나</span>
+      <span class="act">3막 · 받아들이고 고르기</span>
       <a href="#rules"><span class="n">12</span><span>식당 규칙</span></a>
       <a href="#when"><span class="n">13</span><span>언제 쓰나</span></a>
       <a href="#wrap"><span class="n">14</span><span>정리</span></a>
@@ -1190,12 +1190,12 @@
       <!-- 시작 ============================================================ -->
       <section class="slide cover" id="cover">
         <div class="inner">
-          <span class="kicker">OpenAI Agents API · public beta · 2026-09-10</span>
+          <span class="kicker">OpenAI Agents API</span>
           <h1>묻는 API에서, <span class="t-cloud">맡기는 API</span>로</h1>
           <p class="lede">
-            Agents API는 Codex가 쓰는 에이전트 루프(harness)를 OpenAI 서버에서 대신 돌려 주는 API다. 오늘은 두 가지를 본다 —
-            Chat Completions·Responses API에서 <strong>무엇이 달라졌는지</strong>, 그리고 같은 Codex를 ACP로
-            <strong>부를 때와 무엇이 다른지</strong>.
+            Agents API는 Codex가 쓰는 에이전트 루프(harness)를 OpenAI 서버에서 대신 돌려 주는 API다. 오늘은
+            Chat Completions·Responses API에서 <strong>무엇이 달라졌는지</strong>, 같은 Codex를 ACP로
+            <strong>부를 때와 무엇이 다른지</strong>, 그래서 <strong>언제 무엇을 고를지</strong>를 본다.
           </p>
           <p class="kid">
             <span class="tag-kid">쉽게 말하면</span>예전 API는 요리사에게 한 마디씩 물었고, Agents API는 요리를
@@ -1207,8 +1207,8 @@
             <div><b>$0</b><span>API 자체 이용료 · 토큰·도구·컨테이너는 과금</span></div>
           </div>
           <p class="note">
-            같은 오픈소스 Codex harness다. 다만 OpenAI 서버에서 도는 Codex의 버전·설정은 공개·고정되지 않는다. 비교 대상은 Zed·JetBrains에서
-            codex-acp로 쓰는 Codex.
+            ACP(Agent Client Protocol)는 에디터가 외부 에이전트를 프로세스로 띄워 말을 거는 표준이고, 오늘 비교할 상대는 Zed·JetBrains에서
+            codex-acp로 쓰는 Codex다. 양쪽 다 같은 오픈소스 Codex harness를 쓰지만, OpenAI 서버에서 도는 쪽의 버전·설정은 공개·고정되지 않는다.
           </p>
         </div>
       </section>
@@ -1223,7 +1223,7 @@
           <div class="two-lines">
             <div class="statement">
               <span>1막</span>
-              <p>Chat Completions → Responses → Agents API로 오면서 <span class="t-cloud">루프·기억·작업대</span>를 OpenAI가 가져갔다. 내 함수 실행은 끝까지 내 몫이다.</p>
+              <p>Chat Completions → Responses → Agents API로 오면서 <span class="t-cloud">루프·기억</span>을 OpenAI가 가져가고, <span class="t-cloud">주방</span>까지 빌려준다. 내 함수 실행은 끝까지 내 몫이다.</p>
             </div>
             <div class="statement">
               <span>2·3막</span>
@@ -1233,7 +1233,7 @@
           <div class="grid g3">
             <article class="plain">
               <h3>에디터를 닫아도 계속된다</h3>
-              <p>세션이 OpenAI 서버에 있다. ACP로 부른 Codex는 에디터가 꺼지면 2초 뒤 종료된다.</p>
+              <p>세션이 OpenAI 서버에 있다. ACP로 부른 Codex는 에디터가 꺼지면 같이 끝나고, 2초 뒤에도 살아 있으면 강제 종료된다.</p>
             </article>
             <article class="plain">
               <h3>사람이 아니라 이벤트가 시작 버튼</h3>
@@ -1241,7 +1241,7 @@
             </article>
             <article class="plain">
               <h3>어떤 프로그램이든 이어 말한다</h3>
-              <p>session_id만 있으면 네트워크 너머에서 방향 바꾸기·취소·답하기가 된다. ACP의 표준 연결은 stdio 파이프뿐이다.</p>
+              <p>session_id만 있으면 네트워크 너머에서 방향 바꾸기·취소·답하기가 된다. ACP가 표준으로 정한 연결은 같은 컴퓨터 안의 stdio 파이프(표준 입출력)뿐이다.</p>
             </article>
           </div>
         </div>
@@ -1250,7 +1250,7 @@
       <!-- 1막 ============================================================ -->
       <section class="slide" id="steps">
         <div class="inner">
-          <span class="eyebrow">1막 — 원시 API에서 무엇이 달라졌나</span>
+          <span class="eyebrow">1막 — Chat Completions에서 무엇이 달라졌나</span>
           <h2>묻기 → 도구 쥐여 주기 → 맡기기</h2>
           <p class="kid">
             <span class="tag-kid">쉽게 말하면</span>처음엔 한 마디씩 묻고, 다음엔 도구를 쥐여 주고, 이제는 일을 <mark>통째로 맡긴다</mark>.
@@ -1297,8 +1297,8 @@
               </svg>
             </div>
             <figcaption>
-              가로축은 실제 시간 비율이다. Chat Completions는 지금도 지원되지만 새 프로젝트는 Responses가 권장이고, GPT-6 Astra의 도구 호출은
-              Responses에서만 된다.
+              가로축은 실제 시간 비율이다. Chat Completions는 지금도 지원되지만, 새 프로젝트에는 OpenAI가 Responses를 권한다. GPT-6 Astra의
+              도구 호출은 Responses에서만 된다.
             </figcaption>
           </figure>
           <div class="grid g3">
@@ -1310,12 +1310,14 @@
             <article class="plain">
               <h3>Responses API · 도구 쥐여 주기</h3>
               <p class="kid sm">검색·코드 실행은 요리사가 직접 한다. 내 함수가 필요하면 멈추고 나를 부른다.</p>
-              <p>“combines the simplicity of Chat Completions with the tool-use capabilities of the Assistants API.” 그래도 “When used with custom tools, the Responses API yields control back to the client”.</p>
+              <p>Chat Completions의 단순함에 Assistants API의 도구 사용 능력을 합쳤다. 내장 도구는 한 요청 안에서 끝나고, 대화 기억도 <code>previous_response_id</code>로 서버에 맡길 수 있다. 다만 내 함수 차례가 되면 제어는 나에게 돌아온다.</p>
+              <p class="quote">“When used with custom tools, the Responses API yields control back to the client.”<cite>OpenAI 공식 문서</cite></p>
             </article>
             <article class="plain" style="border-top-color: var(--cloud)">
               <h3 class="t-cloud">Agents API · 맡기기</h3>
               <p class="kid sm">요리를 통째로 맡긴다. 요리사가 알아서 반복하고 주문 기록까지 보관한다.</p>
-              <p>“OpenAI manages sessions, orchestration, context compaction, and recovery while your application provides tools and chooses its execution environment.”</p>
+              <p>세션(대화 기록)·도구 반복·긴 대화 압축(compaction)·중단 복구까지 OpenAI가 맡는다. 내 몫은 셋 — 쓸 도구 쥐여 주기, 주방 고르기, 그 도구가 내 함수면 실행하기.</p>
+              <p class="quote">“OpenAI manages sessions, orchestration, context compaction, and recovery…”<cite>OpenAI 공식 문서</cite></p>
             </article>
           </div>
         </div>
@@ -1336,7 +1338,7 @@
           <div class="tablewrap" tabindex="0" role="region" aria-label="Chat Completions, Responses API, Agents API의 책임 비교">
             <table>
               <thead>
-                <tr><th scope="col">일</th><th scope="col">Chat Completions</th><th scope="col">Responses API</th><th scope="col" class="cloud">Agents API</th></tr>
+                <tr><th scope="col">해야 하는 일</th><th scope="col">Chat Completions</th><th scope="col">Responses API</th><th scope="col" class="cloud">Agents API</th></tr>
               </thead>
               <tbody>
                 <tr>
@@ -1361,10 +1363,10 @@
                   <th scope="row">OpenAI 내장 도구</th>
                   <td><span class="who me">없음</span><span class="tech">웹 검색은 검색 전용 모델로만</span></td>
                   <td><span class="who oai">OpenAI</span><span class="tech">web search · file search · code interpreter · hosted shell · remote MCP</span></td>
-                  <td><span class="who oai">OpenAI</span><span class="tech">web search · MCP · tool search, 작업대가 있으면 Bash · apply-patch</span></td>
+                  <td><span class="who oai">OpenAI</span><span class="tech">web search · MCP · tool search, 주방이 있으면 Bash · apply-patch</span></td>
                 </tr>
                 <tr>
-                  <th scope="row">코드 실행 작업대</th>
+                  <th scope="row">코드 실행 주방(environment)</th>
                   <td><span class="who me">나</span></td>
                   <td><span class="who opt">골라 쓰기</span><span class="tech">OpenAI 컨테이너(20분 미사용 시 만료) 또는 내 런타임</span></td>
                   <td><span class="who opt">골라 쓰기</span><span class="tech">none · openai_hosted · self_hosted</span></td>
@@ -1378,14 +1380,14 @@
                 <tr>
                   <th scope="row">긴 작업 · 끊김</th>
                   <td><span class="who me">나</span><span class="tech">요청 하나 단위, 다시 보낸다 <span class="inf">추론</span></span></td>
-                  <td><span class="who opt">골라 쓰기</span><span class="tech">background는 응답 하나 단위, 여러 단계 루프는 내 프로세스</span></td>
-                  <td><span class="who oai">OpenAI</span><span class="tech">스트림을 닫아도 계속, 세션·items로 복구</span></td>
+                  <td><span class="who opt">골라 쓰기</span><span class="tech">요청을 비동기로 돌리는 background는 응답 하나 단위, 여러 단계 루프는 내 프로세스</span></td>
+                  <td><span class="who oai">OpenAI</span><span class="tech">스트림을 닫아도 계속, 세션과 items(세션에 쌓인 기록)를 조회해 복구</span></td>
                 </tr>
                 <tr>
                   <th scope="row">여러 에이전트</th>
                   <td><span class="who me">나</span></td>
                   <td><span class="who opt">골라 쓰기</span><span class="tech">multi-agent beta, 기본 3개 동시</span></td>
-                  <td><span class="who oai">OpenAI</span><span class="tech">subagent 기본 6개 동시, 작업대 공유</span></td>
+                  <td><span class="who oai">OpenAI</span><span class="tech">subagent 기본 6개 동시, 한 주방 공유</span></td>
                 </tr>
                 <tr>
                   <th scope="row">사람 승인</th>
@@ -1399,8 +1401,8 @@
           <div class="strip">
             <b>곁가지</b>
             <span><strong>Agents SDK</strong>는 루프를 내 프로세스 안에서 돌려 주는 라이브러리 — 승인(<code>needs_approval</code>)이 내장이지만 배포·내구성은 내 몫</span>
-            <span>OpenAI 런타임 표의 통합 난이도: Responses API <strong>High</strong> · Agents SDK <strong>Medium</strong> · Agents API <strong>Low</strong></span>
-            <span><strong>Assistants API</strong>는 서버가 상태를 쥐는 첫 시도였지만 2026-08-26 종료 — Agents API가 그 모양을 Codex harness 위에서 다시 가져왔다</span>
+            <span>OpenAI의 런타임 비교 문서가 매긴 통합 난이도: Responses API <strong>High</strong> · Agents SDK <strong>Medium</strong> · Agents API <strong>Low</strong></span>
+            <span><strong>Assistants API</strong>는 서버가 상태를 쥐는 첫 시도였지만 2026-08-26 종료 — 그 구조를 Agents API가 Codex harness 위에서 다시 가져왔다</span>
           </div>
         </div>
       </section>
@@ -1483,7 +1485,7 @@ for item in response.output:
               </ul>
             </div>
             <div class="grid" style="gap: 0.5rem">
-              <div class="code-head"><span class="chip cloud">Agents API</span><span>functions 가이드 원문</span></div>
+              <div class="code-head"><span class="chip cloud">Agents API</span><span>공식 functions 가이드 발췌</span></div>
               <pre class="code">import json
 
 action = action.to_dict()
@@ -1503,12 +1505,13 @@ result.update(success=True, output=json.dumps(output))
                 <li><b>함수 결과</b><span><code>tool_result</code> 이벤트</span></li>
                 <li><b>다시 묻기</b><span>없음 — harness가 같은 턴을 잇는다</span></li>
               </ul>
-              <p class="note">“The harness continues the turn after it receives the required results.” <code>action</code>은 세션의 <code>required_actions</code> 항목이다.</p>
+              <p class="note">모델이 내 함수를 부르면 세션이 <code>requires_action</code>으로 멈추고 부른 내역을 <code>required_actions</code>에 담는다 — 코드의 <code>action</code>이 그중 한 건이다. 결과를 보내면 harness가 멈춰 있던 턴을 이어 간다.</p>
+              <p class="quote">“The harness continues the turn after it receives the required results.”<cite>Agents API functions 가이드</cite></p>
             </div>
           </div>
           <p class="note">
-            앞의 두 코드는 같은 <code>get_horoscope</code> 예제다. Agents API 문서는 다른 예제 함수(<code>get_customer</code>)를 쓴다 — 세 API로 같은 과제를
-            구현한 공식 예제는 없다. <code>…</code>는 생략한 줄.
+            비교 지점은 각 코드 아래 세 줄(기록 · 함수 결과 · 다시 묻기)이다. 세 API로 같은 과제를 구현한 공식 예제가 없어 마지막만 예제 함수가
+            다르다(<code>get_horoscope</code> → <code>get_customer</code>). <code>…</code>는 생략한 줄.
           </p>
         </div>
       </section>
@@ -1537,7 +1540,7 @@ result.update(success=True, output=json.dumps(output))
                   </defs>
                   <rect x="6" y="6" width="468" height="266" rx="10" fill="none" class="s-home" stroke-width="1.5" stroke-dasharray="6 5" />
                   <text x="20" y="30" font-size="13" font-weight="600" class="tx-home">에디터가 Codex를 띄운 컴퓨터</text>
-                  <text x="20" y="47" font-size="11" class="tx-muted">보통 내 노트북 · Zed SSH 원격 프로젝트면 그 서버</text>
+                  <text x="20" y="47" font-size="11" class="tx-muted">요리사(루프)도 주방도 늘 여기 · 보통 내 노트북, Zed SSH 원격이면 그 서버</text>
 
                   <rect x="20" y="66" width="128" height="54" rx="6" class="fill-panel s-ink" stroke-width="1.2" />
                   <text x="84" y="90" font-size="13" font-weight="600" text-anchor="middle" class="tx">나 + 에디터</text>
@@ -1579,7 +1582,7 @@ result.update(success=True, output=json.dumps(output))
                 <span class="keeps">켜져 있어야 하는 것: <b>없음*</b></span>
               </figcaption>
               <div class="scroll">
-                <svg viewBox="0 0 480 390" role="img" aria-label="Agents API에 맡긴 Codex. 내 프로그램이 HTTPS로 OpenAI에 주문하면 Codex 루프와 세션 기록이 OpenAI에 남는다. 다른 프로그램도 session_id로 이어 말할 수 있고, 내 프로그램을 꺼도 작업은 계속된다.">
+                <svg viewBox="0 0 480 390" role="img" aria-label="Agents API에 맡긴 Codex. 내 프로그램이 OpenAI에 주문을 넣으면 Codex 루프와 세션 기록은 OpenAI에 남고, 주방은 없음·OpenAI 주방·내 주방 셋 중 고른다. 다른 프로그램도 session_id로 이어 말할 수 있고, 내 프로그램을 꺼도 작업은 계속된다.">
                   <defs>
                     <marker id="ah-c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                       <path d="M0,0 L10,5 L0,10 z" class="mk-cloud" />
@@ -1597,7 +1600,7 @@ result.update(success=True, output=json.dumps(output))
                   <text x="335" y="158" font-size="13" font-weight="600" text-anchor="middle" class="tx">세션 = 주문 기록</text>
                   <text x="335" y="175" font-size="11" text-anchor="middle" class="tx-muted mono">session_id · 삭제할 때까지</text>
 
-                  <text x="212" y="212" font-size="11" class="tx-muted">주방(environment)은 셋 중 고른다</text>
+                  <text x="212" y="212" font-size="11" class="tx-muted">주방은 셋 중 고른다</text>
                   <rect x="212" y="222" width="72" height="34" rx="5" class="fill-panel s-line" stroke-width="1" />
                   <text x="248" y="244" font-size="11.5" text-anchor="middle" class="tx">없음</text>
                   <rect x="290" y="222" width="90" height="34" rx="5" class="fill-panel s-line" stroke-width="1" />
@@ -1631,8 +1634,8 @@ result.update(success=True, output=json.dumps(output))
           </div>
           <p class="conclusion">에디터가 켜진 동안 끝날 일은 부르고(ACP), 나 없이 시작되고 계속 돌아야 할 일은 맡긴다(Agents API).</p>
           <p class="note">
-            비교 범위: 같은 Codex harness를 <strong>내 컴퓨터에서 ACP로</strong> 잇느냐(Zed·JetBrains의 codex-acp),
-            <strong>OpenAI에서 HTTPS로</strong> 잇느냐. Codex CLI·VS Code 확장도 왼쪽 편이다. ACP도 서버에서 돌릴 수는
+            비교 범위: 같은 Codex harness를 <strong>내 컴퓨터에서 ACP로</strong> 부르느냐(Zed·JetBrains의 codex-acp),
+            <strong>OpenAI에 HTTPS로</strong> 맡기느냐. Codex CLI·VS Code 확장도 왼쪽에 속한다. ACP도 서버에서 돌릴 수는
             있다 — 뒤에서 다룬다.
           </p>
         </div>
@@ -1641,10 +1644,10 @@ result.update(success=True, output=json.dumps(output))
       <section class="slide" id="inside">
         <div class="inner">
           <span class="eyebrow">2막 — 속을 열어 보면</span>
-          <h2>한쪽은 선이 끊기면 멈추고, 한쪽은 주문번호가 남는다</h2>
+          <h2>왜 그렇게 되나 — 선을 쥔 쪽과 세션을 쥔 쪽</h2>
           <p class="kid">
-            <span class="tag-kid">쉽게 말하면</span>ACP는 <mark class="h">에디터가 선을 쥐고</mark>, Agents API는
-            <mark>식당이 주문번호를 쥔다</mark>.
+            <span class="tag-kid">쉽게 말하면</span>ACP는 <mark class="h">에디터가 선을 쥐고</mark>, Agents API는 <mark>식당이 주문 기록을 쥔다</mark> —
+            나에게 남는 건 주문번호뿐이다.
           </p>
           <div class="lanes">
             <div class="lane home">
@@ -1661,8 +1664,8 @@ result.update(success=True, output=json.dumps(output))
                 </tbody>
               </table>
               <p class="note">
-                울타리 = Codex 샌드박스(작업 폴더만 쓰기, 네트워크 끔). 창은 표준 <code>session/request_permission</code>이고,
-                취소·잘못된 답은 거절로 처리된다.
+                울타리 = Codex 샌드박스(작업 폴더만 쓰기, 네트워크 끔). 권한 창은 표준 <code>session/request_permission</code> 요청으로 뜨고,
+                요청이 취소되거나 잘못된 답이 오면 거절로 처리된다.
               </p>
               <h3>에디터를 닫으면 — codex-acp <code>src/index.ts</code></h3>
               <pre class="code"><span class="h">process.stdin.on("close"</span>, () =&gt; {
@@ -1693,15 +1696,16 @@ result.update(success=True, output=json.dumps(output))
               <h3>주방(environment)은 셋 중 하나</h3>
               <table class="mini">
                 <tbody>
-                  <tr><th scope="row">none</th><td>주방 없음 — 함수 도구·서비스 쪽 MCP·web search만</td></tr>
-                  <tr><th scope="row">openai_hosted</th><td>OpenAI 주방 — Linux <code>/workspace</code>, outputs는 artifact로 남음</td></tr>
-                  <tr><th scope="row">self_hosted</th><td>내 주방 — 내 노트북·Docker·파트너 샌드박스의 <code>codex exec-server</code>가 OpenAI로 먼저 연결</td></tr>
+                  <tr><th scope="row">none</th><td>주방 없음 — 내 함수 도구·원격 MCP·web search만</td></tr>
+                  <tr><th scope="row">openai_hosted</th><td>OpenAI 주방 — Linux <code>/workspace</code>, <code>outputs</code> 폴더의 파일만 결과물(artifact)로 남음</td></tr>
+                  <tr><th scope="row">self_hosted</th><td>내 주방 — OpenAI가 시킨 명령을 대신 실행하는 <code>codex exec-server</code>를 내 노트북·Docker·파트너 샌드박스에 띄우고, 그쪽에서 OpenAI로 먼저 접속한다</td></tr>
                 </tbody>
               </table>
               <p class="note">
-                self_hosted여도 루프는 OpenAI에서 돈다. 스트림을 닫아도 작업은 취소되지 않고(“Closing an event stream does
-                not cancel the task.”), 놓친 이벤트는 다시 오지 않는다 — 세션과 items를 조회해 복구한다.
+                self_hosted는 주방만 내 쪽이고, 요리사(루프)는 OpenAI에서 돈다. 그래서 스트림을 닫아도 작업은 취소되지 않고, 놓친 이벤트는
+                다시 오지 않는다 — 세션과 items를 조회해 복구한다.
               </p>
+              <p class="quote">“Closing an event stream does not cancel the task.”<cite>Agents API 공식 문서</cite></p>
             </div>
           </div>
         </div>
@@ -1727,7 +1731,7 @@ result.update(success=True, output=json.dumps(output))
               </div>
             </div>
             <div class="lane cloud">
-              <div class="lane-head"><span class="chip cloud">Agents API × Codex</span><span class="timebar">밤 11:00 → 아침 9:00 · 아무도 없다</span></div>
+              <div class="lane-head"><span class="chip cloud">Agents API × Codex</span><span class="timebar">밤 11:00 → 아침 9:00 · 도는 동안 아무도 없다</span></div>
               <div class="flow">
                 <div class="step person"><span class="dot"></span><div><h3>누군가 GitHub 이슈를 열거나 고치거나 다시 연다</h3></div></div>
                 <div class="step"><span class="dot"></span><div><h3>GitHub가 서명된 webhook을 내 앱에 보낸다</h3></div></div>
@@ -1754,7 +1758,7 @@ result.update(success=True, output=json.dumps(output))
           <span class="eyebrow">2막 — 다섯 질문</span>
           <h2>다섯 질문으로 보는 차이</h2>
           <p class="kid">
-            <span class="tag-kid">쉽게 말하면</span>요리 실력은 같다. 다른 건 누가 시키고, 누가 기다리느냐다.
+            <span class="tag-kid">쉽게 말하면</span>요리 실력은 같다. 다른 건 누가 시키고, 어디서 하고, 누가 묻고, 누가 기다리고, 누가 내느냐다.
           </p>
           <div class="tablewrap" tabindex="0" role="region" aria-label="ACP와 Agents API 다섯 질문 비교">
             <table>
@@ -1775,7 +1779,7 @@ result.update(success=True, output=json.dumps(output))
                 <tr>
                   <th scope="row">노트북을 닫으면</th>
                   <td><span class="easy">요리사 퇴근, 기록만 남음</span><span class="tech">stdin이 닫히면 2초 뒤에도 살아 있는 Codex를 강제 종료. 같은 컴퓨터에서 resume</span></td>
-                  <td><span class="easy">요리는 계속, 끝나면 알림</span><span class="tech">스트림을 닫아도 취소되지 않음. 단 주방(self_hosted)이 그 노트북이면 도구가 실패할 수 있고, OpenAI 주방은 활동·keep-alive가 1시간 끊기면 삭제될 수 있음</span></td>
+                  <td><span class="easy">요리는 계속, 끝나면 알림</span><span class="tech">스트림을 닫아도 취소되지 않음. 단 주방(self_hosted)이 그 노트북이면 도구가 실패할 수 있고, OpenAI 주방은 아무 활동도, keep-alive도 1시간 없으면 삭제될 수 있음</span></td>
                 </tr>
                 <tr>
                   <th scope="row">“울타리 밖으로 나가도 돼요?”</th>
@@ -1783,13 +1787,14 @@ result.update(success=True, output=json.dumps(output))
                   <td><span class="easy">자동으로는 묻지 않는다. 내가 만든 질문만 내 앱으로 온다</span><span class="tech">승인 설정 없음 <span class="inf">추론</span> · 핸들러 없는 함수 도구 → requires_action → tool_result</span></td>
                 </tr>
                 <tr>
-                  <th scope="row">돈</th>
+                  <th scope="row">돈은 어떻게 내나</th>
                   <td><span class="easy">ChatGPT 요금제 로그인 또는 API 키</span><span class="tech">요금제의 Codex 사용량(5시간 단위 추정치) 또는 API 요금. Zed는 추가 요금 없음</span></td>
                   <td><span class="easy">API 키 종량제</span><span class="tech">토큰 + 도구 요금 + OpenAI 주방 컨테이너 시간, API 자체 요금은 없음. 구독으로 쓰는 방법은 문서에 없음 <span class="inf">추론</span></span></td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <p class="note">다음 장은 같은 차이를 요청의 모양과 묻는 방식, 두 묶음의 코드로 본다.</p>
         </div>
       </section>
 
@@ -1824,10 +1829,10 @@ result.update(success=True, output=json.dumps(output))
 ) as events:
     for event in events:
         print(event.to_json(indent=None), flush=True)</pre>
-              <p class="note">“Closing an event stream does not cancel the task.” 나중에 다른 프로그램이 같은 session_id로 이어 말하거나 취소한다.</p>
+              <p class="note">스트림을 닫아도 작업은 취소되지 않는다. 나중에 다른 프로그램이 같은 session_id로 이어 말하거나 취소하면 된다.</p>
             </div>
           </div>
-          <p class="strip"><b>주의</b><span>아래 두 코드는 <strong>같은 기능이 아니다</strong> — 왼쪽은 프로토콜에 내장된 질문, 오른쪽은 내가 만든 질문에 대한 답이다</span></p>
+          <p class="strip"><b>여기부터 · 누가 묻나</b><span>아래 두 코드는 <strong>같은 기능이 아니다</strong> — 왼쪽은 프로토콜에 내장된 질문, 오른쪽은 내가 만든 질문에 대한 답이다</span></p>
           <div class="lanes">
             <div class="lane home">
               <div class="code-head"><span class="chip home">Codex가 먼저 묻는다</span><span>codex-acp 문서 예시 · params 발췌</span></div>
@@ -1841,10 +1846,10 @@ result.update(success=True, output=json.dumps(output))
     "name": "No, and tell Codex what to do differently",
     "kind": "reject_once" }
 ]</pre>
-              <p class="note">예시의 사유는 “The test suite needs to run outside the current sandbox.” 창은 에디터가 그린다.</p>
+              <p class="note">예시에서 Codex가 댄 사유는 테스트를 지금 샌드박스 밖에서 돌려야 한다는 것이다(“The test suite needs to run outside the current sandbox.”). 창을 그리는 쪽은 에디터다.</p>
             </div>
             <div class="lane cloud">
-              <div class="code-head"><span class="chip cloud">내가 만든 질문에 답한다</span><span>Cookbook sev_bot README</span></div>
+              <div class="code-head"><span class="chip cloud">내가 만든 질문에 답한다</span><span>Cookbook sev_bot README 발췌</span></div>
               <pre class="code">await client.beta.agents.sessions.events.create(
     session.id,
     events=[
@@ -1883,7 +1888,7 @@ result.update(success=True, output=json.dumps(output))
           <div class="tablewrap" tabindex="0" role="region" aria-label="직접 운영과 Agents API의 책임 비교">
             <table>
               <thead>
-                <tr><th scope="col">누가 책임지나</th><th scope="col" class="home">직접 운영 · Codex를 내 서버에서</th><th scope="col" class="cloud">Agents API</th></tr>
+                <tr><th scope="col">해야 하는 일</th><th scope="col" class="home">직접 운영 · Codex를 내 서버에서</th><th scope="col" class="cloud">Agents API</th></tr>
               </thead>
               <tbody>
                 <tr>
@@ -1893,12 +1898,12 @@ result.update(success=True, output=json.dumps(output))
                 </tr>
                 <tr>
                   <th scope="row">죽으면 이어 하기</th>
-                  <td><span class="easy">재기동 + <code>session/resume</code></span><span class="tech">기록은 그 디스크에만. acpx가 어댑터 재기동·resume을 일부 해 준다</span></td>
+                  <td><span class="easy">재기동 + <code>session/load</code></span><span class="tech">기록은 그 디스크에만. acpx가 어댑터 재기동·resume을 일부 해 준다</span></td>
                   <td><span class="easy">세션이 서버에 남는다</span><span class="tech">어느 머신에서든 session_id로 이어 간다</span></td>
                 </tr>
                 <tr>
                   <th scope="row">멀리서 부르기 · 알림</th>
-                  <td><span class="easy">브리지를 직접 만든다</span><span class="tech">표준 전송은 stdio뿐. 원격 HTTP/WebSocket RFD는 2026-07-02부터 Active 단계 — 작업 중, 확정 아님</span></td>
+                  <td><span class="easy">브리지를 직접 만든다</span><span class="tech">표준 전송은 stdio뿐. 원격 HTTP/WebSocket 전송은 아직 제안 문서(RFD) 단계 — 2026-07-02부터 Active, 작업 중이고 확정 아님</span></td>
                   <td><span class="easy">HTTPS + session_id</span><span class="tech">message로 방향 바꾸기, cancel, 상태 변화는 webhook</span></td>
                 </tr>
                 <tr>
@@ -1909,7 +1914,7 @@ result.update(success=True, output=json.dumps(output))
                 <tr>
                   <th scope="row">격리 · 비밀</th>
                   <td><span class="easy">여러 사용자용 VM 격리·패치, 비밀 보관을 직접</span></td>
-                  <td><span class="easy">openai_hosted면 샌드박스는 OpenAI 몫</span><span class="tech">self_hosted면 여전히 내 몫. 서비스 쪽 MCP 인증은 vault에 — 에이전트는 값을 못 본다</span></td>
+                  <td><span class="easy">openai_hosted면 샌드박스는 OpenAI 몫</span><span class="tech">self_hosted면 여전히 내 몫. 원격 MCP 인증 정보는 금고(vault)에 맡긴다 — 에이전트는 값을 못 본다</span></td>
                 </tr>
               </tbody>
             </table>
@@ -1921,11 +1926,11 @@ result.update(success=True, output=json.dumps(output))
             <span>부작용 있는 함수 결과는 두 번 보내도 안전하게</span>
             <span>webhook을 쓰면 공개 HTTPS 주소</span>
             <span>다 쓴 세션 DELETE</span>
-            <span>self_hosted면 executor 준비·재연결·종료·파일 보존</span>
+            <span>self_hosted면 <code>codex exec-server</code> 준비·재연결·종료·파일 보존</span>
           </div>
           <p class="note">
-            샌드박스와 subagent는 로컬 Codex에도 있어 차이로 치지 않았다. 사람 없는 ACP는 권한 창을 띄울 사람도 없다 — acpx는 TTY가
-            없으면 권한 요청을 기본으로 거부한다.
+            샌드박스와 subagent는 로컬 Codex에도 있어 차이로 치지 않았다. 사람 없는 서버에서 ACP를 돌리면 권한 창이 떠도 답할 사람이 없다 — acpx는
+            TTY가 없으면 권한 요청을 기본으로 거부한다.
           </p>
         </div>
       </section>
@@ -1954,7 +1959,7 @@ result.update(success=True, output=json.dumps(output))
                   <code>AGENTS.md</code>를 따르는지는 문서에 없다 <span class="inf">미검증</span>.
                 </li>
                 <li>
-                  <strong>OpenAI 주방은 활동·keep-alive가 1시간 끊기면 삭제될 수 있다.</strong> 설정할 수 없고,
+                  <strong>OpenAI 주방은 아무 활동도, 살아 있다는 신호(keep-alive)도 1시간 없으면 삭제될 수 있다.</strong> 설정할 수 없고,
                   <code>/workspace/outputs</code> 파일만 artifact로 남는다.
                 </li>
                 <li>
@@ -1967,7 +1972,7 @@ result.update(success=True, output=json.dumps(output))
               <div class="plain">
                 <h3>베타라서 · 바뀔 수 있음</h3>
                 <ul class="tight">
-                  <li>데이터 레지던시는 현재 미국만 지원, ZDR 미지원 (self_hosted여도 같음)</li>
+                  <li>데이터가 저장되는 지역(레지던시)은 현재 미국만, 데이터를 남기지 않는 ZDR(zero data retention)은 미지원 — self_hosted여도 같다</li>
                   <li><code>OpenAI-Beta: agents=v1</code> 헤더 필요, 외부 trace exporter 없음, 전용 rate limit 문서 없음, 일부 샌드박스 파트너는 preview·beta</li>
                 </ul>
               </div>
@@ -1976,17 +1981,19 @@ result.update(success=True, output=json.dumps(output))
                 <ul class="tight">
                   <li>
                     <strong>내 노트북을 주방으로 쓸 때 울타리가 있다고 가정하지 말 것.</strong> exec-server는 요청받을 때만 샌드박스를 걸고,
-                    OpenAI 쪽이 요청하는지는 문서에 없다. OpenAI도 “Run workloads in isolated compute, such as virtual machines.”를 권한다.
+                    OpenAI 쪽이 요청하는지는 문서에 없다. OpenAI 문서도 가상 머신처럼 격리된 컴퓨트에서 돌리라고
+                    권한다(“Run workloads in isolated compute, such as virtual machines.”).
                   </li>
                   <li><strong>승인을 얼마나 기다려 주는지</strong>, 그동안 OpenAI 주방이 살아 있는지는 문서에 없다.</li>
                 </ul>
               </div>
-              <p class="note">
-                ACP 쪽도 공짜는 아니다. codex-acp가 기대는 Codex App Server는 문서상 “experimental and isn't supported for production
-                workloads”이고, 표준 원격 전송이 없으며, app-server가 죽으면 다시 띄우지 않는다.
-              </p>
             </div>
           </div>
+          <p class="note">
+            공평하게 보면 ACP 쪽도 공짜는 아니다. codex-acp가 딛고 선 Codex App Server부터 문서가 실험적이며 프로덕션 워크로드는 지원하지
+            않는다고 밝힌다(“experimental and isn't supported for production workloads”). 표준 원격 전송도 없고, app-server가 죽어도
+            codex-acp가 다시 띄워 주지 않는다.
+          </p>
         </div>
       </section>
 
@@ -1995,7 +2002,7 @@ result.update(success=True, output=json.dumps(output))
           <span class="eyebrow">3막 — 언제 쓰나</span>
           <h2>첫 질문 하나로 고른다</h2>
           <p class="kid">
-            <span class="tag-kid">쉽게 말하면</span>에디터 앞의 내가 시키고 켜 둔 동안 끝나면 <mark class="h">부르고</mark>, 아니면
+            <span class="tag-kid">쉽게 말하면</span>아래 질문에 “예”면 <mark class="h">부르고</mark>, “아니오”면 신호 하나만 걸려도
             <mark>맡긴다</mark>.
           </p>
           <div class="decide">
@@ -2006,7 +2013,7 @@ result.update(success=True, output=json.dumps(output))
                 <h3><span class="chip home">ACP로 부르기</span></h3>
                 <ul class="tight">
                   <li>내 레포 리팩터링을 diff를 보며 한다</li>
-                  <li>설치하고 바로 실험한다 — ACP Registry에서 Codex를 받아 Agent Panel의 “New Thread…”에서 고른다. 서버도 webhook도 없다</li>
+                  <li>설치하고 바로 실험한다 — ACP Registry에서 Codex를 받아 Agent Panel의 “New Thread…”에서 고른다. 서버도 webhook도 필요 없다</li>
                 </ul>
                 <span class="branch-head">답과 상관없이 ACP를 먼저 볼 때</span>
                 <div class="signals">
@@ -2018,14 +2025,15 @@ result.update(success=True, output=json.dumps(output))
                 <p class="note">단, 모델에 보내는 내용은 둘 다 OpenAI로 간다.</p>
               </div>
               <div class="lane cloud">
-                <span class="branch-head">아니오 → 하나라도 해당하면</span>
+                <span class="branch-head">아니오 →</span>
+                <h3><span class="chip cloud">Agents API에 맡기기</span></h3>
+                <span class="branch-head">아래 중 하나라도 해당하면</span>
                 <div class="signals">
                   <span class="signal">알람·이벤트로 시작</span>
                   <span class="signal">몇 시간~며칠 걸림</span>
                   <span class="signal">한꺼번에 많이</span>
                   <span class="signal">내 서비스 사용자에게 제공</span>
                 </div>
-                <h3><span class="chip cloud">Agents API에 맡기기</span></h3>
                 <ul class="tight">
                   <li>
                     <strong>새벽 장애 알림</strong> → Slack 스레드에 조사 결과 → 롤백 승인·거절 버튼. 버튼은 내가 만든 질문이고, 예제의
@@ -2038,7 +2046,7 @@ result.update(success=True, output=json.dumps(output))
                   </li>
                 </ul>
                 <p class="note">
-                  “한꺼번에 많이”: Dwelly는 “hundreds of agents”를 비동기로 나눠 돌렸다고 인용된다(벤더 발언, 동시성 한도는 문서에 없음).
+                  “한꺼번에 많이”: Dwelly가 수백 개 에이전트(“hundreds of agents”)를 비동기로 나눠 돌렸다는 사례가 인용된다(벤더 발언, 동시성 한도는 문서에 없음).
                   “내 서비스 사용자에게”: Long Lake · WithCoverage.
                 </p>
               </div>
@@ -2057,19 +2065,19 @@ result.update(success=True, output=json.dumps(output))
           <span class="eyebrow">정리</span>
           <h2>묻기에서 맡기기로, 그리고 부를까 맡길까</h2>
           <p class="kid">
-            <span class="tag-kid">쉽게 말하면</span>켜 둔 동안 끝날 일은 <mark class="h">부르고</mark>, 나 없이 돌 일은 <mark>맡긴다</mark>.
+            <span class="tag-kid">쉽게 말하면</span>같은 요리사인데, 집으로 <mark class="h">부르면</mark> 내가 옆에 있어야 하고 식당에 <mark>맡기면</mark> 식당 규칙을 따른다.
           </p>
           <div class="grid g3">
             <article class="plain">
               <h3>OpenAI가 맡는 몫이 늘었다</h3>
               <p>
-                Chat Completions는 기억·루프·도구가 모두 내 몫. Responses는 내장 도구·기억 옵션·background를 얹었고, Agents API는 루프·세션·압축·복구·작업대까지
-                가져갔다. 내 함수 실행은 끝까지 내 몫이다.
+                Chat Completions는 기억·루프·도구가 모두 내 몫이었다. Responses는 내장 도구·기억 옵션·background를 얹었고, Agents API는
+                루프·세션·압축·복구까지 가져갔다. 코드가 도는 주방은 셋 중에서 내가 고른다. 내 함수 실행은 끝까지 내 몫이다.
               </p>
             </article>
             <article class="plain" style="border-top-color: var(--home)">
               <h3 class="t-home">ACP는 부르는 Codex</h3>
-              <p>설치하면 끝, 권한 창과 diff가 공짜, ChatGPT 구독으로 쓸 수 있다. 대신 에디터가 꺼지면 멈춘다.</p>
+              <p>설치하면 끝, 권한 창과 diff가 공짜, ChatGPT 구독으로 쓸 수 있다. 대신 에디터가 꺼지면 멈추고, 서버에서 계속 돌리려면 식당을 직접 차려야 한다.</p>
             </article>
             <article class="plain" style="border-top-color: var(--cloud)">
               <h3 class="t-cloud">Agents API는 맡기는 Codex</h3>
