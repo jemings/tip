@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WebMCP — AI Agent Study</title>
+<meta name="description" content="WebMCP의 개념, Imperative/Declarative API, MCP와의 차이, 브라우저 실행 모델, 보안, 현재 표준화 상태와 웹 개발자 관점의 의미를 정리한 AI Agent 스터디 자료." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f1f2f4; --panel:#fff; --panel-2:#e7e9ed; --ink:#1b2028; --ink-2:#3d4552;
+  --muted:#5d6673; --line:#d5d9df; --line-strong:#b9c0c9; --accent:#315efb; --accent-ink:#2347c3;
+  --accent-soft:#e8edff; --green:#2e6f5c; --green-soft:#dcebe5; --amber:#8a5a00; --amber-soft:#fff1c7;
+  --red:#a63a1e; --red-soft:#f7e4dd; --shadow:0 1px 2px rgba(27,32,40,.06),0 8px 24px rgba(27,32,40,.06);
+  --font-display:"Bricolage Grotesque","IBM Plex Sans KR",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans","IBM Plex Sans KR",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --rail:232px; --pad-x:clamp(1.25rem,4vw,4.5rem); color-scheme:light;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14181d; --panel:#1a1f26; --panel-2:#222932; --ink:#e7eaee; --ink-2:#b3bcc7;
+    --muted:#8a94a1; --line:#2c333c; --line-strong:#3d4650; --accent:#6d8cff; --accent-ink:#91a7ff;
+    --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
+    --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14181d; --panel:#1a1f26; --panel-2:#222932; --ink:#e7eaee; --ink-2:#b3bcc7;
+  --muted:#8a94a1; --line:#2c333c; --line-strong:#3d4650; --accent:#6d8cff; --accent-ink:#91a7ff;
+  --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
+  --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:clamp(.95rem,.9rem+.2vw,1.06rem);line-height:1.62;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;word-break:keep-all;margin:0;line-height:1.08;letter-spacing:-.02em}h1{font-size:clamp(2.6rem,5vw,5rem);font-weight:800;max-width:17ch}h2{font-size:clamp(2rem,3.4vw,3.2rem);font-weight:800}h3{font-size:1.03rem}p{margin:0}
+a{color:var(--accent-ink);text-underline-offset:3px;text-decoration-thickness:1px}code,kbd,.mono{font-family:var(--font-mono)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.slide{padding:clamp(3.5rem,7vh,6rem) var(--pad-x) clamp(3rem,6vh,5rem) calc(var(--pad-x) + var(--rail));border-bottom:1px solid var(--line);scroll-snap-align:start}
+.slide>.inner{max-width:1180px;margin:0 auto;display:grid;gap:clamp(1.1rem,2.4vh,2rem);align-content:center;min-height:calc(100svh - clamp(6.5rem,13vh,11rem))}
+@media(min-width:880px) and (min-height:620px){html{scroll-snap-type:y proximity}}
+.rail{position:fixed;inset:0 auto 0 0;width:var(--rail);padding:clamp(1.5rem,4vh,3rem) 0 clamp(1.5rem,4vh,3rem) clamp(1rem,2.4vw,2rem);display:flex;flex-direction:column;justify-content:safe center;gap:2px;z-index:20;border-right:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);overflow-y:auto;overscroll-behavior:contain}
+.brand{font:600 .7rem var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1rem}.rail a{display:grid;grid-template-columns:2.1rem 1fr;align-items:baseline;gap:.35rem;padding:.3rem .5rem .3rem 0;color:var(--muted);text-decoration:none;font-size:.775rem;line-height:1.35;border-radius:3px;transition:color .15s ease}.rail a:hover,.rail a[aria-current="true"]{color:var(--ink)}.rail a[aria-current="true"]{font-weight:600}.rail .n{font:.68rem var(--font-mono);letter-spacing:.06em;color:var(--muted)}.rail a[aria-current="true"] .n{color:var(--accent-ink)}
+.kicker,.eyebrow{font:500 .72rem var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}.kicker{font-size:.76rem}.lede{font-size:clamp(1.1rem,1rem+.4vw,1.3rem);color:var(--ink-2);max-width:66ch;line-height:1.5}.note{font-size:.88rem;color:var(--muted);max-width:78ch}
+.facts{display:flex;flex-wrap:wrap;gap:1.5rem 3.4rem;border-top:1px solid var(--line);padding-top:.7rem}.facts b{display:block;font-size:clamp(1.5rem,3vw,2.4rem);font-weight:800}.facts span{display:block;font:.67rem var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.grid{display:grid;gap:clamp(.7rem,1.5vw,1.1rem)}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.split{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.card{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;display:grid;gap:.5rem;box-shadow:var(--shadow)}.card p{color:var(--ink-2);font-size:.92rem;line-height:1.52}.plain{border-top:2px solid var(--ink);padding-top:.8rem;display:grid;gap:.45rem}.plain p{color:var(--ink-2);font-size:.92rem}.quote{border-left:2px solid var(--accent);padding-left:.9rem;color:var(--ink-2);font-size:.91rem}.quote cite{display:block;margin-top:.3rem;color:var(--muted);font:.7rem var(--font-mono)}
+.tag{display:inline-block;border:1px solid currentColor;border-radius:2px;padding:.1rem .4rem;font:.64rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;vertical-align:2px}.tag.api{color:var(--accent-ink);background:var(--accent-soft)}.tag.beta{color:var(--amber);background:var(--amber-soft)}.tag.warn{color:var(--red);background:var(--red-soft)}.tag.green{color:var(--green);background:var(--green-soft)}
+.code{border:1px solid var(--line);background:var(--panel);padding:.9rem 1rem;font:.78rem/1.72 var(--font-mono);white-space:pre-wrap;overflow:auto}.code .c{color:var(--muted)}.code .k{color:var(--accent-ink)}.code .s{color:var(--green)}.code .w{color:var(--amber)}
+.flow{display:grid;gap:0}.step{display:grid;grid-template-columns:1.8rem 1fr;gap:.8rem;position:relative;padding-bottom:1rem}.dot{position:relative;display:flex;justify-content:center}.dot:before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:.45rem;z-index:1}.step:not(:last-child) .dot:after{content:"";position:absolute;top:.9rem;bottom:-.55rem;width:1px;background:var(--line-strong)}.step h3{display:flex;gap:.45rem;align-items:center;flex-wrap:wrap}.step p{color:var(--ink-2);font-size:.9rem;margin-top:.15rem}
+.pill-row{display:flex;flex-wrap:wrap;gap:.5rem}.pill{border:1px solid var(--line-strong);padding:.28rem .55rem;border-radius:999px;font:.72rem var(--font-mono);background:var(--panel)}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.9rem 1rem}.callout strong{font-weight:700}.callout.warn{border-left-color:var(--red);background:var(--red-soft)}
+table{border-collapse:collapse;width:100%;font-size:.88rem;background:var(--panel);border:1px solid var(--line)}th,td{text-align:left;padding:.6rem .75rem;border-bottom:1px solid var(--line);vertical-align:top}th{font:500 .68rem var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--panel-2)}tr:last-child td{border-bottom:0}
+.source-list{display:grid;gap:.55rem;font-size:.8rem}.source-list a{text-decoration:none}.source-list small{color:var(--muted)}.footer{padding:1rem 0 0;border-top:1px solid var(--line);margin-top:.4rem;color:var(--muted);font:.72rem var(--font-mono)}
+.hint{position:fixed;right:1rem;bottom:1rem;z-index:10;padding:.3rem .5rem;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);font:.7rem var(--font-mono);color:var(--muted)}
+@media(max-width:900px){.rail{position:sticky;top:0;width:100%;height:auto;flex-direction:row;align-items:center;justify-content:space-between;padding:.65rem var(--pad-x);border-right:0;border-bottom:1px solid var(--line)}.rail a{display:none}.brand{margin:0}.slide{padding-left:var(--pad-x)}.slide>.inner{min-height:0}.g3,.g4,.split{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.g2,.g3,.g4,.split{grid-template-columns:1fr}.hint{display:none}}
+@media print{.rail,.hint{display:none}.slide{padding:1.5cm;break-after:page}.slide>.inner{min-height:0}}
+</style>
+</head>
+<body>
+<nav class="rail" aria-label="슬라이드 목차">
+  <span class="brand">webmcp-study</span>
+  <a href="#s1"><span class="n">01</span><span>한 줄 정의</span></a>
+  <a href="#s2"><span class="n">02</span><span>왜 필요한가</span></a>
+  <a href="#s3"><span class="n">03</span><span>한 장으로 이해</span></a>
+  <a href="#s4"><span class="n">04</span><span>MCP와 무엇이 다른가</span></a>
+  <a href="#s5"><span class="n">05</span><span>Imperative API</span></a>
+  <a href="#s6"><span class="n">06</span><span>Declarative API</span></a>
+  <a href="#s7"><span class="n">07</span><span>실행 모델</span></a>
+  <a href="#s8"><span class="n">08</span><span>보안</span></a>
+  <a href="#s9"><span class="n">09</span><span>현재 상태</span></a>
+  <a href="#s10"><span class="n">10</span><span>왜 중요한가</span></a>
+  <a href="#s11"><span class="n">11</span><span>개발자 관점</span></a>
+  <a href="#s12"><span class="n">12</span><span>다른 Agent 기술과 연결</span></a>
+  <a href="#s13"><span class="n">13</span><span>도입 판단 포인트</span></a>
+  <a href="#s14"><span class="n">14</span><span>Takeaways</span></a>
+  <a href="#s15"><span class="n">15</span><span>Sources</span></a>
+</nav>
+<main>
+<section class="slide" id="s1"><div class="inner">
+  <span class="kicker">Web Platform · Draft · 2026-09-30</span>
+  <h1>웹페이지가 Agent에게 <em style="color:var(--accent)">자기 기능을 Tool로 제공한다</em></h1>
+  <p class="lede">WebMCP는 웹 애플리케이션이 브라우저의 Agent에게 구조화된 Tool을 노출하도록 만드는 제안형 Web API다. Agent가 버튼을 찾아 클릭하는 대신, 페이지가 “무엇을 할 수 있는지”를 직접 선언한다.</p>
+  <div class="facts"><div><b>Draft</b><span>Community Group Report</span></div><div><b>Chrome 149</b><span>Origin Trial</span></div><div><b>2 APIs</b><span>Imperative + Declarative</span></div><div><b>Tools</b><span>current core abstraction</span></div></div>
+  <p class="note">기준일: 2026년 9월 30일. 현재 WebMCP 문서는 Web Machine Learning Community Group의 Draft Community Group Report(2026-09-28)이며, Chrome에서는 Origin Trial/Early Preview 형태로 실험 중이다.</p>
+</div></section>
+
+<section class="slide" id="s2"><div class="inner">
+  <span class="eyebrow">02 — 왜 필요한가</span>
+  <h2>기존 Browser Agent는 “UI를 보고 맞혀서 조작”한다</h2>
+  <div class="grid g2">
+    <article class="card"><h3>스크린샷 / DOM / 접근성 정보</h3><p>Agent가 현재 화면을 관찰하고 버튼·입력창·상태를 스스로 해석해야 한다.</p></article>
+    <article class="card"><h3>추론 → Click / Type / Scroll</h3><p>“이 버튼이 장바구니인가?”처럼 의미를 추론한 뒤 좌표나 요소를 조작한다.</p></article>
+    <article class="card"><h3>다음 상태를 다시 관찰</h3><p>한 번의 클릭만으로 끝나지 않는 작업은 매 단계마다 화면을 다시 읽어야 한다.</p></article>
+    <article class="card"><h3>변경에 취약</h3><p>레이아웃·텍스트·메뉴 구조가 바뀌면 기존 자동화가 깨질 수 있다.</p></article>
+  </div>
+  <div class="callout"><strong>WebMCP의 방향:</strong> “Agent가 UI를 이해한다”에서 “Web App이 Agent용 capability interface를 제공한다”로 역할을 한 단계 바꾼다.</div>
+  <p class="note">Chrome은 WebMCP의 목적을 구조화된 Tool을 제공해 Agent의 actuation을 더 빠르고 정확하게 만드는 것으로 설명한다.</p>
+</div></section>
+
+<section class="slide" id="s3"><div class="inner">
+  <span class="eyebrow">03 — 한 장으로 이해하기</span>
+  <h2>Web App은 Tool Producer, Browser Agent는 Tool Consumer</h2>
+  <div class="grid split">
+    <div class="code"><span class="c">WEB APP</span>
+   │
+   ├─ JavaScript / HTML
+   │
+   ▼
+<span class="k">document.modelContext</span>
+   │
+   ├─ registerTool(...)
+   ├─ getTools(...)
+   └─ executeTool(...)
+   │
+   ▼
+<span class="c">BROWSER AGENT</span>
+   ├─ tool discovery
+   ├─ structured arguments
+   └─ tool invocation</div>
+    <div class="grid">
+      <article class="plain"><h3>Web App</h3><p>이미 존재하는 client/backend 로직을 Agent가 호출할 수 있는 structured capability로 노출한다.</p></article>
+      <article class="plain"><h3>Browser</h3><p>페이지가 등록한 Tool을 Agent에 연결하는 실행 계층이 된다.</p></article>
+      <article class="plain"><h3>Agent</h3><p>LLM + rules + memory + tools를 바탕으로 어떤 Tool을 언제 사용할지 결정한다.</p></article>
+    </div>
+  </div>
+  <p class="note">현재 spec은 <code>document.modelContext</code> 아래 <code>registerTool()</code>, <code>getTools()</code>, <code>executeTool()</code> API를 정의한다. 페이지 내부 JavaScript Agent도 Tool discovery/execute를 사용할 수 있고, 브라우저가 제공하는 Agent는 별도의 내부 메커니즘을 사용한다.</p>
+</div></section>
+
+<section class="slide" id="s4"><div class="inner">
+  <span class="eyebrow">04 — MCP와 무엇이 다른가</span>
+  <h2>이름은 비슷하지만, 연결 지점이 다르다</h2>
+  <table><thead><tr><th></th><th>MCP</th><th>WebMCP</th><th>ACP / A2A</th></tr></thead><tbody>
+    <tr><td>연결 대상</td><td>Agent ↔ 외부 Tool / Data</td><td>Web App ↔ Browser Agent</td><td>Agent ↔ Editor / Agent ↔ Agent</td></tr>
+    <tr><td>주요 위치</td><td>서버 / 애플리케이션</td><td>브라우저의 Web App</td><td>클라이언트 / 네트워크</td></tr>
+    <tr><td>현재 핵심</td><td>Tools · Resources · Prompts 등</td><td>Structured Tools</td><td>Session / Message / Task</td></tr>
+    <tr><td>형태</td><td>Protocol</td><td>Web API</td><td>Protocol</td></tr>
+  </tbody></table>
+  <div class="callout"><strong>한 줄 요약:</strong> MCP를 “외부 capability 연결”이라고 보면, WebMCP는 “웹페이지 자체를 Agent-ready capability로 만드는 방법”에 가깝다.</div>
+  <p class="note">WebMCP는 MCP의 browser transport를 정의하는 표준이 아니다. WebMCP가 정의하는 것은 웹페이지의 Tool 노출을 위한 Web API이며, Chrome 문서도 MCP와 WebMCP를 서로 다른 문제를 해결하는 기술로 비교한다.</p>
+</div></section>
+
+<section class="slide" id="s5"><div class="inner">
+  <span class="eyebrow">05 — Imperative API</span>
+  <h2>복잡한 페이지 로직은 JavaScript 함수 그대로 Tool로</h2>
+  <div class="grid split">
+    <div class="code"><span class="c">// cartStore.add(...)는 기존 application logic</span>
+document.modelContext.registerTool({
+  name: <span class="s">"add_to_cart"</span>,
+  description: <span class="s">"Add a product to the cart"</span>,
+  inputSchema: {
+    type: <span class="s">"object"</span>,
+    properties: {
+      productId: { type: <span class="s">"string"</span> },
+      quantity: { type: <span class="s">"integer"</span>, minimum: 1 }
+    },
+    required: [<span class="s">"productId"</span>, <span class="s">"quantity"</span>]
+  },
+  execute: async ({ productId, quantity }) =>
+    cartStore.add(productId, quantity)
+});</div>
+    <div class="grid">
+      <article class="card"><h3>name</h3><p>Tool의 고유 식별자. Agent의 선택 대상이 된다.</p></article>
+      <article class="card"><h3>description</h3><p>Agent가 “언제 이 Tool을 써야 하는지” 이해하는 핵심 의미 정보다.</p></article>
+      <article class="card"><h3>inputSchema</h3><p>자유로운 텍스트 대신 구조화된 인자를 받도록 만든다.</p></article>
+      <article class="card"><h3>execute</h3><p>실제 페이지 상태 변경 또는 조회를 수행하는 application logic.</p></article>
+    </div>
+  </div>
+  <div class="callout"><strong>설계 포인트:</strong> 등록 시점에 상태를 캡처하기보다 실행 시점의 최신 application state를 읽는 쪽이 안전하다. Tool 정의는 의미 계약이고, 실제 상태는 execute가 결정한다.</div>
+</div></section>
+
+<section class="slide" id="s6"><div class="inner">
+  <span class="eyebrow">06 — Declarative API</span>
+  <h2>기존 HTML form도 Tool이 될 수 있다</h2>
+  <div class="grid split">
+    <div class="code"><span class="c">&lt;form
+  toolname="search_flights"
+  tooldescription="Search available flights"
+  action="/search"
+  method="get"&gt;</span>
+
+  &lt;input name="from" /&gt;
+  &lt;input name="to" /&gt;
+  &lt;input name="date" type="date" /&gt;
+
+<span class="c">&lt;/form&gt;</span></div>
+    <div class="grid">
+      <article class="plain"><h3>왜 필요한가?</h3><p>웹의 많은 기능은 복잡한 JS 함수가 아니라 이미 semantic HTML form으로 구현되어 있다.</p></article>
+      <article class="plain"><h3>장점</h3><p>기존 form을 크게 재작성하지 않고 Tool name, description, parameter semantics를 추가할 수 있다.</p></article>
+      <article class="plain"><h3>방향</h3><p>“Agent 전용 코드”를 새로 만드는 것보다 기존 Web platform semantics를 재사용하는 접근이다.</p></article>
+    </div>
+  </div>
+  <div class="pill-row"><span class="pill">toolname</span><span class="pill">tooldescription</span><span class="pill">form fields = arguments</span><span class="pill">semantic HTML</span></div>
+  <p class="note">Chrome의 Declarative API 문서는 표준 HTML form에 Tool 이름·설명을 annotations로 추가해 browser가 Agent용 structured representation으로 번역하는 방식을 설명한다.</p>
+</div></section>
+
+<section class="slide" id="s7"><div class="inner">
+  <span class="eyebrow">07 — 실행 모델</span>
+  <h2>핵심은 “UI 자동화”가 아니라 “capability invocation”이다</h2>
+  <div class="flow">
+    <div class="step"><div class="dot"></div><div><h3>1. Tool discovery</h3><p>Agent가 현재 페이지에서 사용할 수 있는 Tool을 안다.</p></div></div>
+    <div class="step"><div class="dot"></div><div><h3>2. Semantic selection</h3><p>Tool name / description / schema를 보고 목적에 맞는 기능을 고른다.</p></div></div>
+    <div class="step"><div class="dot"></div><div><h3>3. Structured invocation</h3><p>productId, date, quantity처럼 명시된 인자를 넣어 Tool을 호출한다.</p></div></div>
+    <div class="step"><div class="dot"></div><div><h3>4. Application logic</h3><p>페이지가 이미 가지고 있는 로직이 인증·상태·API 호출·화면 갱신을 수행한다.</p></div></div>
+  </div>
+  <div class="callout"><strong>중요한 관점:</strong> WebMCP는 Agent에게 “더 많은 권한”을 자동으로 주는 기술이 아니라, <strong>기존 웹 애플리케이션의 capability를 더 명확한 interface로 노출하는 기술</strong>이다.</div>
+</div></section>
+
+<section class="slide" id="s8"><div class="inner">
+  <span class="eyebrow">08 — 보안</span>
+  <h2>Tool은 기능이 아니라 <em style="color:var(--red)">권한의 표면</em>이다</h2>
+  <div class="grid g2">
+    <article class="card"><h3><span class="tag warn">Attack</span> Malicious manifest</h3><p>Tool name, description, parameters 등에 Agent의 행동을 유도하는 악성 지시가 숨어 있을 수 있다.</p></article>
+    <article class="card"><h3><span class="tag warn">Attack</span> Contaminated output</h3><p>신뢰 가능한 사이트라도 댓글·사용자 입력·외부 데이터에 악성 지시가 섞여 Agent의 다음 행동에 영향을 줄 수 있다.</p></article>
+    <article class="card"><h3><span class="tag green">Hint</span> readOnly</h3><p>상태를 바꾸지 않는 Tool은 read-only annotation으로 표시해 불필요한 확인을 줄인다.</p></article>
+    <article class="card"><h3><span class="tag warn">Hint</span> consequential</h3><p>결제·예약·삭제·송금처럼 영향이 큰 작업은 consequential hint 등을 사용해 사용자 확인을 유도한다.</p></article>
+  </div>
+  <div class="callout warn"><strong>설계 원칙:</strong> description과 실제 side effect가 일치해야 하고, 민감하거나 되돌릴 수 없는 작업은 명시적인 확인 경계를 둔다. “Tool을 등록할 수 있다”와 “Agent에게 자유롭게 실행시켜도 된다”는 같은 말이 아니다.</div>
+  <p class="note">Chrome의 WebMCP security guidance는 indirect prompt injection과 Tool metadata/output을 통한 공격면을 별도로 다룬다. WebMCP spec에도 Security & Privacy Considerations가 포함되어 있다.</p>
+</div></section>
+
+<section class="slide" id="s9"><div class="inner">
+  <span class="eyebrow">09 — 2026년 9월 현재</span>
+  <h2>표준 확정은 아니지만, 브라우저 플랫폼에 실제로 들어오기 시작했다</h2>
+  <div class="grid g4">
+    <article class="plain"><h3>2026.02</h3><p>WebMCP Early Preview 공개.</p></article>
+    <article class="plain"><h3>2026.06</h3><p>Chrome 149 Origin Trial 시작.</p></article>
+    <article class="plain"><h3>2026.06</h3><p>Chrome DevTools 149에서 실험적 WebMCP debugging 지원.</p></article>
+    <article class="plain"><h3>2026.09</h3><p>Draft Community Group Report가 9월 28일 갱신.</p></article>
+  </div>
+  <div class="facts"><div><b>NOT</b><span>W3C Standard</span></div><div><b>YES</b><span>WebML CG Draft</span></div><div><b>YES</b><span>Chrome Origin Trial</span></div><div><b>EARLY</b><span>Browser ecosystem</span></div></div>
+  <div class="callout"><strong>해석:</strong> 지금 발표에서 “표준이 됐다”고 표현하는 것은 이르다. 반대로 단순 아이디어로만 치부하기에도 Chrome의 실제 구현·실험·DevTools 지원이 이미 진행되고 있다.</div>
+</div></section>
+
+<section class="slide" id="s10"><div class="inner">
+  <span class="eyebrow">10 — 왜 주목할 만한가</span>
+  <h2>웹이 “Agent-compatible UI”에서 “Agent-native interface”로 갈 수 있다</h2>
+  <div class="grid g2">
+    <article class="plain"><h3>Before</h3><p>Agent가 화면을 해석한다. UI가 사람에게 친절해야 하고, Agent는 그 UI를 다시 추론한다.</p></article>
+    <article class="plain"><h3>With WebMCP</h3><p>Web App이 capability를 구조화해 제공한다. Agent는 “무엇을 할 수 있는가”를 직접 본다.</p></article>
+  </div>
+  <div class="grid g3">
+    <article class="card"><h3>Reliability</h3><p>레이아웃과 버튼 위치에 덜 의존한다.</p></article>
+    <article class="card"><h3>Efficiency</h3><p>불필요한 screenshot → click → observe loop를 줄일 수 있다.</p></article>
+    <article class="card"><h3>Personalization</h3><p>사이트의 실제 session/auth/state를 활용하면서 structured action을 수행할 수 있다.</p></article>
+  </div>
+  <p class="note">이는 WebMCP가 “브라우저를 위한 또 하나의 자동화 API”라는 것보다, 웹 애플리케이션이 Agent에게 자신의 capability를 설명하는 새로운 interface layer라는 관점이 중요한 이유다.</p>
+</div></section>
+
+<section class="slide" id="s11"><div class="inner">
+  <span class="eyebrow">11 — 웹 개발자 관점</span>
+  <h2>Agent가 생기면 제품 설계 질문도 하나 늘어난다</h2>
+  <div class="grid g4">
+    <article class="card"><h3>UX</h3><p>사람뿐 아니라 Agent도 이해하기 쉬운 의미와 상태를 제공하는가?</p></article>
+    <article class="card"><h3>Capability</h3><p>우리 서비스에서 Agent가 직접 호출할 가치가 큰 작업은 무엇인가?</p></article>
+    <article class="card"><h3>Schema</h3><p>Tool 이름·description·input schema가 의도를 충분히 표현하는가?</p></article>
+    <article class="card"><h3>Security</h3><p>읽기 / 변경 / 파괴적 작업을 어디에서 나눌 것인가?</p></article>
+  </div>
+  <div class="code"><span class="c">질문을 이렇게 바꿔볼 수 있다.</span>
+
+“사용자가 이 기능을 클릭해서 수행한다”
+        ↓
+“Agent가 이 기능을 Tool로 호출한다면
+ 어떤 name / description / schema / confirmation이 필요한가?”</div>
+  <p class="note">Chrome best practices도 Tool strategy → semantic language → schema/input → reliable tool → test/debug 순서로 설계를 권장한다.</p>
+</div></section>
+
+<section class="slide" id="s12"><div class="inner">
+  <span class="eyebrow">12 — Agent ecosystem</span>
+  <h2>지금까지 나온 기술을 “Agent가 무엇과 연결되는가?”로 보면</h2>
+  <div class="grid g4">
+    <article class="plain"><h3>MCP</h3><p><strong>Agent ↔ External Capability</strong><br>서버·데이터·도구 연결.</p></article>
+    <article class="plain"><h3>ACP</h3><p><strong>Agent ↔ Editor / Client</strong><br>Agent를 다른 클라이언트가 제어·통합.</p></article>
+    <article class="plain"><h3>WebMCP</h3><p><strong>Web App ↔ Browser Agent</strong><br>웹페이지가 자신의 기능을 Tool로 노출.</p></article>
+    <article class="plain"><h3>A2A</h3><p><strong>Agent ↔ Agent</strong><br>서로 다른 Agent의 협업과 작업 위임.</p></article>
+  </div>
+  <div class="callout"><strong>주의:</strong> 이 그림은 “하나의 표준으로 통합된다”는 의미가 아니라, 현재 각 기술이 해결하려는 연결 경계를 비교하기 위한 개념도다.</div>
+</div></section>
+
+<section class="slide" id="s13"><div class="inner">
+  <span class="eyebrow">13 — 도입 판단</span>
+  <h2>“WebMCP를 붙일까?”보다 먼저 볼 세 가지</h2>
+  <div class="grid g3">
+    <article class="card"><h3>① 반복되는 중요한 사용자 작업</h3><p>검색·예약·주문·신청·진단처럼 Agent가 대신 수행할 가치가 명확한가?</p></article>
+    <article class="card"><h3>② 기존 application logic 재사용</h3><p>새 자동화 코드를 만드는 것이 아니라, 이미 안정적인 business logic을 Tool로 연결할 수 있는가?</p></article>
+    <article class="card"><h3>③ side effect와 trust boundary</h3><p>읽기와 변경 작업을 어떻게 구분하고, 어디에서 사용자 확인을 요구할 것인가?</p></article>
+  </div>
+  <div class="callout"><strong>초기 도입에 잘 맞는 예:</strong> 검색 / 조회 / 필터 / 진단 / 계산처럼 비교적 명확한 read-oriented capability부터 시작하고, 결제·삭제·권한 변경 같은 consequential action은 별도 검토한다.</div>
+</div></section>
+
+<section class="slide" id="s14"><div class="inner">
+  <span class="eyebrow">14 — Takeaways</span>
+  <h2>오늘 기억할 것은 네 문장으로 충분하다</h2>
+  <div class="grid g2">
+    <article class="plain"><h3>1. WebMCP = Browser-native capability interface</h3><p>웹페이지가 Agent에게 structured tools를 제공하는 Web API.</p></article>
+    <article class="plain"><h3>2. UI 조작보다 capability 호출에 가깝다</h3><p>Agent가 버튼의 의미를 추측하는 대신 사이트가 기능과 schema를 직접 제공한다.</p></article>
+    <article class="plain"><h3>3. MCP와 이름만 비슷하다</h3><p>MCP의 브라우저 transport가 아니라, Web App ↔ Browser Agent를 위한 별도의 Web API다.</p></article>
+    <article class="plain"><h3>4. 아직은 early stage다</h3><p>Draft spec + Chrome Origin Trial/Early Preview이므로 browser support·semantics·security가 계속 변할 수 있다.</p></article>
+  </div>
+  <div class="quote"><strong>한 문장:</strong> “웹이 사람에게 클릭 방법을 보여주는 것에서, Agent에게 자신이 할 수 있는 일을 API처럼 설명하는 것으로 진화하는 실험이다.”<cite>AI Agent Study summary · 2026-09-30</cite></div>
+</div></section>
+
+<section class="slide" id="s15"><div class="inner">
+  <span class="eyebrow">15 — Sources</span>
+  <h2>공식 자료 중심으로 더 보기</h2>
+  <div class="source-list">
+    <div>① <a href="https://webmachinelearning.github.io/webmcp/" target="_blank" rel="noreferrer">WebMCP Draft Community Group Report</a><small> — Web Machine Learning Community Group · 2026-09-28</small></div>
+    <div>② <a href="https://developer.chrome.com/docs/ai/webmcp" target="_blank" rel="noreferrer">WebMCP</a><small> — Chrome for Developers · updated 2026-08-07</small></div>
+    <div>③ <a href="https://developer.chrome.com/blog/ai-webmcp-origin-trial" target="_blank" rel="noreferrer">Join the WebMCP origin trial</a><small> — Chrome for Developers · 2026-06-09</small></div>
+    <div>④ <a href="https://developer.chrome.com/docs/ai/webmcp/declarative-api" target="_blank" rel="noreferrer">Declarative API</a><small> — Chrome for Developers · updated 2026-09-25</small></div>
+    <div>⑤ <a href="https://developer.chrome.com/docs/ai/webmcp/best-practices" target="_blank" rel="noreferrer">WebMCP best practices</a><small> — Chrome for Developers · 2026-05-18</small></div>
+    <div>⑥ <a href="https://developer.chrome.com/docs/ai/webmcp/secure-tools" target="_blank" rel="noreferrer">WebMCP tool security</a><small> — Chrome for Developers · updated 2026-09-01</small></div>
+    <div>⑦ <a href="https://developer.chrome.com/blog/new-in-devtools-149" target="_blank" rel="noreferrer">What's new in DevTools (Chrome 149)</a><small> — Chrome for Developers · 2026-06-02</small></div>
+    <div>⑧ <a href="https://developer.chrome.com/blog/webmcp-epp" target="_blank" rel="noreferrer">WebMCP is available for early preview</a><small> — Chrome for Developers · 2026-02-10</small></div>
+  </div>
+  <div class="footer">WebMCP Study · prepared for AI Agent Study · factual status checked against official sources on 2026-09-30</div>
+</div></section>
+</main>
+<div class="hint">↑ ↓  슬라이드 이동</div>
+<script>
+const links=[...document.querySelectorAll('.rail a')];
+const sections=[...document.querySelectorAll('.slide')];
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.setAttribute('aria-current','false'));const a=document.querySelector(`.rail a[href="#${e.target.id}"]`);if(a)a.setAttribute('aria-current','true')}})},{threshold:.45});
+sections.forEach(s=>obs.observe(s));
+addEventListener('keydown',e=>{if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();const i=sections.findIndex(s=>{const r=s.getBoundingClientRect();return r.top>=-10&&r.top<window.innerHeight*.5});if(i<sections.length-1)sections[i+1].scrollIntoView();} if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();const i=sections.findIndex(s=>{const r=s.getBoundingClientRect();return r.top>=-10&&r.top<window.innerHeight*.5});if(i>0)sections[i-1].scrollIntoView();}});
+</script>
+</body>
+</html>
