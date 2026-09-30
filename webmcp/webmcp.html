@@ -100,11 +100,12 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   <a href="#who"><span class="n">06</span><span>누가 이 목록을 보나</span></a>
   <a href="#map"><span class="n">07</span><span>지도 위의 자리</span></a>
   <a href="#mcp"><span class="n">08</span><span>MCP와 무엇이 다른가</span></a>
-  <a href="#security"><span class="n">09</span><span>설명도 결과도 프롬프트</span></a>
-  <a href="#when"><span class="n">10</span><span>언제 쓰나</span></a>
-  <a href="#status"><span class="n">11</span><span>지금 어디까지</span></a>
-  <a href="#wrap"><span class="n">12</span><span>정리</span></a>
-  <a href="#refs"><span class="n">13</span><span>출처</span></a>
+  <a href="#rest"><span class="n">09</span><span>REST API와 무엇이 다른가</span></a>
+  <a href="#security"><span class="n">10</span><span>설명도 결과도 프롬프트</span></a>
+  <a href="#when"><span class="n">11</span><span>언제 쓰나</span></a>
+  <a href="#status"><span class="n">12</span><span>지금 어디까지</span></a>
+  <a href="#wrap"><span class="n">13</span><span>정리</span></a>
+  <a href="#refs"><span class="n">14</span><span>출처</span></a>
 </nav>
 <main>
 
@@ -275,8 +276,30 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   <p class="note">WebMCP는 MCP의 확장도 대체도 아니다. 스펙은 WebMCP를 쓰는 페이지를 “tool을 백엔드 대신 클라이언트 스크립트로 구현한 MCP 서버”처럼 볼 수 있다고 하고, Chrome은 “MCP에서 영감을 받은 API”라고 부른다. resources 같은 서버 쪽 개념은 없고 tool만 있다. Chrome은 둘을 같이 쓰라고 권한다.</p>
 </div></section>
 
+<section class="slide" id="rest"><div class="inner">
+  <span class="kicker">09 — REST API와 무엇이 다른가</span>
+  <h2>“그냥 REST API를 열면 되지 않나?”</h2>
+  <table>
+    <thead><tr><th scope="col"></th><th scope="col">REST API</th><th scope="col">WebMCP tool</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">누가 읽나</th><td>개발자가 문서(OpenAPI 등)를 읽는다</td><td class="we">Agent가 <code>description</code>·<code>inputSchema</code>를 직접 읽는다</td></tr>
+      <tr><th scope="row">연결 코드</th><td>누군가 미리 클라이언트나 tool 래퍼를 짜야 한다</td><td class="we">없다. 페이지를 열면 목록이 딸려 온다</td></tr>
+      <tr><th scope="row">인증</th><td>API 키·OAuth 토큰을 따로 발급받는다</td><td class="we">지금 브라우저의 로그인·쿠키 그대로</td></tr>
+      <tr><th scope="row">도는 코드</th><td>서버 엔드포인트</td><td class="we">페이지의 프런트 코드 (그 안에서 서버 API를 부를 수도 있다)</td></tr>
+      <tr><th scope="row">화면</th><td>안 바뀐다. 결과는 JSON으로만 돌아온다</td><td class="we">사용자가 보는 화면이 같이 바뀐다</td></tr>
+    </tbody>
+  </table>
+  <div class="grid g3">
+    <article class="card"><h3>새 API를 안 만든다</h3><p>공개 API가 없는 사이트도, 있던 함수나 form에 이름표만 붙이면 된다. 엔드포인트 설계·버전 관리·키 발급이 따라오지 않는다.</p></article>
+    <article class="card"><h3>화면에만 있는 기능도 연다</h3><p>필터 상태, 편집 중인 문서, 장바구니 UI처럼 서버 API로는 닿지 않는 <b>탭 안의 상태</b>를 그대로 다룬다.</p></article>
+    <article class="card"><h3>사람이 옆에서 본다</h3><p>Agent가 한 일이 화면에 바로 나타나서 사람이 확인하고 이어서 손댈 수 있다. JSON 응답은 사람이 따로 봐야 한다.</p></article>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>REST API는 거래처용 발주 시스템이다. 계약(키)을 맺고 발주 프로그램을 짜 둬야 쓴다. WebMCP 주문서는 매장에 들어온 손님이면 바로 채운다.</p>
+  <p class="note"><span class="tag amber">추론</span> 이 비교는 발표자 정리다. WebMCP가 REST API를 대신하지는 않는다. 탭 없이 도는 일, 서버끼리의 연동, 대량 처리는 여전히 REST API(또는 그것을 감싼 MCP 서버)가 맡는다. WebMCP는 보통 그 위, 화면 쪽에 얹히는 층이다.</p>
+</div></section>
+
 <section class="slide" id="security"><div class="inner">
-  <span class="kicker">09 — 보안</span>
+  <span class="kicker">10 — 보안</span>
   <h2>tool의 설명도 결과도, Agent에게는 <span style="color:var(--red)">프롬프트</span>다</h2>
   <div class="grid g3">
     <article class="card">
@@ -300,7 +323,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="when"><div class="inner">
-  <span class="kicker">10 — 언제 쓰나</span>
+  <span class="kicker">11 — 언제 쓰나</span>
   <h2>첫 질문 하나로 고른다</h2>
   <p class="q">사용자가 그 페이지를 열어 두고, Agent와 같이 하는 일인가?</p>
   <div class="yn">
@@ -326,7 +349,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="status"><div class="inner">
-  <span class="kicker">11 — 2026년 9월 현재</span>
+  <span class="kicker">12 — 2026년 9월 현재</span>
   <h2>표준은 아니지만, Chrome에서 먼저 써 볼 수 있다</h2>
   <div class="grid g4">
     <article class="plain"><h3>2026-02</h3><p>Chrome, Early Preview 프로그램 공개</p></article>
