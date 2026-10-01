@@ -94,9 +94,9 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   <span class="brand">webmcp-study</span>
   <a href="#cover"><span class="n">01</span><span>WebMCP</span></a>
   <a href="#summary"><span class="n">02</span><span>오늘 가져갈 두 문장</span></a>
-  <a href="#same-ask"><span class="n">03</span><span>같은 부탁, 두 방법</span></a>
-  <a href="#imperative"><span class="n">04</span><span>JavaScript로 등록</span></a>
-  <a href="#declarative"><span class="n">05</span><span>HTML form으로 등록</span></a>
+  <a href="#same-ask"><span class="n">03</span><span>WebMCP 없이 vs 있을 때</span></a>
+  <a href="#imperative"><span class="n">04</span><span>tool 등록 ① JavaScript</span></a>
+  <a href="#declarative"><span class="n">05</span><span>tool 등록 ② HTML form</span></a>
   <a href="#who"><span class="n">06</span><span>누가 이 목록을 보나</span></a>
   <a href="#map"><span class="n">07</span><span>지도 위의 자리</span></a>
   <a href="#mcp"><span class="n">08</span><span>MCP와 무엇이 다른가</span></a>
@@ -139,12 +139,12 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="same-ask"><div class="inner">
-  <span class="kicker">03 — 같은 부탁, 두 방법</span>
+  <span class="kicker">03 — 같은 부탁, WebMCP 없이 vs 있을 때</span>
   <h2>화면을 보고 누르느냐, 목록에서 골라 부르느냐</h2>
   <p class="ask">“이 운동화 270으로 두 켤레 장바구니에 담아 줘”</p>
   <div class="lanes">
     <section class="lane bad">
-      <header><h3>지금 — 화면을 보고 누른다</h3><span>DOM · 스크린샷</span></header>
+      <header><h3>WebMCP 없이 — 화면을 보고 누른다</h3><span>DOM · 스크린샷</span></header>
       <ol>
         <li class="guess"><span>화면을 보고 “270 버튼이 어디지?” 추측한 뒤 클릭</span></li>
         <li class="look"><span>다시 화면을 읽는다</span></li>
@@ -156,7 +156,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
       <footer>단계마다 추측이 끼어든다. 문구나 배치가 바뀌면 틀린다.</footer>
     </section>
     <section class="lane good">
-      <header><h3>WebMCP — 목록에서 골라 부른다</h3><span>tool 호출</span></header>
+      <header><h3>WebMCP로 — 목록에서 골라 부른다</h3><span>tool 호출</span></header>
       <ol>
         <li><span>페이지가 내민 목록에서 <code>add_to_cart(상품, 사이즈, 수량)</code>을 찾는다</span></li>
         <li><span><code>add_to_cart({ productId, size: "270", quantity: 2 })</code>를 한 번 부른다</span></li>
@@ -167,11 +167,13 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   </div>
   <p class="easy"><b>쉽게 말하면</b>메뉴판을 읽고 손가락으로 가리키는 대신, 주문서의 빈칸만 채워서 낸다.</p>
   <p class="note">화면 보기가 없어지는 것은 아니다. 스펙의 예시에서도 브라우저는 스크린샷 같은 화면 정보에 tool 목록을 <b>덧붙여</b> Agent에게 건넨다. 목록에 없는 일은 예전처럼 화면을 보고 한다.</p>
+  <div class="callout">오른쪽의 tool 목록은 <b>페이지가 미리 만들어 둔다</b>. WebMCP는 그 목록을 만드는 법을 두 가지 준다 — ① JavaScript로 등록(04), ② HTML form에 속성 붙이기(05). 둘 다 WebMCP다.</div>
 </div></section>
 
 <section class="slide" id="imperative"><div class="inner">
-  <span class="kicker">04 — 방법 ① JavaScript (Imperative API)</span>
+  <span class="kicker">04 — WebMCP tool 등록 ① JavaScript (Imperative API)</span>
   <h2>원래 있던 함수에 이름표를 붙인다</h2>
+  <p class="lede"><code>registerTool()</code>은 WebMCP가 새로 들인 API다. 원래 있던 것은 <code>execute</code> 안에서 부르는 <code>cart.add()</code>뿐이다.</p>
   <div class="grid split">
 <pre class="code"><span class="k">document.modelContext.registerTool</span>({
   name: <span class="s">"add_to_cart"</span>,
@@ -202,8 +204,9 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="declarative"><div class="inner">
-  <span class="kicker">05 — 방법 ② HTML form (Declarative API)</span>
+  <span class="kicker">05 — WebMCP tool 등록 ② HTML form (Declarative API)</span>
   <h2>이미 있는 form은 속성 몇 개로 tool이 된다</h2>
+  <p class="lede"><code>toolname</code>·<code>tooldescription</code> 같은 속성이 WebMCP가 새로 들인 것이다. form과 그 제출 처리는 원래 있던 그대로다.</p>
   <div class="grid split">
 <pre class="code">&lt;form <span class="k">toolname</span>=<span class="s">"search_flights"</span>
       <span class="k">tooldescription</span>=<span class="s">"Search flights by route and date."</span>
