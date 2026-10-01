@@ -77,8 +77,8 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 .page{border:2px solid var(--ink);background:var(--panel);padding:1rem;display:grid;gap:.5rem}.page .bar{font:.75rem var(--font-mono);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:.4rem}.page .tool{font:.85rem var(--font-mono);border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent-soft);padding:.25rem .5rem;justify-self:start}
 .arrow{font-size:1.6rem;color:var(--muted)}
 .readers{display:grid;gap:.7rem}
-/* 바깥 Agent가 들어오는 길 */
-.flow{font:.8rem/1.55 var(--font-mono);color:var(--accent-ink);background:var(--panel-2);padding:.45rem .6rem}
+/* 좁은 화면에서 행을 세로로 쌓는 표 */
+@media(max-width:620px){table.stack thead{display:none}table.stack tr{display:grid;border-bottom:1px solid var(--line)}table.stack tr:last-child{border-bottom:0}table.stack th,table.stack td{border:0;padding:.35rem .85rem;width:auto}table.stack tbody th{padding-top:.7rem;color:var(--ink);font-weight:600}table.stack td::before{content:attr(data-label);display:block;font-size:.72rem;color:var(--muted)}}
 /* 언제 쓰나 */
 .q{font-family:var(--font-display);font-size:clamp(1.3rem,1.1rem + .9vw,1.9rem);font-weight:800;border:2px solid var(--ink);background:var(--panel);padding:.9rem 1.2rem;line-height:1.3}
 .yn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
@@ -100,7 +100,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   <a href="#imperative"><span class="n">04</span><span>tool 등록 ① JavaScript</span></a>
   <a href="#declarative"><span class="n">05</span><span>tool 등록 ② HTML form</span></a>
   <a href="#who"><span class="n">06</span><span>누가 이 목록을 보나</span></a>
-  <a href="#outside"><span class="n">07</span><span>바깥 Agent가 들어오는 길</span></a>
+  <a href="#outside"><span class="n">07</span><span>브라우저 밖 Agent는?</span></a>
   <a href="#map"><span class="n">08</span><span>지도 위의 자리</span></a>
   <a href="#mcp"><span class="n">09</span><span>MCP와 무엇이 다른가</span></a>
   <a href="#rest"><span class="n">10</span><span>REST API와 무엇이 다른가</span></a>
