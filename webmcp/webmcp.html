@@ -244,8 +244,8 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
     <div class="readers">
       <article class="card"><h3>브라우저의 Agent <span class="tag api">주로 부르는 쪽</span></h3><p>브라우저에 들어 있거나 확장 프로그램으로 붙은 Agent다. 페이지의 JavaScript를 직접 돌리지 않는다. 브라우저가 화면 정보에 tool 목록을 붙여 건넨다. 이때 어떤 형식으로 넘길지(MCP든 자체 function calling이든)는 브라우저가 정한다.</p></article>
       <article class="card"><h3>페이지 안의 JavaScript Agent</h3><p><code>getTools()</code>로 목록을 받고 <code>executeTool()</code>로 부른다. 스펙이 이 두 메서드를 둔 이유가 이것이다.</p></article>
-      <article class="card"><h3>개발 도구</h3><p>DevTools 149의 Application 패널에서 tool을 보고 직접 실행해 볼 수 있다. Chrome DevTools for agents(MCP 서버)도 WebMCP tool을 나열하고 실행한다. 둘 다 실험 기능이다. <span class="tag amber">추론</span> MCP 클라이언트인 코딩 Agent로 내 페이지의 tool을 시험해 볼 수 있다.</p></article>
-      <article class="card"><h3>브라우저 밖의 Agent <span class="tag warn">못 본다</span></h3><p>Claude Desktop·CLI·클라우드 Agent처럼 브라우저 밖에서 도는 Agent에게는 목록이 가지 않는다. 같은 가게를 쓰려면 MCP 서버나 REST API로 가거나, 위의 Chrome DevTools for agents처럼 브라우저 안으로 들어가는 MCP 서버를 거친다. 들어오는 길은 다음 장(07)에서 본다.</p></article>
+      <article class="card"><h3>개발 도구</h3><p>DevTools 149의 Application 패널에서 tool을 보고 직접 실행해 볼 수 있다. Chrome DevTools for agents(MCP 서버)도 WebMCP tool을 나열하고 실행한다. 둘 다 실험 기능이다. <span class="tag amber">추정</span> MCP 클라이언트인 코딩 Agent로 내 페이지의 tool을 시험해 볼 수 있다.</p></article>
+      <article class="card"><h3>브라우저 밖의 Agent <span class="tag warn">못 본다</span></h3><p>Claude Desktop·CLI·클라우드 Agent처럼 브라우저 밖에서 도는 Agent에게는 목록이 가지 않는다. 같은 가게를 쓰려면 MCP 서버나 REST API로 가거나, 위의 Chrome DevTools for agents처럼 브라우저 안으로 들어가는 MCP 서버를 거친다. 이 tool을 쓰는 방법은 다음 장(07)에서 본다.</p></article>
     </div>
   </div>
   <p class="easy"><b>쉽게 말하면</b>주문서는 가게 안에 들어온 사람만 본다. 브라우저 밖의 Agent는 가게 밖 손님이라, 이 가게에 주문서가 있는지조차 모른다.</p>
@@ -253,28 +253,19 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="outside"><div class="inner">
-  <span class="kicker">07 — 브라우저 밖의 Agent는 어떻게 들어오나</span>
-  <h2>두 Agent가 대화하는 게 아니라, 바깥 Agent가 브라우저 안에 손을 넣는다</h2>
-  <p class="lede">WebMCP 스펙이 정하는 것은 <b>페이지 → 브라우저</b> 구간뿐이다. 바깥 Agent와 브라우저 Agent를 잇는 장치는 없다. “브라우저 Agent”는 따로 있는 존재라기보다 <b>탭 안에서 tool 목록을 받는 자리</b>이고, 바깥 Agent는 아래 길로 그 자리에 앉는다.</p>
-  <div class="grid g3">
-    <article class="card">
-      <h3>① 브라우저를 모는 MCP 서버 <span class="tag green">공식 · 실험</span></h3>
-      <p class="flow">바깥 Agent → MCP → 서버 → 브라우저 → 탭의 tool</p>
-      <p>Chrome DevTools for agents가 이 길이다. 브라우저의 Agent를 거치지 않고 <b>바깥 Agent가 직접</b> tool을 나열하고 부른다.</p>
-    </article>
-    <article class="card">
-      <h3>② 확장 프로그램형 Agent <span class="tag amber">추론</span></h3>
-      <p class="flow">확장 프로그램(손) ↔ 바깥의 모델(머리)</p>
-      <p>06의 “확장 프로그램으로 붙은 Agent”다. 브라우저 안의 손과 바깥의 판단이 <b>사실상 한 Agent</b>라서 둘을 이을 필요가 없다.</p>
-    </article>
-    <article class="card">
-      <h3>③ Agent끼리 일을 맡김 <span class="tag amber">추론</span></h3>
-      <p class="flow">바깥 Agent → (A2A 같은 방식) → 브라우저 Agent</p>
-      <p>“이 사이트에서 이거 해 줘”를 넘기는 길이다. 두 Agent가 실제로 대화하는 유일한 경우지만, <b>표준도 공식 구현도 확인되지 않았다</b>.</p>
-    </article>
-  </div>
-  <p class="easy"><b>쉽게 말하면</b>가게 밖 손님은 주문서를 못 본다. 그래서 가게 안에 대리인을 들여보낸다. 리모컨 로봇(①)이든 자기 분신(②)이든 가게 직원에게 부탁하든(③), 주문서를 채우는 건 결국 가게 안에 있는 쪽이다.</p>
-  <p class="note">①은 Chrome 문서에 나오는 실험 기능이다. ②·③의 구조 설명은 발표자 정리다.</p>
+  <span class="kicker">07 — 브라우저 밖의 Agent는 어떻게 쓰나</span>
+  <h2>WebMCP는 두 Agent를 잇지 않는다</h2>
+  <p class="lede">WebMCP가 정하는 것은 <b>페이지가 브라우저에 tool 목록을 넘기는 데까지</b>다. 그 목록을 받아 tool을 부를 수 있는 것은 브라우저 안에서 도는 프로그램뿐이다. 그래서 바깥 Agent가 이 tool을 쓰려면 <b>브라우저 안에 자기 대신 움직일 무언가를 둬야 한다</b>. 지금 생각할 수 있는 방법은 세 가지다.</p>
+  <table class="stack">
+    <thead><tr><th scope="col"></th><th scope="col">브라우저 안에 두는 것</th><th scope="col">tool을 부르는 쪽</th><th scope="col">근거</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">① 브라우저 제어 MCP 서버</th><td data-label="브라우저 안에 두는 것">MCP 서버가 브라우저를 원격으로 조종한다 (Chrome DevTools for agents)</td><td class="we" data-label="tool을 부르는 쪽"><b>바깥 Agent</b>가 MCP로 직접 부른다. 브라우저의 Agent는 끼지 않는다</td><td data-label="근거"><span class="tag green">문서 확인</span> 실험 기능</td></tr>
+      <tr><th scope="row">② 확장 프로그램</th><td data-label="브라우저 안에 두는 것">확장 프로그램이 tool 목록을 받는다</td><td class="we" data-label="tool을 부르는 쪽">확장 프로그램이 부르고, <b>무엇을 부를지는 바깥의 모델</b>이 정한다</td><td data-label="근거"><span class="tag amber">추정</span> 확장 Agent의 흔한 구조를 적용</td></tr>
+      <tr><th scope="row">③ Agent끼리 맡기기</th><td data-label="브라우저 안에 두는 것">브라우저에 들어 있는 Agent</td><td class="we" data-label="tool을 부르는 쪽"><b>브라우저 Agent</b>가 부른다. 바깥 Agent는 할 일만 넘긴다</td><td data-label="근거"><span class="tag warn">구현 없음</span> 표준도 공식 구현도 찾지 못함</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">두 Agent가 실제로 말을 주고받는 것은 ③뿐이다. ①·②에서는 바깥 Agent가 브라우저 안의 손을 직접 움직이므로 “브라우저 Agent”가 따로 없다.</div>
+  <p class="easy"><b>쉽게 말하면</b>가게 밖 손님은 주문서를 직접 못 채운다. 그래서 ① 내가 조종하는 로봇을 들여보내거나, ② 전화로 내 지시를 받는 대리인을 세우거나, ③ 가게 점원에게 할 일을 부탁한다.</p>
 </div></section>
 
 <section class="slide" id="map"><div class="inner">
@@ -327,7 +318,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
     <article class="card"><h3>사람이 옆에서 본다</h3><p>Agent가 한 일이 화면에 바로 나타나서 사람이 확인하고 이어서 손댈 수 있다. JSON 응답은 사람이 따로 봐야 한다.</p></article>
   </div>
   <p class="easy"><b>쉽게 말하면</b>REST API는 거래처용 발주 시스템이다. 계약(키)을 맺고 발주 프로그램을 짜 둬야 쓴다. WebMCP 주문서는 매장에 들어온 손님이면 바로 채운다.</p>
-  <p class="note"><span class="tag amber">추론</span> 이 비교는 발표자 정리다. WebMCP가 REST API를 대신하지는 않는다. 탭 없이 도는 일, 서버끼리의 연동, 대량 처리는 여전히 REST API(또는 그것을 감싼 MCP 서버)가 맡는다. WebMCP는 보통 그 위, 화면 쪽에 얹히는 층이다.</p>
+  <p class="note"><span class="tag api">발표자 정리</span> 이 비교는 문서에 그대로 있는 것이 아니라 발표자가 묶은 것이다. WebMCP가 REST API를 대신하지는 않는다. 탭 없이 도는 일, 서버끼리의 연동, 대량 처리는 여전히 REST API(또는 그것을 감싼 MCP 서버)가 맡는다. WebMCP는 보통 그 위, 화면 쪽에 얹히는 층이다.</p>
 </div></section>
 
 <section class="slide" id="security"><div class="inner">
@@ -426,7 +417,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
     <div>⑨ <a href="https://developer.chrome.com/blog/new-in-devtools-149" target="_blank" rel="noreferrer">What's new in DevTools (Chrome 149)</a><small> — Chrome for Developers · 2026-06-02</small></div>
     <div>⑩ <a href="https://developer.chrome.com/blog/webmcp-epp" target="_blank" rel="noreferrer">WebMCP is available for early preview</a><small> — Chrome for Developers · 2026-02-10</small></div>
   </div>
-  <p class="note">읽는 법: API 이름·속성은 스펙(①)과 Chrome 문서(④⑤⑥)를 따랐다. <span class="tag amber">추론</span> 표시는 문서에 직접 적혀 있지 않은, 발표자의 해석이다.</p>
+  <p class="note">읽는 법: API 이름·속성은 스펙(①)과 Chrome 문서(④⑤⑥)를 따랐다. <span class="tag amber">추정</span> 표시는 문서에 적혀 있지 않아 발표자가 문서를 바탕으로 짐작한 것이다. <span class="tag api">발표자 정리</span>는 문서 내용을 발표자가 묶어 비교한 것이다.</p>
   <div class="footer">WebMCP · AI Agent 스터디 발표 자료 · 사실 확인 기준일 2026-09-30</div>
 </div></section>
 
