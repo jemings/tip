@@ -77,6 +77,8 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 .page{border:2px solid var(--ink);background:var(--panel);padding:1rem;display:grid;gap:.5rem}.page .bar{font:.75rem var(--font-mono);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:.4rem}.page .tool{font:.85rem var(--font-mono);border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent-soft);padding:.25rem .5rem;justify-self:start}
 .arrow{font-size:1.6rem;color:var(--muted)}
 .readers{display:grid;gap:.7rem}
+/* 바깥 Agent가 들어오는 길 */
+.flow{font:.8rem/1.55 var(--font-mono);color:var(--accent-ink);background:var(--panel-2);padding:.45rem .6rem}
 /* 언제 쓰나 */
 .q{font-family:var(--font-display);font-size:clamp(1.3rem,1.1rem + .9vw,1.9rem);font-weight:800;border:2px solid var(--ink);background:var(--panel);padding:.9rem 1.2rem;line-height:1.3}
 .yn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
@@ -98,14 +100,15 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   <a href="#imperative"><span class="n">04</span><span>tool 등록 ① JavaScript</span></a>
   <a href="#declarative"><span class="n">05</span><span>tool 등록 ② HTML form</span></a>
   <a href="#who"><span class="n">06</span><span>누가 이 목록을 보나</span></a>
-  <a href="#map"><span class="n">07</span><span>지도 위의 자리</span></a>
-  <a href="#mcp"><span class="n">08</span><span>MCP와 무엇이 다른가</span></a>
-  <a href="#rest"><span class="n">09</span><span>REST API와 무엇이 다른가</span></a>
-  <a href="#security"><span class="n">10</span><span>설명도 결과도 프롬프트</span></a>
-  <a href="#when"><span class="n">11</span><span>언제 쓰나</span></a>
-  <a href="#status"><span class="n">12</span><span>지금 어디까지</span></a>
-  <a href="#wrap"><span class="n">13</span><span>정리</span></a>
-  <a href="#refs"><span class="n">14</span><span>출처</span></a>
+  <a href="#outside"><span class="n">07</span><span>바깥 Agent가 들어오는 길</span></a>
+  <a href="#map"><span class="n">08</span><span>지도 위의 자리</span></a>
+  <a href="#mcp"><span class="n">09</span><span>MCP와 무엇이 다른가</span></a>
+  <a href="#rest"><span class="n">10</span><span>REST API와 무엇이 다른가</span></a>
+  <a href="#security"><span class="n">11</span><span>설명도 결과도 프롬프트</span></a>
+  <a href="#when"><span class="n">12</span><span>언제 쓰나</span></a>
+  <a href="#status"><span class="n">13</span><span>지금 어디까지</span></a>
+  <a href="#wrap"><span class="n">14</span><span>정리</span></a>
+  <a href="#refs"><span class="n">15</span><span>출처</span></a>
 </nav>
 <main>
 
@@ -242,15 +245,40 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
       <article class="card"><h3>브라우저의 Agent <span class="tag api">주로 부르는 쪽</span></h3><p>브라우저에 들어 있거나 확장 프로그램으로 붙은 Agent다. 페이지의 JavaScript를 직접 돌리지 않는다. 브라우저가 화면 정보에 tool 목록을 붙여 건넨다. 이때 어떤 형식으로 넘길지(MCP든 자체 function calling이든)는 브라우저가 정한다.</p></article>
       <article class="card"><h3>페이지 안의 JavaScript Agent</h3><p><code>getTools()</code>로 목록을 받고 <code>executeTool()</code>로 부른다. 스펙이 이 두 메서드를 둔 이유가 이것이다.</p></article>
       <article class="card"><h3>개발 도구</h3><p>DevTools 149의 Application 패널에서 tool을 보고 직접 실행해 볼 수 있다. Chrome DevTools for agents(MCP 서버)도 WebMCP tool을 나열하고 실행한다. 둘 다 실험 기능이다. <span class="tag amber">추론</span> MCP 클라이언트인 코딩 Agent로 내 페이지의 tool을 시험해 볼 수 있다.</p></article>
-      <article class="card"><h3>브라우저 밖의 Agent <span class="tag warn">못 본다</span></h3><p>Claude Desktop·CLI·클라우드 Agent처럼 브라우저 밖에서 도는 Agent에게는 목록이 가지 않는다. 같은 가게를 쓰려면 MCP 서버나 REST API로 가거나, 위의 Chrome DevTools for agents처럼 브라우저 안으로 들어가는 MCP 서버를 거친다.</p></article>
+      <article class="card"><h3>브라우저 밖의 Agent <span class="tag warn">못 본다</span></h3><p>Claude Desktop·CLI·클라우드 Agent처럼 브라우저 밖에서 도는 Agent에게는 목록이 가지 않는다. 같은 가게를 쓰려면 MCP 서버나 REST API로 가거나, 위의 Chrome DevTools for agents처럼 브라우저 안으로 들어가는 MCP 서버를 거친다. 들어오는 길은 다음 장(07)에서 본다.</p></article>
     </div>
   </div>
   <p class="easy"><b>쉽게 말하면</b>주문서는 가게 안에 들어온 사람만 본다. 브라우저 밖의 Agent는 가게 밖 손님이라, 이 가게에 주문서가 있는지조차 모른다.</p>
   <p class="note">기본으로는 같은 origin에만 보인다. 다른 사이트의 iframe에는 <code>tools</code> 권한 정책과 <code>exposedTo</code>로 허락한 곳에만 보인다.</p>
 </div></section>
 
+<section class="slide" id="outside"><div class="inner">
+  <span class="kicker">07 — 브라우저 밖의 Agent는 어떻게 들어오나</span>
+  <h2>두 Agent가 대화하는 게 아니라, 바깥 Agent가 브라우저 안에 손을 넣는다</h2>
+  <p class="lede">WebMCP 스펙이 정하는 것은 <b>페이지 → 브라우저</b> 구간뿐이다. 바깥 Agent와 브라우저 Agent를 잇는 장치는 없다. “브라우저 Agent”는 따로 있는 존재라기보다 <b>탭 안에서 tool 목록을 받는 자리</b>이고, 바깥 Agent는 아래 길로 그 자리에 앉는다.</p>
+  <div class="grid g3">
+    <article class="card">
+      <h3>① 브라우저를 모는 MCP 서버 <span class="tag green">공식 · 실험</span></h3>
+      <p class="flow">바깥 Agent → MCP → 서버 → 브라우저 → 탭의 tool</p>
+      <p>Chrome DevTools for agents가 이 길이다. 브라우저의 Agent를 거치지 않고 <b>바깥 Agent가 직접</b> tool을 나열하고 부른다.</p>
+    </article>
+    <article class="card">
+      <h3>② 확장 프로그램형 Agent <span class="tag amber">추론</span></h3>
+      <p class="flow">확장 프로그램(손) ↔ 바깥의 모델(머리)</p>
+      <p>06의 “확장 프로그램으로 붙은 Agent”다. 브라우저 안의 손과 바깥의 판단이 <b>사실상 한 Agent</b>라서 둘을 이을 필요가 없다.</p>
+    </article>
+    <article class="card">
+      <h3>③ Agent끼리 일을 맡김 <span class="tag amber">추론</span></h3>
+      <p class="flow">바깥 Agent → (A2A 같은 방식) → 브라우저 Agent</p>
+      <p>“이 사이트에서 이거 해 줘”를 넘기는 길이다. 두 Agent가 실제로 대화하는 유일한 경우지만, <b>표준도 공식 구현도 확인되지 않았다</b>.</p>
+    </article>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>가게 밖 손님은 주문서를 못 본다. 그래서 가게 안에 대리인을 들여보낸다. 리모컨 로봇(①)이든 자기 분신(②)이든 가게 직원에게 부탁하든(③), 주문서를 채우는 건 결국 가게 안에 있는 쪽이다.</p>
+  <p class="note">①은 Chrome 문서에 나오는 실험 기능이다. ②·③의 구조 설명은 발표자 정리다.</p>
+</div></section>
+
 <section class="slide" id="map"><div class="inner">
-  <span class="kicker">07 — 지금까지 본 기술 사이에서</span>
+  <span class="kicker">08 — 지금까지 본 기술 사이에서</span>
   <h2>“Agent가 무엇과 이어지나”로 놓아 보면</h2>
   <div class="map">
     <article class="link"><h3>MCP</h3><span class="ends">Agent ↔ 도구·데이터</span><p>서버에 있는 기능을 어떤 Agent에게나 연다.</p></article>
@@ -263,7 +291,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="mcp"><div class="inner">
-  <span class="kicker">08 — MCP와 무엇이 다른가</span>
+  <span class="kicker">09 — MCP와 무엇이 다른가</span>
   <h2>같은 신발 가게가 “주문 조회”를 Agent에게 연다면</h2>
   <table>
     <thead><tr><th scope="col"></th><th scope="col">MCP 서버로 열면</th><th scope="col">WebMCP로 열면</th></tr></thead>
@@ -281,7 +309,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="rest"><div class="inner">
-  <span class="kicker">09 — REST API와 무엇이 다른가</span>
+  <span class="kicker">10 — REST API와 무엇이 다른가</span>
   <h2>“그냥 REST API를 열면 되지 않나?”</h2>
   <table>
     <thead><tr><th scope="col"></th><th scope="col">REST API</th><th scope="col">WebMCP tool</th></tr></thead>
@@ -303,7 +331,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="security"><div class="inner">
-  <span class="kicker">10 — 보안</span>
+  <span class="kicker">11 — 보안</span>
   <h2>tool의 설명도 결과도, Agent에게는 <span style="color:var(--red)">프롬프트</span>다</h2>
   <p class="lede">아래 세 힌트는 모두 <b>등록할 때</b> tool 정의의 <code>annotations</code>에 붙인다. 호출 결과마다 붙이는 것이 아니다.</p>
 <pre class="code"><span class="k">registerTool</span>({ name, description, inputSchema, execute,
@@ -331,7 +359,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="when"><div class="inner">
-  <span class="kicker">11 — 언제 쓰나</span>
+  <span class="kicker">12 — 언제 쓰나</span>
   <h2>첫 질문 하나로 고른다</h2>
   <p class="q">사용자가 그 페이지를 열어 두고, Agent와 같이 하는 일인가?</p>
   <div class="yn">
@@ -357,7 +385,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="status"><div class="inner">
-  <span class="kicker">12 — 2026년 9월 현재</span>
+  <span class="kicker">13 — 2026년 9월 현재</span>
   <h2>표준은 아니지만, Chrome에서 먼저 써 볼 수 있다</h2>
   <div class="grid g4">
     <article class="plain"><h3>2026-02</h3><p>Chrome, Early Preview 프로그램 공개</p></article>
