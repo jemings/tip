@@ -77,8 +77,12 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 .page{border:2px solid var(--ink);background:var(--panel);padding:1rem;display:grid;gap:.5rem}.page .bar{font:.75rem var(--font-mono);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:.4rem}.page .tool{font:.85rem var(--font-mono);border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent-soft);padding:.25rem .5rem;justify-self:start}
 .arrow{font-size:1.6rem;color:var(--muted)}
 .readers{display:grid;gap:.7rem}
-/* 좁은 화면에서 행을 세로로 쌓는 표 */
-@media(max-width:620px){table.stack thead{display:none}table.stack tr{display:grid;border-bottom:1px solid var(--line)}table.stack tr:last-child{border-bottom:0}table.stack th,table.stack td{border:0;padding:.35rem .85rem;width:auto}table.stack tbody th{padding-top:.7rem;color:var(--ink);font-weight:600}table.stack td::before{content:attr(data-label);display:block;font-size:.72rem;color:var(--muted)}}
+/* WebMCP가 정하는 범위 */
+.legs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);gap:.6rem;align-items:center}
+.legs .node{border:2px solid var(--ink);background:var(--panel);padding:.8rem .9rem;display:grid;gap:.25rem;text-align:center}.legs .node b{font-size:1rem}.legs .node span{font-size:.8rem;color:var(--muted)}
+.legs .leg{display:grid;gap:.2rem;text-align:center;font-size:.82rem;color:var(--ink-2)}.legs .leg::after{content:"";height:2px;background:var(--line-strong);order:-1;margin-bottom:.25rem}
+.legs .leg b{font-size:.9rem}.legs .leg.spec::after{background:var(--accent);height:3px}.legs .leg.spec b{color:var(--accent-ink)}
+@media(max-width:900px){.legs{grid-template-columns:1fr}.legs .leg::after{display:none}.legs .leg{padding:.2rem 0}.legs .leg b::before{content:"↓ "}}
 /* 언제 쓰나 */
 .q{font-family:var(--font-display);font-size:clamp(1.3rem,1.1rem + .9vw,1.9rem);font-weight:800;border:2px solid var(--ink);background:var(--panel);padding:.9rem 1.2rem;line-height:1.3}
 .yn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
@@ -100,7 +104,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   <a href="#imperative"><span class="n">04</span><span>tool 등록 ① JavaScript</span></a>
   <a href="#declarative"><span class="n">05</span><span>tool 등록 ② HTML form</span></a>
   <a href="#who"><span class="n">06</span><span>누가 이 목록을 보나</span></a>
-  <a href="#outside"><span class="n">07</span><span>브라우저 밖 Agent는?</span></a>
+  <a href="#outside"><span class="n">07</span><span>WebMCP가 정하는 범위</span></a>
   <a href="#map"><span class="n">08</span><span>지도 위의 자리</span></a>
   <a href="#mcp"><span class="n">09</span><span>MCP와 무엇이 다른가</span></a>
   <a href="#rest"><span class="n">10</span><span>REST API와 무엇이 다른가</span></a>
@@ -242,10 +246,10 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
     </div>
     <span class="arrow" aria-hidden="true">→</span>
     <div class="readers">
-      <article class="card"><h3>브라우저의 Agent <span class="tag api">주로 부르는 쪽</span></h3><p>브라우저에 들어 있거나 확장 프로그램으로 붙은 Agent다. 확장 프로그램형은 판단을 바깥의 모델이 하기도 한다(07 ②). 페이지의 JavaScript를 직접 돌리지 않는다. 브라우저가 화면 정보에 tool 목록을 붙여 건넨다. 이때 어떤 형식으로 넘길지(MCP든 자체 function calling이든)는 브라우저가 정한다.</p></article>
+      <article class="card"><h3>브라우저의 Agent <span class="tag api">주로 부르는 쪽</span></h3><p>브라우저에 들어 있거나 확장 프로그램으로 붙은 Agent다. 페이지의 JavaScript를 직접 돌리지 않는다. 브라우저가 화면 정보에 tool 목록을 붙여 건넨다. 이때 어떤 형식으로 넘길지(MCP든 자체 function calling이든)는 브라우저가 정한다.</p></article>
       <article class="card"><h3>페이지 안의 JavaScript Agent</h3><p><code>getTools()</code>로 목록을 받고 <code>executeTool()</code>로 부른다. 스펙이 이 두 메서드를 둔 이유가 이것이다.</p></article>
       <article class="card"><h3>개발 도구</h3><p>DevTools 149의 Application 패널에서 tool을 보고 직접 실행해 볼 수 있다. Chrome DevTools for agents(MCP 서버)도 WebMCP tool을 나열하고 실행한다. 둘 다 실험 기능이다.</p></article>
-      <article class="card"><h3>브라우저 밖의 Agent <span class="tag warn">못 본다</span></h3><p>Claude Desktop·CLI·클라우드 Agent처럼 브라우저 밖에서 도는 Agent에게는 목록이 가지 않는다. 그래도 이 tool을 쓰는 방법은 다음 장(07)에서 본다.</p></article>
+      <article class="card"><h3>브라우저 밖의 Agent <span class="tag warn">못 본다</span></h3><p>Claude Desktop·CLI·클라우드 Agent처럼 브라우저 밖에서 도는 Agent에게는 목록이 가지 않는다. 같은 기능이 필요하면 MCP 서버나 REST API를 쓴다(07).</p></article>
     </div>
   </div>
   <p class="easy"><b>쉽게 말하면</b>주문서는 가게 안에 들어온 사람만 본다. 브라우저 밖의 Agent는 가게 밖 손님이라, 이 가게에 주문서가 있는지조차 모른다.</p>
@@ -253,19 +257,21 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="outside"><div class="inner">
-  <span class="kicker">07 — 브라우저 밖의 Agent는 어떻게 쓰나</span>
-  <h2>WebMCP는 두 Agent를 잇지 않는다</h2>
-  <p class="lede">WebMCP가 정하는 것은 <b>페이지가 브라우저에 tool 목록을 넘기는 데까지</b>다. 그 목록을 받아 tool을 부를 수 있는 것은 브라우저 안에서 도는 프로그램뿐이다. 그래서 바깥 Agent가 이 tool을 쓰려면 <b>브라우저 안에 자기 대신 움직일 무언가를 둬야 한다</b>. 지금 생각할 수 있는 방법은 세 가지다.</p>
-  <table class="stack">
-    <thead><tr><th scope="col"></th><th scope="col">브라우저 안에 두는 것</th><th scope="col">tool을 부르는 쪽</th><th scope="col">근거</th></tr></thead>
-    <tbody>
-      <tr><th scope="row">① 브라우저 제어 MCP 서버</th><td data-label="브라우저 안에 두는 것">MCP 서버가 브라우저를 원격으로 조종한다 (Chrome DevTools for agents)</td><td class="we" data-label="tool을 부르는 쪽"><b>바깥 Agent</b>가 MCP로 직접 부른다. 브라우저의 Agent는 끼지 않는다</td><td data-label="근거"><span class="tag green">문서 확인</span> 실험 기능</td></tr>
-      <tr><th scope="row">② 확장 프로그램</th><td data-label="브라우저 안에 두는 것">tool 목록을 받는 확장 프로그램 (06의 “확장 프로그램으로 붙은 Agent”)</td><td class="we" data-label="tool을 부르는 쪽">확장 프로그램이 부르지만 <b>무엇을 부를지는 바깥의 모델</b>이 정한다. 브라우저 안에 있어 보여도 판단은 바깥에서 한다</td><td data-label="근거"><span class="tag amber">추정</span> 확장 Agent의 흔한 구조를 적용</td></tr>
-      <tr><th scope="row">③ Agent끼리 맡기기</th><td data-label="브라우저 안에 두는 것">브라우저에 들어 있는 Agent</td><td class="we" data-label="tool을 부르는 쪽"><b>브라우저 Agent</b>가 부른다. 바깥 Agent는 할 일만 넘긴다</td><td data-label="근거"><span class="tag warn">구현 없음</span> 표준도 공식 구현도 찾지 못함</td></tr>
-    </tbody>
-  </table>
-  <div class="callout">두 Agent가 실제로 말을 주고받는 것은 ③뿐이다. ①·②에서는 바깥 Agent가 브라우저 안의 손을 직접 움직이므로 “브라우저 Agent”가 따로 없다.</div>
-  <p class="easy"><b>쉽게 말하면</b>가게 밖 손님은 주문서를 직접 못 채운다. 그래서 ① 내가 조종하는 로봇을 들여보내거나, ② 전화로 내 지시를 받는 대리인을 세우거나, ③ 가게 점원에게 할 일을 부탁한다.</p>
+  <span class="kicker">07 — WebMCP가 정하는 범위</span>
+  <h2>WebMCP가 정하는 건 페이지에서 브라우저까지다</h2>
+  <div class="legs">
+    <div class="node"><b>웹페이지</b><span>tool을 등록한다 (04·05)</span></div>
+    <div class="leg spec"><b>① WebMCP</b><span>스펙이 정한다</span></div>
+    <div class="node"><b>브라우저</b><span>tool 목록을 모은다</span></div>
+    <div class="leg"><b>② 브라우저가 정한다</b><span>function calling, MCP 등</span></div>
+    <div class="node"><b>브라우저 안의 Agent</b><span>tool을 골라 부른다 (06)</span></div>
+  </div>
+  <div class="grid g2">
+    <article class="card"><h3>넘기는 형식이 MCP여도 WebMCP다</h3><p>tool이 탭 안에 있고 페이지 코드로 돈다면 WebMCP다. 09의 MCP 비교는 <b>tool을 어디에 두나(서버냐 탭이냐)</b>를 비교한 것이고, ② 구간에서 어떤 형식으로 건네는지와는 상관없다.</p></article>
+    <article class="card"><h3>브라우저 밖의 Agent는 대상이 아니다</h3><p>Claude Desktop·CLI·클라우드 Agent는 ② 구간 밖에 있어 목록을 받지 못한다. 같은 기능이 필요하면 가게가 연 <b>MCP 서버나 REST API</b>를 쓴다(09·10).</p></article>
+  </div>
+  <div class="callout"><b>예외 — 개발·시험할 때</b> Chrome DevTools for agents(MCP 서버)는 ② 구간을 MCP로 열어 준다. 코딩 Agent로 내 페이지의 tool을 나열하고 실행해 볼 수 있다. 실험 기능이고, 실제 사용자를 위한 경로는 아니다.</div>
+  <p class="easy"><b>쉽게 말하면</b>가게(페이지)는 주문서를 카운터(브라우저)에 올려 두는 데까지만 약속한다. 손님(Agent)에게 어떻게 보여 줄지는 카운터가 정한다. 가게 밖 손님은 전화 주문(MCP)이나 거래처 발주(REST API)를 쓴다.</p>
 </div></section>
 
 <section class="slide" id="map"><div class="inner">
@@ -290,7 +296,7 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
       <tr><th scope="row">코드가 도는 곳</th><td>가게의 서버</td><td class="we">사용자 브라우저 탭 안의 JavaScript</td></tr>
       <tr><th scope="row">쓸 수 있을 때</th><td>언제든, 탭이 없어도</td><td class="we">그 사이트 탭이 열려 있는 동안만</td></tr>
       <tr><th scope="row">로그인</th><td>Agent가 따로 인증(보통 OAuth)</td><td class="we">지금 브라우저의 로그인·쿠키 그대로</td></tr>
-      <tr><th scope="row">부르는 쪽</th><td>MCP를 아는 어떤 Agent든 (데스크톱·CLI·클라우드)</td><td class="we">브라우저 안의 Agent (바깥 Agent는 브라우저를 거쳐서만, 07)</td></tr>
+      <tr><th scope="row">부르는 쪽</th><td>MCP를 아는 어떤 Agent든 (데스크톱·CLI·클라우드)</td><td class="we">브라우저 안의 Agent</td></tr>
       <tr><th scope="row">사람은</th><td>안 봐도 된다 (백그라운드)</td><td class="we">같은 화면에서 결과를 본다</td></tr>
       <tr><th scope="row">찾는 법</th><td>Agent에 서버를 미리 등록</td><td class="we">사이트에 들어가야 보인다</td></tr>
     </tbody>
@@ -373,7 +379,6 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
     </div>
   </div>
   <p class="easy"><b>붙인다면</b>검색·조회 같은 읽기 tool부터 시작한다. tool은 적게, 서로 겹치지 않게 만든다. 결제·삭제는 <code>consequentialHint</code>와 확인 흐름을 먼저 설계한다.</p>
-  <p class="note">07의 ①(MCP 서버가 브라우저를 조종)은 개발·시험용 실험 기능이다. 사람 없이 도는 자동화라면 처음부터 MCP 서버나 API로 간다.</p>
 </div></section>
 
 <section class="slide" id="status"><div class="inner">
