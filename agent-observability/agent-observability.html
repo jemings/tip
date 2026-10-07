@@ -1,20 +1,20 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent가 왜 45초나 걸렸나? — Agent Observability + OpenTelemetry</title>
-  <meta name="description" content="AI Agent가 수행한 LLM·Tool·MCP 실행 경로를 어떻게 관측할지, OpenTelemetry GenAI Semantic Conventions를 중심으로 정리한 스터디 발표 자료." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agent Observability — AI Agent Study</title>
+<meta name="description" content="45초 걸린 Agent 실행 하나를 택배 배송 조회처럼 펼쳐 보며, OpenTelemetry가 Agent·모델·tool·MCP 호출을 어떻게 한 trace로 잇는지, 지금 쓰는 코딩 Agent에서 어떻게 켜 보는지 정리한 스터디 발표 자료." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
 :root{
   --paper:#f1f2f4; --panel:#fff; --panel-2:#e7e9ed; --ink:#1b2028; --ink-2:#3d4552;
   --muted:#5d6673; --line:#d5d9df; --line-strong:#b9c0c9; --accent:#315efb; --accent-ink:#2347c3;
   --accent-soft:#e8edff; --green:#2e6f5c; --green-soft:#dcebe5; --amber:#8a5a00; --amber-soft:#fff1c7;
   --red:#a63a1e; --red-soft:#f7e4dd; --shadow:0 1px 2px rgba(27,32,40,.06),0 8px 24px rgba(27,32,40,.06);
+  --bar-amber:#c98a12;
   --font-display:"Bricolage Grotesque","IBM Plex Sans KR",system-ui,sans-serif;
   --font-body:"IBM Plex Sans","IBM Plex Sans KR",system-ui,sans-serif;
   --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -25,119 +25,94 @@
     --paper:#14181d; --panel:#1a1f26; --panel-2:#222932; --ink:#e7eaee; --ink-2:#b3bcc7;
     --muted:#8a94a1; --line:#2c333c; --line-strong:#3d4650; --accent:#6d8cff; --accent-ink:#91a7ff;
     --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
-    --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+    --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+    --bar-amber:#f0bf54; color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#14181d; --panel:#1a1f26; --panel-2:#222932; --ink:#e7eaee; --ink-2:#b3bcc7;
   --muted:#8a94a1; --line:#2c333c; --line-strong:#3d4650; --accent:#6d8cff; --accent-ink:#91a7ff;
   --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
-  --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+  --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+  --bar-amber:#f0bf54; color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:clamp(.95rem,.9rem + .2vw,1.06rem);line-height:1.62;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--font-display);text-wrap:balance;word-break:keep-all;margin:0;line-height:1.12;letter-spacing:-.02em}h1{font-size:clamp(2.4rem,4.6vw,4.4rem);font-weight:800;max-width:18ch}h2{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:800}h3{font-size:1.05rem}p{margin:0}
-a{color:var(--accent-ink);text-underline-offset:3px;text-decoration-thickness:1px}code,.mono{font-family:var(--font-mono);font-size:.92em}
+a{color:var(--accent-ink);text-underline-offset:3px;text-decoration-thickness:1px}code,.mono{font-family:var(--font-mono);font-size:.92em}:not(pre)>code{overflow-wrap:anywhere}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
 .slide{padding:clamp(3rem,6vh,5rem) var(--pad-x) clamp(2.6rem,5vh,4rem) calc(var(--pad-x) + var(--rail));border-bottom:1px solid var(--line);scroll-snap-align:start}
-.slide>.inner{max-width:1180px;margin:0 auto;display:grid;gap:clamp(1rem,2.2vh,1.7rem);align-content:center;min-height:calc(100svh - clamp(5.6rem,11vh,9rem))}
+.slide>.inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(1rem,2.2vh,1.7rem);align-content:center;min-height:calc(100svh - clamp(5.6rem,11vh,9rem))}
 @media(min-width:880px) and (min-height:620px){html{scroll-snap-type:y proximity}}
 .rail{position:fixed;inset:0 auto 0 0;width:var(--rail);padding:clamp(1.5rem,4vh,3rem) 0 clamp(1.5rem,4vh,3rem) clamp(1rem,2.4vw,2rem);display:flex;flex-direction:column;justify-content:safe center;gap:2px;z-index:20;border-right:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);overflow-y:auto;overscroll-behavior:contain}
 .brand{font:600 .7rem var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1rem}.rail a{display:grid;grid-template-columns:2.1rem 1fr;align-items:baseline;gap:.35rem;padding:.3rem .5rem .3rem 0;color:var(--muted);text-decoration:none;font-size:.8rem;line-height:1.35;border-radius:3px;transition:color .15s ease}.rail a:hover,.rail a[aria-current="true"]{color:var(--ink)}.rail a[aria-current="true"]{font-weight:600}.rail .n{font:.68rem var(--font-mono);letter-spacing:.06em;color:var(--muted)}.rail a[aria-current="true"] .n{color:var(--accent-ink)}
 .kicker{font:500 .76rem var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
 .lede{font-size:clamp(1.08rem,1rem + .35vw,1.28rem);color:var(--ink-2);max-width:62ch;line-height:1.55}
 .note{font-size:.86rem;color:var(--muted);max-width:84ch}
-.easy{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.7rem 1rem;font-size:1rem;color:var(--ink);max-width:84ch}.easy b{color:var(--accent-ink);margin-right:.35rem}
+.easy{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.7rem 1rem;font-size:1rem;color:var(--ink);max-width:84ch}.easy b:first-child{color:var(--accent-ink);margin-right:.35rem}
 .facts{display:flex;flex-wrap:wrap;gap:1.2rem 3rem;border-top:1px solid var(--line);padding-top:.8rem}.facts b{display:block;font-family:var(--font-display);font-size:clamp(1.4rem,2.6vw,2.1rem);font-weight:800;line-height:1.2}.facts span{display:block;font-size:.8rem;color:var(--muted)}
-.grid{display:grid;gap:clamp(.7rem,1.5vw,1.1rem)}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.split{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(.7rem,1.5vw,1.1rem)}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.split{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
 .card{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;display:grid;gap:.45rem;align-content:start;box-shadow:var(--shadow)}.card p{color:var(--ink-2);font-size:.93rem;line-height:1.55}
 .plain{border-top:2px solid var(--ink);padding-top:.7rem;display:grid;gap:.4rem;align-content:start}.plain p{color:var(--ink-2);font-size:.93rem}
 .big{border-top:3px solid var(--accent);padding-top:.9rem;display:grid;gap:.6rem;align-content:start}.big h3{font-size:clamp(1.25rem,1.1rem + .6vw,1.6rem)}.big p{color:var(--ink-2);font-size:1rem;line-height:1.6}
 .tag{display:inline-block;border:1px solid currentColor;border-radius:2px;padding:.05rem .4rem;font:.68rem var(--font-mono);letter-spacing:.04em;vertical-align:2px;white-space:nowrap}.tag.warn{color:var(--red);background:var(--red-soft)}.tag.green{color:var(--green);background:var(--green-soft)}.tag.amber{color:var(--amber);background:var(--amber-soft)}.tag.api{color:var(--accent-ink);background:var(--accent-soft)}
-.code{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;font:.9rem/1.65 var(--font-mono);white-space:pre;overflow:auto;margin:0}.code .c{color:var(--muted)}.code .k{color:var(--accent-ink);font-weight:600}.code .s{color:var(--green)}.code .h{background:var(--amber-soft);color:var(--amber)}
+.code{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;font:.86rem/1.65 var(--font-mono);white-space:pre;overflow:auto;margin:0}.code .c{color:var(--muted)}.code .k{color:var(--accent-ink);font-weight:600}.code .s{color:var(--green)}.code .h{background:var(--amber-soft);color:var(--amber)}
 .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.8rem 1rem}.callout.warn{border-left-color:var(--red);background:var(--red-soft)}
-/* 같은 부탁, 두 방법 */
+/* 사건 */
 .ask{font-size:1.1rem;font-weight:600;border:1px dashed var(--line-strong);padding:.6rem 1rem;background:var(--panel);justify-self:start}
-.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(.8rem,2vw,1.4rem)}
-.lane{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);display:grid;grid-template-rows:auto 1fr auto}
-.lane>header{padding:.7rem 1rem;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:.5rem;align-items:baseline}.lane>header h3{font-size:1.05rem}.lane>header span{font:.75rem var(--font-mono);color:var(--muted)}
-.lane ol{list-style:none;margin:0;padding:.7rem 1rem;display:grid;gap:.45rem;align-content:start;counter-reset:s}
-.lane li{display:grid;grid-template-columns:1.6rem 1fr;gap:.5rem;font-size:.95rem;color:var(--ink-2);counter-increment:s}.lane li::before{content:counter(s);font:600 .75rem/1.6rem var(--font-mono);text-align:center;border-radius:50%;width:1.6rem;height:1.6rem;background:var(--panel-2);color:var(--muted)}
-.lane li.guess::before{background:var(--red-soft);color:var(--red)}.lane.good li::before{background:var(--accent-soft);color:var(--accent-ink)}
-.lane li.look{color:var(--muted);font-size:.86rem}
-.lane>footer{padding:.6rem 1rem;border-top:1px solid var(--line);font-size:.9rem}.lane.bad>footer{color:var(--red)}.lane.good>footer{color:var(--green)}
-/* 연결 지도 */
-.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
-.link{border:1px solid var(--line);background:var(--panel);padding:1rem;display:grid;gap:.5rem;align-content:start}.link h3{font-size:1.25rem}.link .ends{font:600 .9rem var(--font-mono);color:var(--ink)}.link p{font-size:.88rem;color:var(--ink-2)}
-.link.me{border:2px solid var(--accent);background:var(--accent-soft)}.link.me .ends{color:var(--accent-ink)}
-/* 비교 표 */
-table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--panel);border:1px solid var(--line)}th,td{text-align:left;padding:.6rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}thead th{font-weight:600;font-size:.95rem;background:var(--panel-2)}tbody th{font-weight:500;color:var(--muted);font-size:.86rem;width:8.5rem}tr:last-child>*{border-bottom:0}td.we{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
-/* 누가 보나 */
-.who{display:grid;grid-template-columns:minmax(0,.8fr) auto minmax(0,1.6fr);gap:1rem;align-items:center}
-.page{border:2px solid var(--ink);background:var(--panel);padding:1rem;display:grid;gap:.5rem}.page .bar{font:.75rem var(--font-mono);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:.4rem}.page .tool{font:.85rem var(--font-mono);border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent-soft);padding:.25rem .5rem;justify-self:start}
-.arrow{font-size:1.6rem;color:var(--muted)}
-.readers{display:grid;gap:.7rem}
-/* WebMCP가 정하는 범위 */
-.legs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);gap:.6rem;align-items:center}
-.legs .node{border:2px solid var(--ink);background:var(--panel);padding:.8rem .9rem;display:grid;gap:.25rem;text-align:center}.legs .node b{font-size:1rem}.legs .node span{font-size:.8rem;color:var(--muted)}
-.legs .leg{display:grid;gap:.2rem;text-align:center;font-size:.82rem;color:var(--ink-2)}.legs .leg::after{content:"";height:2px;background:var(--line-strong);order:-1;margin-bottom:.25rem}
-.legs .leg b{font-size:.9rem}.legs .leg.spec::after{background:var(--accent);height:3px}.legs .leg.spec b{color:var(--accent-ink)}
-@media(max-width:900px){.legs{grid-template-columns:1fr}.legs .leg::after{display:none}.legs .leg{padding:.2rem 0}.legs .leg b::before{content:"↓ "}}
+.reply{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:.75rem 1rem;display:flex;flex-wrap:wrap;gap:.3rem .8rem;align-items:baseline;justify-self:start;max-width:64ch}.reply small{font:600 .7rem var(--font-mono);letter-spacing:.08em;color:var(--muted)}.reply time{font:600 .9rem var(--font-mono);color:var(--red);white-space:nowrap}
+.suspect .no{font:600 .72rem var(--font-mono);letter-spacing:.08em;color:var(--muted)}.suspect .fix{font-size:.86rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:.45rem;margin-top:.15rem}
+/* waterfall */
+.agent{--c:var(--accent)}.model{--c:var(--green)}.tool{--c:var(--bar-amber)}.mcp{--c:var(--red)}.http{--c:var(--muted)}
+.wf{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:.85rem 1rem;display:grid;gap:.3rem}
+.wf-row,.wf-axis{display:grid;grid-template-columns:minmax(0,17rem) minmax(0,1fr) 3.4rem;gap:.8rem;align-items:center}
+.wf-axis{font:.68rem var(--font-mono);color:var(--muted)}.wf-axis .ticks{position:relative;height:1rem}.wf-axis .ticks span{position:absolute;left:calc((var(--x) - var(--t0)) / var(--T) * 100%);transform:translateX(-50%)}.wf-axis .ticks span.first{transform:none}
+.wf-name{font:.78rem var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:calc(var(--d,0) * 1.1rem)}
+.wf-track{position:relative;height:1.05rem;background:var(--paper);border-radius:2px}
+.wf-track i,.wf-track .wait{position:absolute;top:0;bottom:0;left:calc((var(--s) - var(--t0)) / var(--T) * 100%);width:calc((var(--e) - var(--s)) / var(--T) * 100%);min-width:3px}
+.wf-track i{background:var(--c);border-radius:2px}
+.wf-track .wait{border:1px dashed var(--red);border-left:0;border-right:0;color:var(--red);font:600 .64rem/1rem var(--font-mono);text-align:center;white-space:nowrap;overflow:hidden}
+.wf-row time{font:.75rem var(--font-mono);color:var(--muted);text-align:right}
+.wf-row.hot .wf-name,.wf-row.hot time{color:var(--red);font-weight:600}
+.wf-legend{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;font-size:.82rem;color:var(--muted)}.wf-legend span::before{content:"";display:inline-block;width:.7rem;height:.7rem;border-radius:2px;background:var(--c);margin-right:.4rem;vertical-align:-1px}
+.wf-title{font:600 .78rem var(--font-mono);color:var(--muted);letter-spacing:.04em}
+/* OTel 흐름 */
+.flow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,1.2fr);gap:.6rem;align-items:center}
+.flow .node{border:2px solid var(--ink);background:var(--panel);padding:.8rem .9rem;display:grid;gap:.25rem;text-align:center}.flow .node b{font-size:1rem}.flow .node span{font-size:.8rem;color:var(--muted)}
+.flow .leg{display:grid;gap:.2rem;text-align:center;font-size:.8rem;color:var(--ink-2)}.flow .leg::after{content:"";height:3px;background:var(--accent);order:-1;margin-bottom:.25rem}.flow .leg b{font:600 .9rem var(--font-mono);color:var(--accent-ink)}
+.mini{margin:0;padding-left:1.1rem;display:grid;gap:.35rem;font-size:.9rem;color:var(--ink-2)}.split-r{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+.parcel{font-size:.86rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:.45rem;margin-top:.15rem}
+/* 표 */
+table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--panel);border:1px solid var(--line)}th,td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--line);vertical-align:top}thead th{font-weight:600;font-size:.93rem;background:var(--panel-2)}tbody th{font-weight:500;color:var(--muted);font-size:.86rem;width:8.5rem}tr:last-child>*{border-bottom:0}td.we{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
 /* 언제 쓰나 */
 .q{font-family:var(--font-display);font-size:clamp(1.3rem,1.1rem + .9vw,1.9rem);font-weight:800;border:2px solid var(--ink);background:var(--panel);padding:.9rem 1.2rem;line-height:1.3}
 .yn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
 .yn>div{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;display:grid;gap:.6rem;align-content:start}.yn h3{font-size:1.15rem}.yn .y h3{color:var(--accent-ink)}.yn .n h3{color:var(--ink-2)}
-.yn ul{margin:0;padding-left:1.1rem;display:grid;gap:.3rem;font-size:.95rem;color:var(--ink-2)}
-.source-list{display:grid;gap:.5rem;font-size:.88rem}.source-list a{text-decoration:none}.source-list small{color:var(--muted)}.footer{padding:1rem 0 0;border-top:1px solid var(--line);color:var(--muted);font:.74rem var(--font-mono)}
+.yn ul{margin:0;padding-left:1.1rem;display:grid;gap:.35rem;font-size:.95rem;color:var(--ink-2)}
+.source-list{display:grid;gap:.45rem;font-size:.88rem}.source-list a{text-decoration:none}.source-list small{color:var(--muted)}.source-list h3{font-size:.8rem;font-family:var(--font-mono);letter-spacing:.1em;color:var(--muted);margin-top:.5rem}.footer{padding:1rem 0 0;border-top:1px solid var(--line);color:var(--muted);font:.74rem var(--font-mono)}
 .hint{position:fixed;right:1rem;bottom:1rem;z-index:10;padding:.3rem .5rem;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);font:.7rem var(--font-mono);color:var(--muted)}
-@media(max-width:900px){.rail{position:sticky;top:0;width:100%;height:auto;flex-direction:row;align-items:center;justify-content:space-between;padding:.65rem var(--pad-x);border-right:0;border-bottom:1px solid var(--line)}.rail a{display:none}.brand{margin:0}.slide{padding-left:var(--pad-x)}.slide>.inner{min-height:0}.g3,.g4,.map{grid-template-columns:repeat(2,minmax(0,1fr))}.split,.who{grid-template-columns:1fr}.arrow{transform:rotate(90deg);justify-self:center}}
-@media(max-width:620px){.g2,.g3,.g4,.split,.lanes,.map,.yn{grid-template-columns:1fr}.hint{display:none}.code{font-size:.78rem}tbody th{width:auto}}
+@media(max-width:900px){.rail{position:sticky;top:0;width:100%;height:auto;flex-direction:row;align-items:center;justify-content:space-between;padding:.65rem var(--pad-x);border-right:0;border-bottom:1px solid var(--line)}.rail a{display:none}.brand{margin:0}.slide{padding-left:var(--pad-x)}.slide>.inner{min-height:0}.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.split,.split-r{grid-template-columns:minmax(0,1fr)}.flow{grid-template-columns:minmax(0,1fr)}.flow .leg::after{display:none}.flow .leg{padding:.15rem 0}.flow .leg b::before{content:"↓ "}.wf-row,.wf-axis{grid-template-columns:minmax(0,12rem) minmax(0,1fr) 3rem;gap:.6rem}}
+@media(max-width:620px){.g2,.g3,.g4,.split,.yn{grid-template-columns:minmax(0,1fr)}.hint{display:none}.code{font-size:.74rem}tbody th{width:auto}table{font-size:.85rem}th,td{padding:.45rem .55rem}
+  .wf-row{grid-template-columns:minmax(0,1fr) auto;gap:.15rem .5rem}.wf-row .wf-track{grid-column:1/-1}.wf-name{padding-left:calc(var(--d,0) * .7rem)}.wf-axis{grid-template-columns:minmax(0,1fr)}.wf-axis>span:not(.ticks){display:none}}
 @media print{.rail,.hint{display:none}.slide{padding:1.5cm;break-after:page}.slide>.inner{min-height:0}}
-
-      .trace{display:grid;gap:.5rem;border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;box-shadow:var(--shadow)}
-      .trace-row{display:grid;grid-template-columns:2.2rem minmax(0,1fr) auto;gap:.7rem;align-items:center;padding:.55rem .6rem;border-left:3px solid var(--line-strong);background:var(--paper)}
-      .trace-row.agent{border-left-color:var(--accent)}
-      .trace-row.model{border-left-color:var(--green)}
-      .trace-row.tool{border-left-color:var(--amber)}
-      .trace-row.mcp{border-left-color:var(--red)}
-      .trace-row b{font-family:var(--font-mono);font-size:.78rem}
-      .trace-row span{font-size:.9rem;color:var(--ink-2)}
-      .trace-row time{font-family:var(--font-mono);font-size:.76rem;color:var(--muted)}
-      .trace-tree{font:.82rem/1.75 var(--font-mono);border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;overflow:auto;white-space:pre}
-      .sig{display:inline-block;font:500 .7rem var(--font-mono);letter-spacing:.04em;padding:.08rem .38rem;border:1px solid var(--line-strong);color:var(--muted);background:var(--panel-2)}
-      .signal-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
-      .signal{border:1px solid var(--line);background:var(--panel);padding:1rem;display:grid;gap:.45rem;align-content:start}
-      .signal strong{font-family:var(--font-display);font-size:1.2rem}
-      .signal p{font-size:.88rem;color:var(--ink-2)}
-      .metric{border:1px solid var(--line);background:var(--panel);padding:1rem;display:grid;gap:.35rem}
-      .metric b{font:800 clamp(1.5rem,2.5vw,2.2rem)/1 var(--font-display)}
-      .metric span{font-size:.8rem;color:var(--muted)}
-      .span-box{border:1px solid var(--line);background:var(--panel);padding:1rem;display:grid;gap:.55rem}
-      .span-box .bar{height:8px;background:var(--panel-2);overflow:hidden}
-      .span-box .bar i{display:block;height:100%;background:var(--accent)}
-      .span-box .kv{display:grid;grid-template-columns:1fr auto;gap:.25rem .8rem;font:.75rem/1.5 var(--font-mono)}
-      .span-box .kv span:first-child{color:var(--muted)}
-      @media(max-width:900px){.signal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-      @media(max-width:620px){.signal-grid{grid-template-columns:1fr}.trace-row{grid-template-columns:1.8rem 1fr}.trace-row time{display:none}}
-
-  </style>
+</style>
 </head>
 <body>
 <nav class="rail" aria-label="슬라이드 목차">
-  <span class="brand">agent-observability-study</span>
-  <a href="#cover"><span class="n">01</span><span>Agent Observability</span></a>
+  <span class="brand">agent-otel-study</span>
+  <a href="#cover"><span class="n">01</span><span>Agent가 45초 걸렸다</span></a>
   <a href="#summary"><span class="n">02</span><span>오늘 가져갈 두 문장</span></a>
-  <a href="#blind"><span class="n">03</span><span>Agent는 왜 블랙박스가 되나</span></a>
-  <a href="#trace"><span class="n">04</span><span>한 번의 실행을 펼쳐 보면</span></a>
-  <a href="#otel"><span class="n">05</span><span>OpenTelemetry는 무엇을 하나</span></a>
-  <a href="#spans"><span class="n">06</span><span>Agent를 Span으로 표현한다</span></a>
-  <a href="#mcp"><span class="n">07</span><span>MCP까지 이어 붙이면</span></a>
-  <a href="#signals"><span class="n">08</span><span>Trace만으로 끝나지 않는다</span></a>
-  <a href="#questions"><span class="n">09</span><span>이제 이런 질문에 답한다</span></a>
-  <a href="#content"><span class="n">10</span><span>Prompt도 전부 기록할까</span></a>
-  <a href="#design"><span class="n">11</span><span>좋은 Agent Trace의 조건</span></a>
-  <a href="#compare"><span class="n">12</span><span>LLM Observability vs Agent Observability</span></a>
+  <a href="#case"><span class="n">03</span><span>사건 — 용의자 셋</span></a>
+  <a href="#trace"><span class="n">04</span><span>배송 조회를 열면</span></a>
+  <a href="#otel"><span class="n">05</span><span>OTel이 정하는 세 가지</span></a>
+  <a href="#names"><span class="n">06</span><span>Agent용 이름표</span></a>
+  <a href="#mcp"><span class="n">07</span><span>MCP 서버 안까지</span></a>
+  <a href="#labels"><span class="n">08</span><span>같은 일, 다른 이름표</span></a>
+  <a href="#try"><span class="n">09</span><span>직접 켜 보기</span></a>
+  <a href="#content"><span class="n">10</span><span>Prompt도 남길까</span></a>
+  <a href="#when"><span class="n">11</span><span>언제 쓰나</span></a>
+  <a href="#build"><span class="n">12</span><span>내 Agent에 붙이기</span></a>
   <a href="#status"><span class="n">13</span><span>지금 어디까지</span></a>
   <a href="#wrap"><span class="n">14</span><span>정리</span></a>
   <a href="#refs"><span class="n">15</span><span>출처</span></a>
@@ -146,14 +121,14 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
 
 <section class="slide" id="cover"><div class="inner">
   <span class="kicker">Agent Observability · OpenTelemetry · 2026-10</span>
-  <h1>Agent가 왜 45초나 걸렸는지, <span style="color:var(--accent)">흔적을 남겨야 안다</span></h1>
-  <p class="lede">Agent는 한 번의 요청 안에서 LLM·Tool·MCP·Retry·Handoff를 여러 번 오간다. 최종 답변만 보면 무엇을 했는지 알기 어렵다. Agent Observability는 그 실행 과정을 telemetry로 남겨 다시 펼쳐 보는 방법이다.</p>
-  <p class="easy"><b>쉽게 말하면</b>숙제를 한 번에 끝낸 게 아니라 여러 번 찾아보고 물어보고 다시 고쳤다면, 마지막 답만 봐서는 왜 오래 걸렸는지 모른다. <mark>과정을 녹화해 둬야</mark> 어디서 막혔는지 찾을 수 있다.</p>
+  <h1>Agent가 45초 걸렸다. <span style="color:var(--accent)">어디서 막혔을까?</span></h1>
+  <p class="lede">AI Agent는 부탁 한 번에 모델·tool·MCP 서버를 여러 번 오간다. 답만 봐서는 어디서 시간이 갔는지 모른다. <b>OpenTelemetry(OTel)</b>는 그 길을 구간별로 남기는 공용 규칙이다.</p>
+  <p class="easy"><b>쉽게 말하면</b>택배가 늦으면 송장 번호로 배송 조회를 연다. 집하 → 허브 → 배송 출발, 어느 구간에서 멈췄는지 한눈에 보인다. Agent에도 송장 번호를 붙이자는 것이 오늘 이야기다.</p>
   <div class="facts">
-    <div><b>3가지</b><span>Logs · Metrics · Traces</span></div>
-    <div><b>개발 중</b><span>GenAI Semantic Conventions</span></div>
-    <div><b>Agent</b><span>invoke · plan · tool</span></div>
-    <div><b>MCP</b><span>Client · Server까지 연결</span></div>
+    <div><b>Trace</b><span>송장 번호 하나 = 부탁 한 번</span></div>
+    <div><b>Span</b><span>구간 한 줄 = 모델·tool 호출 하나</span></div>
+    <div><b>gen_ai.*</b><span>Agent용 공용 이름표</span></div>
+    <div><b>Development</b><span>이름표는 아직 시범 운영 중</span></div>
   </div>
 </div></section>
 
@@ -162,271 +137,406 @@ table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--pane
   <h2>오늘 가져갈 두 문장</h2>
   <div class="grid g2">
     <article class="big">
-      <h3>1. Agent를 “답변 생성기”가 아니라 “실행 과정”으로 본다</h3>
-      <p>한 번의 요청 안에서 <b>Agent → LLM → Tool → MCP → LLM</b>이 이어진다면, 각각을 연결해 하나의 Trace로 보는 것이 핵심이다.</p>
+      <h3>1. Agent의 부탁 한 번은 여러 구간을 지나는 택배다</h3>
+      <p>모델 호출, tool 실행, MCP 서버 호출이 각각 한 구간이다. 구간마다 한 줄(<b>span</b>)을 남기고 송장 번호(<b>trace</b>)로 묶으면, 어디서 시간이 갔는지 <b>막대 길이로</b> 보인다.</p>
     </article>
     <article class="big">
-      <h3>2. OpenTelemetry는 그 흔적에 공통 이름을 붙이는 쪽이다</h3>
-      <p>OpenTelemetry는 저장·대시보드 제품이 아니라 <b>Telemetry를 표현하고 전달하는 표준화 계층</b>이다. GenAI 쪽에도 Agent·Tool·MCP·모델 호출을 위한 Semantic Conventions가 만들어지고 있다.</p>
+      <h3>2. OTel은 모든 택배사의 송장 양식을 하나로 맞춘다</h3>
+      <p>기록하는 법, 보내는 법, 부르는 이름을 정한다. 한 번 심어 두면 Jaeger든 Langfuse든 Datadog이든 <b>어느 조회 화면으로든</b> 보낼 수 있다.</p>
     </article>
   </div>
-  <p class="easy"><b>그래서</b>“모델이 느렸다”에서 끝나는 게 아니라 <b>“Calendar tool이 30초, LLM은 1초씩 세 번”</b>처럼 실행 경로를 설명할 수 있게 된다.</p>
+  <p class="easy"><b>그래서</b>“Agent가 느려요”가 <b>“위키 저장 API가 429를 받아 35초를 기다렸어요”</b>로 바뀐다.</p>
 </div></section>
 
-<section class="slide" id="blind"><div class="inner">
-  <span class="kicker">03 — Agent는 왜 블랙박스가 되나</span>
-  <h2>같은 요청인데, 안쪽에서 여러 일이 일어난다</h2>
-  <p class="ask">“회의 자료를 찾아서 요약하고, 결과를 문서에 저장해 줘.”</p>
-  <div class="lanes">
-    <section class="lane bad">
-      <header><h3>최종 답만 본다</h3><span>black box</span></header>
-      <ol>
-        <li class="guess"><span>“완료했습니다.”만 남는다</span></li>
-        <li class="look"><span>어떤 문서를 찾았는지 모른다</span></li>
-        <li class="look"><span>검색이 몇 번이었는지 모른다</span></li>
-        <li class="guess"><span>느려졌다면 원인을 추측한다</span></li>
-      </ol>
-      <footer>원인 분석이 “Agent가 그랬다” 수준에서 멈춘다.</footer>
-    </section>
-    <section class="lane good">
-      <header><h3>실행 흔적을 본다</h3><span>trace</span></header>
-      <ol>
-        <li><span><code>invoke_agent</code> 시작</span></li>
-        <li><span>검색 Tool 2회 → 문서 조회 1회</span></li>
-        <li><span>LLM 3회 → 마지막에 저장 Tool</span></li>
-        <li><span>저장 API가 28초 걸린 것을 확인</span></li>
-      </ol>
-      <footer>문제의 위치와 반복 패턴을 바로 설명할 수 있다.</footer>
-    </section>
+<section class="slide" id="case"><div class="inner">
+  <span class="kicker">03 — 사건</span>
+  <h2>45.8초 걸려서 돌아온 “다 했습니다”</h2>
+  <p class="ask">“어제 회의록 찾아서 요약하고, 사내 위키에 올려 줘”</p>
+  <p class="reply"><small>AGENT</small><span>회의록 2건을 찾아 요약했고, 위키에 “10/6 주간회의 요약”으로 올렸습니다.</span><time>걸린 시간 45.8초</time></p>
+  <div class="grid g3">
+    <article class="card suspect"><span class="no">용의자 ①</span><h3>모델</h3><p>“요약하느라 오래 생각했나?”</p><p class="fix">추측으로 고치면 → 더 빠른 모델로 바꾼다</p></article>
+    <article class="card suspect"><span class="no">용의자 ②</span><h3>문서 읽기</h3><p>“회의록이 너무 길었나?”</p><p class="fix">추측으로 고치면 → 읽는 양을 줄인다</p></article>
+    <article class="card suspect"><span class="no">용의자 ③</span><h3>위키 저장</h3><p>“위키 서버가 느렸나?”</p><p class="fix">추측으로 고치면 → 위키 담당자에게 물어본다</p></article>
   </div>
-  <p class="easy"><b>쉽게 말하면</b>영수증만 보면 “얼마 냈는지”만 알 수 있다. 상세 내역을 보면 <mark>무엇을 몇 번 샀는지</mark> 안다.</p>
-  <p class="note">Agent의 실행 경로에는 framework 내부에서 일어난 단계도 있고, 별도 서비스에 대한 원격 호출도 섞인다. 그래서 단일 로그 파일보다 연결된 Trace가 유리하다.</p>
+  <p class="easy"><b>답만 보면</b>셋 다 그럴듯하다. 증거가 없으니 아무거나 고쳐 보고 “여전히 느리네”를 되풀이한다.</p>
+  <p class="note"><span class="tag api">예시</span> 이 사건은 설명하려고 만든 이야기다. 이름과 시간은 지어낸 값이다. 이 사건을 07까지 끌고 간다.</p>
 </div></section>
 
 <section class="slide" id="trace"><div class="inner">
-  <span class="kicker">04 — 한 번의 실행을 펼쳐 보면</span>
-  <h2>Agent Trace는 “한 줄짜리 로그”가 아니다</h2>
-  <div class="trace">
-    <div class="trace-row agent"><b>01</b><span><strong>invoke_agent</strong> · summarize-meeting-agent</span><time>45.8s</time></div>
-    <div class="trace-row model"><b>02</b><span>inference · gpt-5 · input 6.2k / output 480</span><time>1.4s</time></div>
-    <div class="trace-row tool"><b>03</b><span>execute_tool · search_documents</span><time>0.8s</time></div>
-    <div class="trace-row tool"><b>04</b><span>execute_tool · fetch_document</span><time>3.1s</time></div>
-    <div class="trace-row model"><b>05</b><span>inference · gpt-5 · requests another tool</span><time>1.2s</time></div>
-    <div class="trace-row mcp"><b>06</b><span>MCP · tools/call save_document</span><time>38.2s</time></div>
-    <div class="trace-row model"><b>07</b><span>inference · gpt-5 · final response</span><time>1.0s</time></div>
+  <span class="kicker">04 — 배송 조회를 열면</span>
+  <h2>범인은 막대 길이가 알려 준다</h2>
+  <div class="wf" style="--t0:0;--T:45.8">
+    <div class="wf-axis" aria-hidden="true"><span></span><span class="ticks"><span class="first" style="--x:0">0s</span><span style="--x:10">10s</span><span style="--x:20">20s</span><span style="--x:30">30s</span><span style="--x:40">40s</span></span><span></span></div>
+    <div class="wf-row agent" style="--s:0;--e:45.8;--d:0"><span class="wf-name">invoke_agent meeting-summarizer</span><span class="wf-track"><i></i></span><time>45.8s</time></div>
+    <div class="wf-row model" style="--s:.1;--e:1.3;--d:1"><span class="wf-name">chat claude-sonnet-5-5</span><span class="wf-track"><i></i></span><time>1.2s</time></div>
+    <div class="wf-row tool" style="--s:1.3;--e:2.1;--d:1"><span class="wf-name">execute_tool search_docs</span><span class="wf-track"><i></i></span><time>0.8s</time></div>
+    <div class="wf-row model" style="--s:2.1;--e:3.2;--d:1"><span class="wf-name">chat claude-sonnet-5-5</span><span class="wf-track"><i></i></span><time>1.1s</time></div>
+    <div class="wf-row tool" style="--s:3.2;--e:4.7;--d:1"><span class="wf-name">execute_tool fetch_doc</span><span class="wf-track"><i></i></span><time>1.5s</time></div>
+    <div class="wf-row model" style="--s:4.7;--e:7.5;--d:1"><span class="wf-name">chat claude-sonnet-5-5</span><span class="wf-track"><i></i></span><time>2.8s</time></div>
+    <div class="wf-row mcp hot" style="--s:7.5;--e:44.6;--d:1"><span class="wf-name">execute_tool save_page</span><span class="wf-track"><i></i></span><time>37.1s</time></div>
+    <div class="wf-row model" style="--s:44.6;--e:45.8;--d:1"><span class="wf-name">chat claude-sonnet-5-5</span><span class="wf-track"><i></i></span><time>1.2s</time></div>
   </div>
-  <div class="grid g2">
-    <article class="card"><h3>부모와 자식 관계가 중요하다</h3><p>모든 단계가 같은 Trace ID 아래 연결되면, Agent가 전체 실행을 시작했고 그 안에 모델·Tool·MCP 호출이 포함됐다는 사실이 보인다.</p></article>
-    <article class="card"><h3>시간이 길면 원인이 보인다</h3><p>총 45.8초라도 어느 Span이 시간을 잡아먹는지 알 수 있다. Retry가 논리적으로 같은 작업에 포함됐다면 해당 작업의 Span이 그 시간을 덮을 수 있다.</p></article>
+  <div class="wf-legend"><span class="agent">Agent 실행</span><span class="model">모델 호출</span><span class="tool">tool</span><span class="mcp">MCP 서버의 tool</span></div>
+  <div class="grid g3">
+    <article class="plain"><h3>막대 하나 = span</h3><p>구간 한 줄. 이름, 시작·끝 시각, 이름표(attribute)를 담는다.</p></article>
+    <article class="plain"><h3>들여쓰기 = 부모·자식</h3><p>누가 누구를 불렀는지. 모델 호출과 tool은 모두 Agent 실행 안에 있다.</p></article>
+    <article class="plain"><h3>전체 = trace</h3><p>같은 송장 번호(<code>trace_id</code>)를 단 span의 묶음. 부탁 한 번이 trace 하나다.</p></article>
   </div>
-  <p class="easy"><b>핵심</b>Agent Observability에서 중요한 것은 “로그를 많이 남긴다”가 아니라 <b>한 요청의 실행 단계를 연결해서 본다</b>는 것이다.</p>
+  <p class="easy"><b>보이는 것</b>모델은 네 번 합쳐 6.3초. 37.1초는 <b>위키 저장(save_page) 한 번</b>에서 났다. 용의자 ①·②는 무죄. 그런데 save_page 안에서는 무슨 일이? 07에서 MCP 서버 안까지 따라간다.</p>
 </div></section>
 
 <section class="slide" id="otel"><div class="inner">
-  <span class="kicker">05 — OpenTelemetry는 무엇을 하나</span>
-  <h2>제품이 아니라, 흔적의 공통 언어를 만든다</h2>
-  <div class="grid split">
-    <div class="trace-tree">Application / Agent
-      │
-      ├─ Span / Metric / Event
-      │
-      ▼
-  OpenTelemetry SDK
-      │
-      ▼
-  OTLP Export
-      │
-      ▼
-  Collector
-      │
-      ├─ Jaeger
-      ├─ Grafana
-      ├─ Datadog
-      └─ 기타 Backend</div>
-    <div class="grid">
-      <article class="plain"><h3>OpenTelemetry가 정하는 것</h3><p>Trace·Metric·Event를 어떻게 표현하고 서로 연결할지에 대한 공통 모델과 Semantic Conventions를 제공한다.</p></article>
-      <article class="plain"><h3>OpenTelemetry가 직접 하지 않는 것</h3><p>“여기가 느리다”를 분석하는 저장소나 대시보드 제품 자체가 아니다. Backend는 별도로 선택한다.</p></article>
-      <article class="plain"><h3>GenAI가 붙으면서</h3><p>일반 HTTP/DB Span만으로는 부족하니 모델 호출·Agent·Tool·MCP 같은 GenAI 작업에 이름과 Attribute를 붙이기 시작했다.</p></article>
-    </div>
+  <span class="kicker">05 — OpenTelemetry가 정하는 것</span>
+  <h2>송장 쓰는 법, 보내는 법, 부르는 이름을 모두 같게</h2>
+  <div class="flow">
+    <div class="node"><b>내 Agent</b><span>+ OTel SDK<br>구간마다 span을 남긴다</span></div>
+    <div class="leg"><b>OTLP</b><span>공용 전송 형식</span></div>
+    <div class="node"><b>Collector</b><span>모으고·거르고·나눈다<br>(없어도 된다)</span></div>
+    <div class="leg"><b>OTLP</b><span>그대로 넘긴다</span></div>
+    <div class="node"><b>조회 화면 (backend)</b><span>Jaeger · Grafana · Langfuse · Datadog …</span></div>
   </div>
-  <p class="easy"><b>쉽게 말하면</b>각 팀이 영수증 양식을 따로 만들면 비교가 어렵다. OpenTelemetry는 <mark>같은 칸 이름</mark>으로 기록하자는 약속에 가깝다.</p>
+  <div class="grid g3">
+    <article class="card"><h3>① 기록하는 법 <span class="tag api">API · SDK</span></h3><p>span을 열고 닫고, 송장 번호를 다음 구간에 넘긴다. Python·JS·Go·Java 등 언어마다 있다.</p><p class="parcel">택배로 치면 → 송장 양식</p></article>
+    <article class="card"><h3>② 보내는 법 <span class="tag api">OTLP · Collector</span></h3><p>기록을 공용 형식(OTLP)으로 보낸다. Collector는 중간 허브다. 모아서 거르고, 여러 곳에 나눠 보낸다.</p><p class="parcel">택배로 치면 → 택배사 공용 전산망</p></article>
+    <article class="card"><h3>③ 부르는 이름 <span class="tag api">Semantic Conventions</span></h3><p>span과 이름표에 붙일 이름. “모델 호출은 <code>chat</code>, 입력 토큰은 <code>gen_ai.usage.input_tokens</code>”처럼 정한다.</p><p class="parcel">택배로 치면 → “집하·배송출발” 같은 단계 이름</p></article>
+  </div>
+  <div class="callout">OTel은 <b>조회 화면이 아니다</b>. 기록을 저장하고 그려 주는 곳(backend)은 따로 고른다. 화면을 바꿔도 Agent 쪽 코드는 그대로다.</div>
+  <p class="note">OTel이 남기는 신호는 세 가지다. Trace(구간별 조회), Metric(“이번 주 평균 몇 초” 같은 통계), Log(그 순간의 메모). 오늘은 Trace를 중심으로 본다.</p>
 </div></section>
 
-<section class="slide" id="spans"><div class="inner">
-  <span class="kicker">06 — Agent를 Span으로 표현한다</span>
-  <h2>Agent의 “행동 종류”가 Span 이름이 된다</h2>
-  <div class="grid g3">
-    <article class="card"><span class="sig">invoke_agent</span><h3>Agent 실행</h3><p>같은 프로세스 안의 Agent invocation 또는 원격 Agent service 호출을 표현한다.</p></article>
-    <article class="card"><span class="sig">plan</span><h3>계획·작업 분해</h3><p>Agent가 먼저 전략을 세우거나 task decomposition을 수행하는 구간을 나타낸다.</p></article>
-    <article class="card"><span class="sig">execute_tool</span><h3>Tool 실행</h3><p>Agent가 실제 도구를 실행한 구간이다. 자체 Tool이든 MCP Tool이든 연결할 수 있다.</p></article>
-  </div>
-  <div class="span-box">
-    <div><b>invoke_agent weather-forecast-agent</b> <span class="sig">INTERNAL</span></div>
-    <div class="bar"><i style="width:72%"></i></div>
-    <div class="kv">
-      <span>gen_ai.operation.name</span><b>invoke_agent</b>
-      <span>gen_ai.agent.name</span><b>weather-forecast-agent</b>
-      <span>child</span><b>chat → tools/call → chat</b>
+<section class="slide" id="names"><div class="inner">
+  <span class="kicker">06 — GenAI Semantic Conventions</span>
+  <h2>Agent용 단계 이름도 정해져 있다</h2>
+  <table>
+    <thead><tr><th scope="col">구간</th><th scope="col">span 이름</th><th scope="col">대표 이름표 (attribute)</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Agent 실행 한 번</th><td><code>invoke_agent {Agent 이름}</code></td><td><code>gen_ai.agent.name</code> · <code>gen_ai.conversation.id</code></td></tr>
+      <tr><th scope="row">모델 호출</th><td><code>chat {모델}</code></td><td><code>gen_ai.request.model</code> · <code>gen_ai.usage.input_tokens</code> · <code>gen_ai.usage.output_tokens</code></td></tr>
+      <tr><th scope="row">tool 실행</th><td><code>execute_tool {tool 이름}</code></td><td><code>gen_ai.tool.name</code> · <code>gen_ai.tool.call.id</code></td></tr>
+      <tr><th scope="row">MCP 호출</th><td><code>tools/call {tool 이름}</code></td><td><code>mcp.method.name</code> · <code>mcp.session.id</code></td></tr>
+      <tr><th scope="row">실패했을 때</th><td>어느 span이든</td><td><code>error.type</code></td></tr>
+    </tbody>
+  </table>
+  <div class="grid split">
+<pre class="code"><span class="c"># 04의 세 번째 모델 호출을 열어 보면</span>
+span      <span class="k">chat claude-sonnet-5-5</span>   (CLIENT)
+trace_id  4bf92f3577b34da6a3ce929d0e0e4736
+parent    invoke_agent meeting-summarizer
+
+gen_ai.operation.name       chat
+gen_ai.provider.name        anthropic
+gen_ai.request.model        claude-sonnet-5-5
+gen_ai.usage.input_tokens   6210
+gen_ai.usage.output_tokens  480
+gen_ai.response.finish_reasons  ["tool_use"]</pre>
+    <div class="grid">
+      <article class="plain"><h3>이름이 같으면 질문도 같다</h3><p>“모델별 입력 토큰 합계”, “tool별 실패율”을 어느 Agent에서 왔든 <b>같은 쿼리 하나</b>로 뽑는다.</p></article>
+      <article class="plain"><h3>더 있다</h3><p><code>plan</code>(계획 세우기), <code>invoke_workflow</code>(여러 Agent 묶음), <code>create_agent</code>, 메모리 작업(<code>search_memory</code> 등). 필요한 것만 쓴다.</p></article>
     </div>
   </div>
-  <p class="note">현재 Agent 관련 Semantic Conventions의 상태는 <span class="tag amber">Development</span>다. 즉 이름과 Attribute가 최종 고정된 단계는 아니다.</p>
-  <p class="easy"><b>쉽게 말하면</b>“심부름 전체”, “계획 세우기”, “실제로 전화하기”를 따로 표시해 두면 어느 단계에서 시간이 났는지 보인다.</p>
+  <p class="easy"><b>쉽게 말하면</b>택배사마다 “배송출발”을 “출고”, “발송”, “상차”로 따로 적으면 한 화면에 모을 수 없다. 단계 이름을 하나로 정해 두는 것이다.</p>
+  <p class="note">이 이름표는 전부 <span class="tag amber">Development</span> 단계다(13). <code>plan</code>과 메모리 작업은 아직 릴리스 전(main 브랜치)이다.</p>
 </div></section>
 
 <section class="slide" id="mcp"><div class="inner">
-  <span class="kicker">07 — MCP까지 이어 붙이면</span>
-  <h2>Agent → Tool → MCP Server도 한 Trace로 이어질 수 있다</h2>
-  <div class="trace-tree">invoke_agent weather-forecast-agent
-  │
-  ├── chat {model}
-  │
-  ├── tools/call get-weather          ← MCP client span
-  │        │
-  │        └── tools/call get-weather  ← MCP server span
-  │
-  └── chat {model}</div>
+  <span class="kicker">07 — MCP 서버 안까지</span>
+  <h2>다른 프로그램으로 넘어가도 송장 번호가 따라간다</h2>
+  <span class="wf-title">04의 save_page 37.1초를 확대하면</span>
+  <div class="wf" style="--t0:7.5;--T:37.1">
+    <div class="wf-axis" aria-hidden="true"><span></span><span class="ticks"><span style="--x:10">10s</span><span style="--x:20">20s</span><span style="--x:30">30s</span><span style="--x:40">40s</span></span><span></span></div>
+    <div class="wf-row mcp" style="--s:7.5;--e:44.6;--d:0"><span class="wf-name">execute_tool save_page · Agent</span><span class="wf-track"><i></i></span><time>37.1s</time></div>
+    <div class="wf-row mcp" style="--s:7.6;--e:44.5;--d:1"><span class="wf-name">tools/call save_page · MCP 서버</span><span class="wf-track"><i></i></span><time>36.9s</time></div>
+    <div class="wf-row http hot" style="--s:7.7;--e:8.1;--d:2"><span class="wf-name">PUT /api/pages → 429</span><span class="wf-track"><i></i><b class="wait" style="--s:8.1;--e:23.1">15초 대기</b></span><time>0.4s</time></div>
+    <div class="wf-row http hot" style="--s:23.1;--e:23.5;--d:2"><span class="wf-name">PUT /api/pages → 429</span><span class="wf-track"><i></i><b class="wait" style="--s:23.5;--e:43.5">20초 대기</b></span><time>0.4s</time></div>
+    <div class="wf-row http" style="--s:43.5;--e:44.4;--d:2"><span class="wf-name">PUT /api/pages → 200</span><span class="wf-track"><i></i></span><time>0.9s</time></div>
+  </div>
+  <div class="grid split">
+<pre class="code"><span class="c">// Agent → wiki-mcp 서버로 가는 MCP 요청</span>
+{ "jsonrpc": "2.0", "id": 7, "method": <span class="s">"tools/call"</span>,
+  "params": {
+    "name": <span class="s">"save_page"</span>,
+    "arguments": { "title": <span class="s">"10/6 주간회의 요약"</span>, … },
+    <span class="h">"_meta": {</span>
+      <span class="h">"traceparent": "00-4bf92f35…4736-00f067aa0ba902b7-01"</span>
+    <span class="h">}</span>
+  }
+}</pre>
+    <div class="grid">
+      <article class="plain"><h3>어떻게 이어지나</h3><p>Agent가 요청의 <code>params._meta</code>에 <code>traceparent</code>(송장 번호 + 보낸 구간 번호)를 넣는다. 서버는 그 값을 부모로 삼아 자기 span을 만든다. 언어가 달라도, 다른 컴퓨터여도 같은 trace에 붙는다.</p></article>
+      <article class="plain"><h3>왜 HTTP 헤더가 아니라 메시지 안에</h3><p>MCP는 stdio로도 돈다. 그러면 헤더가 없다. HTTP여도 요청 하나에 MCP 메시지가 여럿 오갈 수 있다. 그래서 메시지마다 싣는다.</p></article>
+    </div>
+  </div>
+  <div class="callout warn"><b>진범: 위키 API의 429(요청이 너무 많음)</b>. 실제로 일한 시간은 1.7초, 기다린 시간이 35초다. 모델을 바꿨다면 여전히 40초가 넘었을 것이다. 고칠 곳은 위키 API 호출 한도다.</div>
+  <p class="easy"><b>쉽게 말하면</b>다른 택배사로 넘겨 배송하더라도 송장 번호가 같이 넘어가면, 한 조회 화면에서 끝까지 보인다.</p>
+  <p class="note">스펙: Agent가 이미 <code>execute_tool</code> span을 만들면 MCP 계측은 span을 또 만들지 않고 거기에 <code>mcp.*</code> 이름표만 붙인다. 그래서 Agent 쪽 줄이 하나다.</p>
+</div></section>
+
+<section class="slide" id="labels"><div class="inner">
+  <span class="kicker">08 — 같은 일, 다른 이름표</span>
+  <h2>둘 다 OTel로 내보내는데, 이름이 다르다</h2>
+  <p class="lede">Claude Code(trace는 beta)와 GitHub Copilot CLI는 둘 다 OTel trace를 내보내고, 둘 다 Claude 모델을 부를 수 있다. 같은 일을 어떻게 적는지 나란히 놓으면:</p>
+  <table>
+    <thead><tr><th scope="col">같은 일</th><th scope="col">Claude Code</th><th scope="col">GitHub Copilot CLI</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">부탁 한 번</th><td><code>claude_code.interaction</code></td><td class="we"><code>invoke_agent</code></td></tr>
+      <tr><th scope="row">모델 호출</th><td><code>claude_code.llm_request</code></td><td class="we"><code>chat {모델}</code></td></tr>
+      <tr><th scope="row">tool 실행</th><td><code>claude_code.tool</code></td><td class="we"><code>execute_tool {tool}</code></td></tr>
+      <tr><th scope="row">tool 이름</th><td><code>tool_name</code></td><td class="we"><code>gen_ai.tool.name</code></td></tr>
+      <tr><th scope="row">입력 토큰</th><td><code>input_tokens</code> — 캐시 토큰은 빠져 있다. 표준 값을 얻으려면 캐시 두 칸을 더한다</td><td class="we"><code>gen_ai.usage.input_tokens</code></td></tr>
+      <tr><th scope="row">토큰 지표</th><td><code>claude_code.token.usage</code></td><td class="we"><code>gen_ai.client.token.usage</code></td></tr>
+    </tbody>
+  </table>
   <div class="grid g2">
-    <article class="card"><h3>왜 MCP를 따로 보나?</h3><p>MCP는 JSON-RPC 기반이고, 하나의 Streamable HTTP 요청 안에서도 여러 MCP 메시지가 오갈 수 있다. 그래서 HTTP 요청 시간만 보는 것보다 MCP 수준의 Span이 더 많은 문맥을 준다.</p></article>
-    <article class="card"><h3>중복 Span도 조심한다</h3><p>MCP Tool 실행이 이미 상위 <code>execute_tool</code>로 정확히 추적되고 있다면, MCP instrumentation이 불필요한 별도 Span을 또 만들지 않고 기존 Span에 MCP Attribute를 붙이는 방식을 권장한다.</p></article>
+    <article class="card"><h3>다른 도구도 제각각</h3><p>Codex는 <code>codex.*</code>, Gemini CLI는 <code>gemini_cli.*</code>에 일부 <code>gen_ai.*</code>를 같이 쓴다. Copilot CLI 문서는 “모든 이름이 GenAI Semantic Conventions를 따른다”고 적는다.</p></article>
+    <article class="card"><h3>그래서 누군가 환산표를 만든다</h3><p>Honeycomb 문서는 Claude Code 데이터를 Collector의 <code>transform</code>으로 <code>gen_ai.*</code> 이름에 맞추는 법을 따로 싣는다. Phoenix는 <code>gen_ai.*</code>를 자기 이름으로 바꿔 읽고, Langfuse는 두 이름을 다 읽는다.</p></article>
   </div>
-  <p class="easy"><b>그래서</b>“Tool이 느렸다”에서 멈추지 않고 <b>“MCP client는 빨랐는데 server에서 30초가 걸렸다”</b>까지 내려갈 수 있다.</p>
-  <p class="note">OpenTelemetry의 MCP Semantic Conventions는 client/server Span과 session·operation Metric, context propagation을 별도로 정의하고 있다.</p>
+  <p class="easy"><b>쉽게 말하면</b>같은 무게를 한쪽은 kg, 한쪽은 근으로 적은 셈이다. 한 저울에 올리려면 환산표가 필요하다. 표준 이름표는 그 환산표를 없앤다.</p>
+  <p class="note">어느 쪽이 나쁘다는 이야기가 아니다. Claude Code도 <code>gen_ai.request.model</code>·<code>gen_ai.tool.call.id</code> 같은 표준 이름을 일부 같이 붙이고, 표준 값으로 바꾸는 법을 문서에 적어 둔다. 표준이 아직 움직이는 중이라 생긴 차이다(13).</p>
 </div></section>
 
-<section class="slide" id="signals"><div class="inner">
-  <span class="kicker">08 — Trace만으로 끝나지 않는다</span>
-  <h2>한 번 자세히 보는 것과, 전체 추세를 보는 것은 다르다</h2>
-  <div class="signal-grid">
-    <article class="signal"><strong>Trace</strong><span class="sig">ONE REQUEST</span><p>한 Agent 실행에서 <b>어디를 거쳤는지</b>, 어느 Span이 오래 걸렸는지 본다.</p></article>
-    <article class="signal"><strong>Metric</strong><span class="sig">SYSTEM TREND</span><p>평균 지연, Tool 호출 수, Token 사용량처럼 <b>전체 추세</b>를 본다.</p></article>
-    <article class="signal"><strong>Event</strong><span class="sig">POINT IN TIME</span><p>상태 변화나 특정 시점의 사건을 기록한다. 오래 지속되는 작업 자체는 Span이 더 적합하다.</p></article>
-    <article class="signal"><strong>Log</strong><span class="sig">DETAIL</span><p>예외나 애플리케이션의 상세 진단 정보처럼 <b>문맥이 많은 기록</b>을 남긴다.</p></article>
-  </div>
-  <div class="grid g3">
-    <div class="metric"><b>1.8s</b><span>Agent p50</span></div>
-    <div class="metric"><b>7.2</b><span>평균 tool calls / request</span></div>
-    <div class="metric"><b>32k</b><span>평균 input tokens</span></div>
-  </div>
-  <p class="easy"><b>쉽게 말하면</b>Trace는 <mark>한 번의 CCTV</mark>, Metric은 <mark>한 달치 통계</mark>, Event는 “그 순간 무슨 일이 있었나”, Log는 “그때 남긴 자세한 메모”다.</p>
-</div></section>
+<section class="slide" id="try"><div class="inner">
+  <span class="kicker">09 — 오늘 저녁 5분 실습</span>
+  <h2>지금 쓰는 코딩 Agent의 배송 조회를 열어 보자</h2>
+  <div class="grid split">
+<pre class="code"><span class="c"># ① 조회 화면 띄우기 — Grafana·Tempo·Loki·Prometheus 한 통</span>
+<span class="k">docker run</span> --rm -p 3000:3000 -p 4317:4317 -p 4318:4318 \
+  grafana/otel-lgtm
 
-<section class="slide" id="questions"><div class="inner">
-  <span class="kicker">09 — 그래서 어떤 질문에 답하나</span>
-  <h2>Agent 운영에서 궁금한 질문이 바뀐다</h2>
-  <div class="grid g3">
-    <article class="card"><h3>느린가?</h3><p>총 지연시간뿐 아니라 <b>어느 Agent·Model·Tool·MCP</b>가 병목인지 찾는다.</p></article>
-    <article class="card"><h3>비싼가?</h3><p>Input / Output Token 사용량, 모델별 호출 수, 요청당 Agent 실행량을 묶어 본다.</p></article>
-    <article class="card"><h3>자꾸 실패하나?</h3><p>Tool error, timeout, retry, Agent error를 Trace와 연결해 실패 지점을 본다.</p></article>
-    <article class="card"><h3>Loop에 빠지나?</h3><p>한 요청 안에 inference와 tool 호출이 비정상적으로 많이 반복되는 패턴을 찾는다.</p></article>
-    <article class="card"><h3>어디서 품질이 깨지나?</h3><p>어떤 Tool 결과 뒤에 재시도나 추가 계획이 집중되는지 실행 경로를 비교한다.</p></article>
-    <article class="card"><h3>누가 무엇을 했나?</h3><p>Agent 이름·버전·Tool 이름·MCP session 같은 문맥을 연결해 실행 주체를 구분한다.</p></article>
+<span class="c"># ② Claude Code가 거기로 보내게 (다른 터미널에서)</span>
+export CLAUDE_CODE_ENABLE_TELEMETRY=1
+export <span class="h">CLAUDE_CODE_ENHANCED_TELEMETRY_BETA=1</span>  <span class="c"># trace는 beta</span>
+export OTEL_TRACES_EXPORTER=otlp
+export OTEL_METRICS_EXPORTER=otlp
+export OTEL_LOGS_EXPORTER=otlp
+export OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+<span class="k">claude</span>
+
+<span class="c"># ③ http://localhost:3000 → Explore → Tempo</span></pre>
+    <div class="grid">
+      <article class="plain"><h3>무엇이 보이나</h3><p><code>claude_code.interaction</code> 아래로 모델 호출과 tool 막대가 늘어선다. Metric 쪽에는 <code>claude_code.cost.usage</code>(USD)와 <code>claude_code.token.usage</code>가 쌓인다.</p></article>
+      <article class="plain"><h3>tool 막대 안을 열면</h3><p><code>blocked_on_user</code>(내 승인을 기다린 시간)와 <code>execution</code>(실제 실행)이 따로 찍힌다. Agent가 느린 줄 알았는데 <b>내가 승인 버튼을 늦게 눌렀을</b> 수도 있다.</p></article>
+      <article class="plain"><h3>다른 Agent라면</h3>
+        <ul class="mini">
+          <li><b>Copilot CLI</b> — <code>COPILOT_OTEL_ENABLED=true</code>와 <code>OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318</code></li>
+          <li><b>Codex</b> — <code>~/.codex/config.toml</code>의 <code>[otel]</code>에서 <code>exporter</code>와 <code>trace_exporter</code>를 <code>{ otlp-grpc = { endpoint = "http://localhost:4317" } }</code>로</li>
+          <li><b>Gemini CLI</b> — <code>.gemini/settings.json</code>의 <code>telemetry.enabled: true</code>. 보내는 곳 기본값이 <code>localhost:4317</code>이다. 프롬프트가 기본으로 남으니 <code>logPrompts: false</code>도 같이(10)</li>
+        </ul>
+      </article>
+    </div>
   </div>
-  <p class="easy"><b>핵심</b>Observability가 좋아지면 “Agent가 이상하다”가 아니라 <b>“이 경로에서 이 Tool이 8번 호출됐다”</b>처럼 말할 수 있다.</p>
+  <p class="easy"><b>해 보면</b>04의 그림이 내 Agent로 그려진다. 막대 한 줄 한 줄이 방금 내가 시킨 일이다.</p>
+  <p class="note">기본 설정으로는 프롬프트 원문이 남지 않는다(10). 회사에서 관리자가 OTel 설정을 내려 주고 있다면 그 설정이 우선할 수 있다.</p>
 </div></section>
 
 <section class="slide" id="content"><div class="inner">
-  <span class="kicker">10 — Prompt도 전부 기록할까</span>
-  <h2>가장 유용한 데이터가, 가장 위험한 데이터일 수도 있다</h2>
-  <div class="grid split">
-    <div class="grid g2">
-      <article class="card"><h3>기록하면 좋은 것</h3><ul class="tight"><li>모델 이름</li><li>Agent 이름 / 버전</li><li>Duration / Error</li><li>Input / Output token</li><li>Tool 이름</li><li>MCP method / session</li></ul></article>
-      <article class="card"><h3>주의해야 하는 것</h3><ul class="tight"><li>Prompt 전체</li><li>Tool arguments</li><li>Tool result</li><li>대화 내용</li><li>사내 문서 / 개인정보</li><li>Secret / token</li></ul></article>
-    </div>
-    <div class="grid">
-      <article class="plain"><h3>OpenTelemetry도 content capture를 별도로 본다</h3><p>GenAI conventions는 input/output message 등의 content를 <span class="tag amber">opt-in</span>으로 다루고 있다. “무조건 다 수집”이 기본값인 설계가 아니다.</p></article>
-      <article class="plain"><h3>운영에서는 단계적으로</h3><p><b>metadata 먼저</b> → 문제 재현이 필요할 때 제한된 content → 민감 데이터 마스킹·보존기간·접근권한을 따로 설계하는 식이 현실적이다.</p></article>
-      <article class="callout warn"><b>중요:</b> Observability는 디버깅 편의를 위해 사용자 데이터를 전부 복사하는 기능이 아니다. 무엇을 수집하지 않을지부터 정해야 한다.</article>
-    </div>
+  <span class="kicker">10 — Prompt도 남길까</span>
+  <h2>송장에 상자 속 내용까지 적지는 않는다</h2>
+  <div class="grid g3">
+    <article class="card"><h3>① 안 남긴다 <span class="tag green">기본값</span></h3><p>모델·토큰·시간·tool 이름만 남긴다. 04~07의 수사는 이것만으로 다 됐다.</p></article>
+    <article class="card"><h3>② span에 바로 남긴다 <span class="tag amber">개발·테스트</span></h3><p><code>gen_ai.input.messages</code>·<code>gen_ai.output.messages</code>에 대화 원문을 넣는다. 재현은 쉽지만 trace를 보는 모두가 원문을 본다.</p></article>
+    <article class="card"><h3>③ 따로 두고 위치만 <span class="tag api">운영 권장</span></h3><p>원문은 별도 저장소에 두고, span에는 그 위치만 적는다. 저장소에 접근 권한을 따로 건다.</p></article>
   </div>
-  <p class="easy"><b>쉽게 말하면</b>블랙박스를 열었다고 차 안의 모든 대화를 영구 녹음할 필요는 없다. <mark>필요한 계기판 정보</mark>만으로도 많은 문제를 찾을 수 있다.</p>
-</div></section>
-
-<section class="slide" id="design"><div class="inner">
-  <span class="kicker">11 — 좋은 Agent Trace의 조건</span>
-  <h2>많이 남기는 것보다, 연결이 잘 되어야 한다</h2>
-  <div class="grid g2">
-    <article class="big"><h3>① 한 요청이 하나의 이야기로 이어진다</h3><p><code>invoke_agent</code> 아래에 model·tool·MCP 작업이 적절한 parent/child 관계로 연결되어야 한다.</p></article>
-    <article class="big"><h3>② 이름과 Attribute가 비교 가능하다</h3><p>“검색 호출”을 팀마다 제멋대로 이름 붙이면 집계가 어렵다. Semantic Conventions가 필요한 이유다.</p></article>
-    <article class="big"><h3>③ 고카디널리티 데이터는 조심한다</h3><p>URL 전체나 자유 텍스트처럼 값이 너무 다양하면 Span name이나 Metric label로 쓰기 곤란하다. 안정적인 식별자는 속성으로 남기는 편이 낫다.</p></article>
-    <article class="big"><h3>④ 실패와 재시도도 같은 흐름에서 본다</h3><p>자동 retry가 논리적으로 같은 작업이라면, “재시도된 요청 3개”보다 “한 작업이 3번 시도됐다”는 사실이 더 중요할 수 있다.</p></article>
-  </div>
-  <p class="easy"><b>한마디로</b>Agent Trace는 <mark>길게 쌓인 로그 더미</mark>가 아니라, 사건을 다시 재생할 수 있는 실행 지도여야 한다.</p>
-</div></section>
-
-<section class="slide" id="compare"><div class="inner">
-  <span class="kicker">12 — LLM Observability와 Agent Observability</span>
-  <h2>LLM 호출을 보는 것에서, 실행 주체를 보는 것으로</h2>
   <table>
-    <thead><tr><th scope="col"></th><th scope="col">LLM 중심 Observability</th><th scope="col">Agent 중심 Observability</th></tr></thead>
+    <thead><tr><th scope="col">도구</th><th scope="col">프롬프트 원문 (기본값)</th><th scope="col">켜는 법</th></tr></thead>
     <tbody>
-      <tr><th scope="row">관심 대상</th><td>모델 호출 1회</td><td class="we">하나의 목표를 수행한 전체 실행</td></tr>
-      <tr><th scope="row">주요 단위</th><td>inference</td><td class="we">invoke_agent · plan · execute_tool</td></tr>
-      <tr><th scope="row">질문</th><td>어떤 모델이 얼마나 느렸나?</td><td class="we">왜 이 Agent가 이 Tool을 이 순서로 여러 번 불렀나?</td></tr>
-      <tr><th scope="row">외부 경계</th><td>모델 API</td><td class="we">Tool · MCP · 다른 Agent · Workflow</td></tr>
-      <tr><th scope="row">비용 분석</th><td>Token / model 중심</td><td class="we">Agent 경로별 Token + Tool + retry까지 연결</td></tr>
-      <tr><th scope="row">디버깅</th><td>LLM 요청/응답</td><td class="we">실행 경로 전체</td></tr>
+      <tr><th scope="row">Claude Code</th><td>안 남김 (길이만)</td><td><code>OTEL_LOG_USER_PROMPTS=1</code></td></tr>
+      <tr><th scope="row">Copilot CLI</th><td>안 남김</td><td><code>OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=true</code></td></tr>
+      <tr><th scope="row">Codex</th><td>안 남김 (tool 결과는 앞부분이 남는다)</td><td><code>log_user_prompt = true</code></td></tr>
+      <tr><th scope="row">Gemini CLI</th><td><b style="color:var(--red)">남김</b></td><td><code>logPrompts</code> 기본값이 <code>true</code>. 회사 코드라면 <code>false</code>부터</td></tr>
     </tbody>
   </table>
-  <p class="easy"><b>중요</b>둘 중 하나를 버리는 게 아니다. <b>LLM Trace는 Agent Trace 안의 한 조각</b>이 되고, Agent가 커질수록 그 바깥의 실행 흐름이 더 중요해진다.</p>
+  <p class="easy"><b>쉽게 말하면</b>송장에는 “서류 1박스”까지만 적는다. 내용물 사진은 따로 금고에 넣고, 송장에는 금고 번호만 적는다.</p>
+  <p class="note">스펙: “계측은 기본으로 지시문·입력·출력을 남기지 말아야 하고(SHOULD NOT), 사용자가 켤 수 있는 옵션을 줘야 한다.” ③은 스펙이 운영 환경에 권하는 방식이다.</p>
+</div></section>
+
+<section class="slide" id="when"><div class="inner">
+  <span class="kicker">11 — 언제 쓰나</span>
+  <h2>첫 질문 하나로 고른다</h2>
+  <p class="q">Agent가 “왜 그랬는지”를 숫자로 설명해야 하나?</p>
+  <div class="yn">
+    <div class="y">
+      <h3>예 → trace를 켠다</h3>
+      <ul>
+        <li><b>느리다</b> — 어느 구간에서 시간이 갔나 (04·07)</li>
+        <li><b>비싸다</b> — 어느 모델·Agent·사람에게서 토큰이 나갔나</li>
+        <li><b>맴돈다</b> — 부탁 한 번에 <code>execute_tool</code>이 몇 번 찍혔나</li>
+        <li><b>여럿이 쓴다</b> — 팀 전체의 사용량·비용·승인 거부를 한 화면에</li>
+        <li><b>MCP 서버를 만들어 남에게 준다</b> — 내 서버의 span이 손님 trace에 그대로 붙는다</li>
+      </ul>
+    </div>
+    <div class="n">
+      <h3>아니오 → 아직은 없어도 된다</h3>
+      <ul>
+        <li>혼자 가끔 돌려 보는 실험 — 터미널 출력으로 충분하다</li>
+        <li>답이 맞았는지 채점하기 — trace는 “무엇을 했나”를 보여 줄 뿐이다. 채점은 평가(eval) 도구가 한다</li>
+      </ul>
+    </div>
+  </div>
+  <p class="easy"><b>시작 순서</b>① 쓰고 있는 코딩 Agent에서 켜 본다(09) → ② 만드는 Agent에 붙인다(12) → ③ 내 MCP 서버·tool까지 송장 번호를 잇는다(07).</p>
+</div></section>
+
+<section class="slide" id="build"><div class="inner">
+  <span class="kicker">12 — 내가 만드는 Agent에 붙이기</span>
+  <h2>세 갈래 중 쉬운 길부터</h2>
+  <div class="grid split split-r">
+    <div class="grid">
+    <article class="card"><h3>① framework 스위치 켜기</h3><p>이미 OTel이 들어 있다. <b>Google ADK, Pydantic AI, Microsoft Agent Framework</b>는 표준 이름을 그대로 낸다.</p><p><b>Strands Agents</b>는 옛 이름이 기본이라 <code>OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental</code>를 켠다. <b>Vercel AI SDK 7</b>은 <code>@ai-sdk/otel</code>을 붙인다.</p></article>
+    <article class="card"><h3>② 계측 라이브러리 얹기</h3><p>내 코드는 그대로 두고 SDK 호출을 감싼다. OTel 공식 <code>opentelemetry-python-genai</code>(openai, anthropic, openai-agents, langchain 등), OpenLIT, OpenLLMetry, OpenInference.</p><p><b>OpenAI Agents SDK</b>는 기본으로 OpenAI 대시보드에 trace를 보낸다. OTel로 받으려면 이 길로 간다.</p></article>
+    </div>
+    <article class="card"><h3>③ 직접 span 심기</h3><p>모자란 구간만 손으로 감싼다. 이름만 표준을 따르면 된다.</p>
+<pre class="code"><span class="k">from</span> opentelemetry <span class="k">import</span> trace
+tracer = trace.get_tracer(<span class="s">"meeting-summarizer"</span>)
+
+<span class="k">with</span> tracer.start_as_current_span(
+        <span class="s">"execute_tool save_page"</span>) <span class="k">as</span> span:
+    span.set_attribute(<span class="s">"gen_ai.operation.name"</span>,
+                       <span class="s">"execute_tool"</span>)
+    span.set_attribute(<span class="s">"gen_ai.tool.name"</span>, <span class="s">"save_page"</span>)
+    wiki.save_page(title, body)  <span class="c"># 원래 코드</span></pre>
+    <p>이렇게 감싸 두면 04의 <code>execute_tool save_page</code> 막대 한 줄이 생긴다.</p></article>
+  </div>
+  <div class="callout"><b>받는 쪽은 아무거나</b> 범용 화면(Jaeger, Grafana Tempo)이든 LLM 전용 화면(Langfuse, Arize Phoenix, Datadog LLM Observability, LangSmith)이든 모두 OTLP를 받는다. 화면을 바꿔도 ①~③은 그대로다.</div>
+  <p class="note">이름표가 다른 계측도 있다. OpenInference는 자체 이름(<code>llm.token_count.prompt</code>)이 기본이고, 표준 이름은 옵션(<code>OPENINFERENCE_ENABLE_GENAI_SEMCONV</code>)으로 같이 낸다. CrewAI에 들어 있는 telemetry는 익명 사용 통계라 내 backend로 오지 않는다.</p>
 </div></section>
 
 <section class="slide" id="status"><div class="inner">
   <span class="kicker">13 — 2026년 10월 현재</span>
-  <h2>방향은 잡혔지만, GenAI 표준은 아직 진행 중이다</h2>
+  <h2>뼈대는 굳었고, 이름표는 아직 고치는 중</h2>
   <div class="grid g4">
-    <article class="plain"><h3>Agent</h3><p><span class="tag amber">Development</span><br><code>invoke_agent</code> · <code>plan</code> · <code>execute_tool</code> 등을 정의</p></article>
-    <article class="plain"><h3>MCP</h3><p><span class="tag amber">Development</span><br>Client / Server Span과 session·operation Metric 정의</p></article>
-    <article class="plain"><h3>GenAI</h3><p><span class="tag amber">Development</span><br>Inference · Tool · content capture 등을 정의</p></article>
-    <article class="plain"><h3>Conventions</h3><p><span class="tag amber">진행 중</span><br>이름·Attribute·안정성 수준은 계속 바뀔 수 있음</p></article>
+    <article class="plain"><h3>2025-08</h3><p>v1.37. <code>gen_ai.system</code>이 <code>gen_ai.provider.name</code>으로 바뀌는 등 큰 개편. 그래서 framework마다 “옛 이름 / 새 이름” 모드가 있다</p></article>
+    <article class="plain"><h3>2026-05</h3><p>GenAI 이름표가 별도 저장소 <code>semantic-conventions-genai</code>로 독립</p></article>
+    <article class="plain"><h3>2026-06</h3><p>본 저장소 v1.42.0이 <code>gen_ai.*</code>를 “옮겨 감”으로 표시</p></article>
+    <article class="plain"><h3>2026-09 ~ 10</h3><p>main에 Agent Skills용 tool span, 토큰·시간 지표 이름 변경이 들어감. 아직 릴리스 전</p></article>
   </div>
   <div class="grid g2">
-    <article class="card"><h3>그래도 지금 보는 이유</h3><p>Agent framework와 MCP가 늘어날수록 각 제품이 서로 다른 이름으로 telemetry를 만들면 운영 데이터가 갈라진다. 공통 Semantic Conventions의 방향 자체가 중요한 이유다.</p></article>
-    <article class="card"><h3>그래서 도입할 때</h3><p>“표준이 완성됐으니 그대로 붙인다”보다 <b>표준 명칭을 최대한 따르고, 현재 버전을 명시하고, 변경 가능성을 감안해 instrument를 분리</b>하는 방식이 안전하다.</p></article>
+    <article class="card"><h3>지금 상태</h3><p>GenAI·Agent·MCP 이름표는 전부 <span class="tag amber">Development</span>이고, 새 저장소는 아직 릴리스가 없다. 예를 들어 토큰 지표 <code>gen_ai.client.token.usage</code>는 main에서 다른 이름으로 바뀌었지만, 지금 도구들은 이 이름을 쓴다.</p></article>
+    <article class="card"><h3>그래서 붙일 때</h3><p>어느 버전의 이름을 내는지 적어 둔다. 라이브러리에 <code>OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental</code> 같은 스위치가 있는지 본다. 화면(backend)이 어느 이름을 읽는지 확인한다.</p></article>
   </div>
-  <p class="easy"><b>쉽게 말하면</b>도로 표지판은 생기고 있지만 아직 최종판은 아니다. 그래도 <mark>모두가 같은 방향으로 표지판을 세우기 시작했다</mark>는 건 중요한 흐름이다.</p>
+  <p class="easy"><b>쉽게 말하면</b>송장 양식의 칸 이름은 아직 시범 운영 중이라 바뀔 수 있다. 그래도 송장 번호로 구간을 잇는 trace·span 자체는 OTel에서 오래 써 온 안정된 뼈대다.</p>
 </div></section>
 
 <section class="slide" id="wrap"><div class="inner">
   <span class="kicker">정리</span>
-  <h2>Agent를 잘 보려면, Agent가 걸어온 길을 기록해야 한다</h2>
-  <div class="grid g2">
-    <article class="big"><h3>Agent Observability의 핵심은 실행 경로다</h3><p><code>invoke_agent → inference → execute_tool → MCP → inference</code>처럼 한 요청의 흐름을 연결해서 본다.</p></article>
-    <article class="big"><h3>OpenTelemetry는 그 연결을 표준화하는 축이다</h3><p>Trace·Metric·Event·Log를 쓰고, GenAI/Agent/MCP에 공통 이름과 Attribute를 붙이려는 방향으로 발전하고 있다.</p></article>
+  <h2>Agent에도 송장 번호를 붙이자</h2>
+  <div class="grid g3">
+    <article class="big"><h3>부탁 한 번 = trace 하나</h3><p>구간마다 span을 남기면 범인이 막대 길이로 보인다. 추측으로 모델을 바꾸는 일이 사라진다.</p></article>
+    <article class="big"><h3>OTel = 공용 송장</h3><p>기록하는 법·보내는 법·부르는 이름을 맞춘다. 한 번 심으면 어느 화면으로든 보낸다.</p></article>
+    <article class="big"><h3>MCP 서버까지 따라간다</h3><p><code>params._meta</code>의 <code>traceparent</code>로 다른 프로그램의 span도 같은 trace에 붙는다.</p></article>
   </div>
-  <div class="callout"><b>이번 발표의 한 문장</b> “LLM이 무슨 답을 했는지”만 보는 Observability에서, “Agent가 목표를 달성하려고 무엇을 했는지”를 다시 재생하는 Observability로 넘어가고 있다.</div>
-  <p class="note">다음 단계에서 실제 시스템에 적용한다면, 가장 먼저 <b>Agent span → model span → tool span → MCP span</b>의 최소 Trace 하나를 만드는 것부터 시작하면 된다.</p>
+  <div class="callout"><b>이번 발표의 한 문장</b> “Agent가 느려요”를 “위키 API가 429를 줘서 35초 기다렸어요”로 바꾸는 것이 Agent Observability다. OTel은 그 말을 모두가 같은 단어로 하게 해 준다.</div>
+  <p class="note">오늘 해 볼 것 하나: 09의 명령으로 내 코딩 Agent의 trace를 한 번 열어 본다.</p>
 </div></section>
 
 <section class="slide" id="refs"><div class="inner">
   <span class="kicker">출처</span>
   <h2>공식 자료</h2>
   <div class="source-list">
-    <div>① <a href="https://github.com/open-telemetry/semantic-conventions-genai" target="_blank" rel="noreferrer">OpenTelemetry GenAI Semantic Conventions</a><small> — spans · metrics · events · MCP · provider conventions</small></div>
-    <div>② <a href="https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md" target="_blank" rel="noreferrer">GenAI agent and framework spans</a><small> — Agent creation · invocation · workflow · plan · tool execution</small></div>
-    <div>③ <a href="https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md" target="_blank" rel="noreferrer">Generative AI client spans</a><small> — inference · execute tool · input/output content capture</small></div>
-    <div>④ <a href="https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/mcp.md" target="_blank" rel="noreferrer">MCP Semantic Conventions</a><small> — client/server spans · context propagation · operation/session metrics</small></div>
-    <div>⑤ <a href="https://opentelemetry.io/docs/specs/semconv/general/events/" target="_blank" rel="noreferrer">OpenTelemetry Semantic Conventions — Events</a><small> — point-in-time state changes and occurrences</small></div>
-    <div>⑥ <a href="https://opentelemetry.io/docs/specs/semconv/general/metrics/" target="_blank" rel="noreferrer">OpenTelemetry Semantic Conventions — Metrics</a><small> — general metric conventions and GenAI metric index</small></div>
-    <div>⑦ <a href="https://opentelemetry.io/docs/" target="_blank" rel="noreferrer">OpenTelemetry Documentation</a><small> — core concepts, SDKs, Collector, semantic conventions</small></div>
+    <h3>OpenTelemetry 표준</h3>
+    <div>① <a href="https://github.com/open-telemetry/semantic-conventions-genai" target="_blank" rel="noreferrer">OpenTelemetry GenAI Semantic Conventions</a><small> — 2026-05 독립한 저장소 · main 2026-10-06 기준</small></div>
+    <div>② <a href="https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md" target="_blank" rel="noreferrer">GenAI agent and framework spans</a><small> — invoke_agent · invoke_workflow · plan</small></div>
+    <div>③ <a href="https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md" target="_blank" rel="noreferrer">Generative AI client spans</a><small> — chat · execute_tool · 원문 기록(content capture)</small></div>
+    <div>④ <a href="https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/mcp.md" target="_blank" rel="noreferrer">MCP Semantic Conventions</a><small> — client/server span · params._meta 전파 · 중복 span 피하기</small></div>
+    <div>⑤ <a href="https://github.com/open-telemetry/semantic-conventions/releases/tag/v1.42.0" target="_blank" rel="noreferrer">semantic-conventions v1.42.0 release</a><small> — 2026-06-12 · gen_ai.* 이전 표시</small></div>
+    <div>⑥ <a href="https://opentelemetry.io/blog/2026/genai-observability/" target="_blank" rel="noreferrer">Inside the LLM Call: GenAI Observability with OpenTelemetry</a><small> — OTel 블로그 · 2026-05-14</small></div>
+    <h3>코딩 Agent의 OTel 문서</h3>
+    <div>⑦ <a href="https://code.claude.com/docs/en/monitoring-usage" target="_blank" rel="noreferrer">Claude Code — Monitoring</a><small> — 환경 변수 · span 구조 · 원문 기록 기본값 · gen_ai 매핑</small></div>
+    <div>⑧ <a href="https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference" target="_blank" rel="noreferrer">GitHub Copilot CLI command reference</a><small> — “OpenTelemetry monitoring” 절</small></div>
+    <div>⑨ <a href="https://learn.chatgpt.com/docs/config-file/config-reference" target="_blank" rel="noreferrer">Codex configuration reference</a><small> — [otel] 설정 키</small></div>
+    <div>⑩ <a href="https://geminicli.com/docs/cli/telemetry/" target="_blank" rel="noreferrer">Gemini CLI — Telemetry</a><small> — logPrompts 기본값</small></div>
+    <h3>도구·생태계</h3>
+    <div>⑪ <a href="https://github.com/grafana/docker-otel-lgtm" target="_blank" rel="noreferrer">grafana/docker-otel-lgtm</a><small> — 실습용 한 통짜 조회 화면</small></div>
+    <div>⑫ <a href="https://docs.honeycomb.io/send-data/use-cases/agents" target="_blank" rel="noreferrer">Honeycomb — Agent observability</a><small> — Collector transform으로 Claude Code 이름 맞추기</small></div>
+    <div>⑬ <a href="https://github.com/open-telemetry/opentelemetry-python-genai" target="_blank" rel="noreferrer">opentelemetry-python-genai</a><small> — OTel 공식 GenAI 계측 패키지</small></div>
+    <div>⑭ <a href="https://github.com/Arize-ai/openinference/blob/main/spec/semantic_conventions.md" target="_blank" rel="noreferrer">OpenInference semantic conventions</a><small> — 자체 이름표</small></div>
+    <div>⑮ framework 문서: <a href="https://adk.dev/observability/traces/" target="_blank" rel="noreferrer">Google ADK</a> · <a href="https://pydantic.dev/docs/ai/integrations/logfire/" target="_blank" rel="noreferrer">Pydantic AI</a> · <a href="https://learn.microsoft.com/agent-framework/agents/observability" target="_blank" rel="noreferrer">Microsoft Agent Framework</a> · <a href="https://ai-sdk.dev/docs/ai-sdk-core/telemetry" target="_blank" rel="noreferrer">Vercel AI SDK</a> · <a href="https://github.com/openai/openai-agents-python/blob/main/docs/tracing.md" target="_blank" rel="noreferrer">OpenAI Agents SDK</a></div>
   </div>
-  <p class="note">읽는 법: Agent/MCP span 이름과 상태는 ①~④의 현재 문서를 따랐다. “Agent Trace가 왜 중요한가”, “LLM 중심 → Agent 중심” 등의 표현은 발표자가 여러 convention을 묶어 정리한 것이다. <span class="tag amber">Development</span> 표시는 현재 문서에 명시된 안정성 수준이다.</p>
-  <div class="footer">Agent Observability + OpenTelemetry · AI Agent 스터디 발표 자료 · 사실 확인 기준일 2026-10-04</div>
+  <p class="note">읽는 법: span·이름표 이름은 ①~④의 main 브랜치를 따랐다. 03~07의 회의록 사건은 설명용 <span class="tag api">예시</span>다. 08의 비교표는 ⑦⑧을 발표자가 나란히 놓은 것이다.</p>
+  <div class="footer">Agent Observability + OpenTelemetry · AI Agent 스터디 발표 자료 · 사실 확인 기준일 2026-10-07</div>
 </div></section>
 
 </main>
 <div class="hint">↑ ↓  슬라이드 이동</div>
 <script>
-const links=[...document.querySelectorAll('.rail a')];
-const sections=[...document.querySelectorAll('.slide')];
-const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.setAttribute('aria-current','false'));const a=document.querySelector(`.rail a[href="#${e.target.id}"]`);if(a)a.setAttribute('aria-current','true')}})},{threshold:.45});
-sections.forEach(s=>obs.observe(s));
-const current=()=>sections.findIndex(s=>{const r=s.getBoundingClientRect();return r.top>=-10&&r.top<window.innerHeight*.5});
-addEventListener('keydown',e=>{
-  if(e.target.closest('input,textarea,select,[contenteditable]'))return;
-  const i=current();
-  if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();if(i<sections.length-1)sections[i+1].scrollIntoView();}
-  if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();if(i>0)sections[i-1].scrollIntoView();}
-});
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var links = Array.prototype.slice.call(document.querySelectorAll(".rail a"));
+  var current = 0;
+
+  function setActive(i) {
+    current = i;
+    links.forEach(function (a, n) {
+      if (n === i) a.setAttribute("aria-current", "true");
+      else a.removeAttribute("aria-current");
+    });
+  }
+
+  var pending = -1;
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(
+      function (entries) {
+        var best = null;
+        entries.forEach(function (e) {
+          if (e.isIntersecting && (!best || e.intersectionRatio > best.intersectionRatio)) best = e;
+        });
+        if (!best) return;
+        var i = slides.indexOf(best.target);
+        /* 프로그램 스크롤 중에는 목적지에 도착할 때까지 중간 슬라이드를 무시한다 */
+        if (pending >= 0 && i !== pending) return;
+        pending = -1;
+        setActive(i);
+      },
+      { rootMargin: "-45% 0px -45% 0px" }
+    );
+    slides.forEach(function (s) { io.observe(s); });
+  }
+  setActive(0);
+
+  function jump(i) {
+    pending = i;
+    slides[i].scrollIntoView({ block: "start" });
+    setActive(i);
+  }
+
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* 화면보다 긴 슬라이드는 화면의 85%씩 움직여 끝까지 보여 준 뒤에 다음 장으로 넘어간다 */
+  function stepWithin(dir) {
+    var r = slides[current].getBoundingClientRect();
+    var y = window.scrollY;
+    var vh = window.innerHeight;
+    var start = y + r.top;
+    var end = y + r.bottom - vh;
+    var step = Math.round(vh * 0.85);
+    var target;
+    if (dir > 0) {
+      if (end - y <= 4) return false;
+      target = Math.min(y + step, end);
+    } else {
+      if (y - start <= 4) return false;
+      target = Math.max(y - step, start);
+    }
+    window.scrollTo({ top: target, behavior: reduceMotion ? "auto" : "smooth" });
+    return true;
+  }
+
+  document.addEventListener("keydown", function (e) {
+    var t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Home") { e.preventDefault(); jump(0); return; }
+    if (e.key === "End") { e.preventDefault(); jump(slides.length - 1); return; }
+    var dir = 0;
+    if (e.key === "ArrowDown" || e.key === "PageDown") dir = 1;
+    else if (e.key === "ArrowUp" || e.key === "PageUp") dir = -1;
+    else if (e.key === " " || e.key === "Spacebar") dir = e.shiftKey ? -1 : 1;
+    if (!dir) return;
+    e.preventDefault();
+    if (stepWithin(dir)) return;
+    if (current + dir < 0 || current + dir > slides.length - 1) return;
+    jump(current + dir);
+  });
+})();
 </script>
 </body>
 </html>
