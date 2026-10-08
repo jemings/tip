@@ -103,6 +103,12 @@ a{color:var(--accent-ink);text-underline-offset:3px;text-decoration-thickness:1p
 .flow .leg{display:grid;gap:.2rem;text-align:center;font-size:.8rem;color:var(--ink-2)}.flow .leg::after{content:"";height:3px;background:var(--accent);order:-1;margin-bottom:.25rem}.flow .leg b{font:600 .9rem var(--font-mono);color:var(--accent-ink)}
 .mini{margin:0;padding-left:1.1rem;display:grid;gap:.35rem;font-size:.9rem;color:var(--ink-2)}.split-r{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
 .parcel{font-size:.86rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:.45rem;margin-top:.15rem}
+/* 사례 — 설정 찾기 */
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:.45rem;counter-reset:st}
+.steps li{display:grid;grid-template-columns:1.4rem minmax(0,1fr) auto;gap:.6rem;align-items:baseline;border:1px solid var(--line);background:var(--panel);padding:.6rem .8rem;font-size:.92rem}
+.steps li::before{counter-increment:st;content:counter(st);font:600 .78rem var(--font-mono);color:var(--muted)}
+.steps li small{display:block;color:var(--muted);font-size:.8rem;line-height:1.45}
+.steps li.found{border:2px solid var(--green)}.steps li.found::before{color:var(--green)}
 /* 표 */
 table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--panel);border:1px solid var(--line)}th,td{text-align:left;padding:.55rem .8rem;border-bottom:1px solid var(--line);vertical-align:top}thead th{font-weight:600;font-size:.93rem;background:var(--panel-2)}tbody th{font-weight:500;color:var(--muted);font-size:.86rem;width:8.5rem}tr:last-child>*{border-bottom:0}td.we{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
 /* 언제 쓰나 */
@@ -133,12 +139,13 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
   <a href="#team"><span class="n">10</span><span>코딩 Agent의 Metric</span></a>
   <a href="#labels"><span class="n">11</span><span>같은 일, 다른 이름표</span></a>
   <a href="#try"><span class="n">12</span><span>직접 켜 보기</span></a>
-  <a href="#content"><span class="n">13</span><span>Prompt도 남길까</span></a>
-  <a href="#when"><span class="n">14</span><span>언제 쓰나</span></a>
-  <a href="#build"><span class="n">15</span><span>내 Agent에 붙이기</span></a>
-  <a href="#status"><span class="n">16</span><span>지금 어디까지</span></a>
-  <a href="#wrap"><span class="n">17</span><span>정리</span></a>
-  <a href="#refs"><span class="n">18</span><span>출처</span></a>
+  <a href="#found"><span class="n">13</span><span>사례 — 설정 찾기</span></a>
+  <a href="#content"><span class="n">14</span><span>Prompt도 남길까</span></a>
+  <a href="#when"><span class="n">15</span><span>언제 쓰나</span></a>
+  <a href="#build"><span class="n">16</span><span>내 Agent에 붙이기</span></a>
+  <a href="#status"><span class="n">17</span><span>지금 어디까지</span></a>
+  <a href="#wrap"><span class="n">18</span><span>정리</span></a>
+  <a href="#refs"><span class="n">19</span><span>출처</span></a>
 </nav>
 <main>
 
@@ -259,7 +266,7 @@ gen_ai.response.finish_reasons  ["tool_use"]</pre>
     </div>
   </div>
   <p class="easy"><b>쉽게 말하면</b>택배사마다 “배송출발”을 “출고”, “발송”, “상차”로 따로 적으면 한 화면에 모을 수 없다. 단계 이름을 하나로 정해 두는 것이다.</p>
-  <p class="note">이 이름표는 전부 <span class="tag amber">Development</span> 단계다(16). <code>plan</code>과 메모리 작업은 아직 릴리스 전(main 브랜치)이다.</p>
+  <p class="note">이 이름표는 전부 <span class="tag amber">Development</span> 단계다(17). <code>plan</code>과 메모리 작업은 아직 릴리스 전(main 브랜치)이다.</p>
 </div></section>
 
 <section class="slide" id="mcp"><div class="inner">
@@ -345,7 +352,7 @@ gen_ai.response.finish_reasons  ["tool_use"]</pre>
   </table>
   <div class="callout"><b>전부 Histogram이다</b> 표준 GenAI·MCP Metric은 모두 Histogram이다. 하나만 남겨도 “몇 번”(개수)과 “얼마나”(분포)를 같이 얻는다. 08의 그림은 <code>mcp.<wbr>client.<wbr>operation.<wbr>duration</code>을 tool 이름 <code>save_page</code>로 거른 것이다.</div>
   <p class="easy"><b>쉽게 말하면</b>택배사 통계표의 칸 이름도 정해 둔 것이다. “구간별 배송 시간”, “하루 물량”처럼. 어느 택배사 데이터든 같은 칸으로 모아 본다.</p>
-  <p class="note"><span class="tag amber">main</span>은 아직 릴리스 전(main 브랜치)이라는 뜻이다. Copilot CLI는 이미 이 이름으로 낸다. 위 네 줄은 릴리스된 이름인데, 그중 모델 호출 시간·첫 글자·토큰 세 줄은 main에서 새 이름으로 바뀌었다(16). 이 밖에 MCP 연결 시간(<code>mcp.<wbr>client.<wbr>session.<wbr>duration</code>), 모델을 직접 띄울 때 쓰는 서버 쪽 Metric(<code>gen_ai.<wbr>server.<wbr>time_to_first_token</code> 등)도 있다.</p>
+  <p class="note"><span class="tag amber">main</span>은 아직 릴리스 전(main 브랜치)이라는 뜻이다. Copilot CLI는 이미 이 이름으로 낸다. 위 네 줄은 릴리스된 이름인데, 그중 모델 호출 시간·첫 글자·토큰 세 줄은 main에서 새 이름으로 바뀌었다(17). 이 밖에 MCP 연결 시간(<code>mcp.<wbr>client.<wbr>session.<wbr>duration</code>), 모델을 직접 띄울 때 쓰는 서버 쪽 Metric(<code>gen_ai.<wbr>server.<wbr>time_to_first_token</code> 등)도 있다.</p>
 </div></section>
 
 <section class="slide" id="team"><div class="inner">
@@ -383,7 +390,7 @@ gen_ai.response.finish_reasons  ["tool_use"]</pre>
     <article class="card"><h3>그래서 누군가 환산표를 만든다</h3><p>Honeycomb 문서는 Claude Code 데이터를 Collector의 <code>transform</code>으로 <code>gen_ai.<wbr>*</code> 이름에 맞추는 법을 따로 싣는다. Phoenix는 <code>gen_ai.<wbr>*</code>를 자기 이름으로 바꿔 읽고, Langfuse는 두 이름을 다 읽는다.</p></article>
   </div>
   <p class="easy"><b>쉽게 말하면</b>같은 무게를 한쪽은 kg, 한쪽은 근으로 적은 셈이다. 한 저울에 올리려면 환산표가 필요하다. 표준 이름표는 그 환산표를 없앤다.</p>
-  <p class="note">어느 쪽이 나쁘다는 이야기가 아니다. Claude Code도 <code>gen_ai.<wbr>request.<wbr>model</code>·<code>gen_ai.<wbr>tool.<wbr>call.<wbr>id</code> 같은 표준 이름을 일부 같이 붙이고, 표준 값으로 바꾸는 법을 문서에 적어 둔다. 표준이 아직 움직이는 중이라 생긴 차이다(16).</p>
+  <p class="note">어느 쪽이 나쁘다는 이야기가 아니다. Claude Code도 <code>gen_ai.<wbr>request.<wbr>model</code>·<code>gen_ai.<wbr>tool.<wbr>call.<wbr>id</code> 같은 표준 이름을 일부 같이 붙이고, 표준 값으로 바꾸는 법을 문서에 적어 둔다. 표준이 아직 움직이는 중이라 생긴 차이다(17).</p>
 </div></section>
 
 <section class="slide" id="try"><div class="inner">
@@ -414,17 +421,55 @@ export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
         <ul class="mini">
           <li><b>Copilot CLI</b> — <code>COPILOT_OTEL_ENABLED=true</code>와 <code>OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318</code></li>
           <li><b>Codex</b> — <code>~/.<wbr>codex/config.<wbr>toml</code>의 <code>[otel]</code>에서 <code>exporter</code>와 <code>trace_exporter</code>를 <code>{ otlp-grpc = { endpoint = "http://localhost:4317" } }</code>로</li>
-          <li><b>Gemini CLI</b> — <code>.<wbr>gemini/settings.<wbr>json</code>의 <code>telemetry.<wbr>enabled: true</code>. 보내는 곳 기본값이 <code>localhost:4317</code>이다. 프롬프트가 기본으로 남으니 <code>logPrompts: false</code>도 같이(13)</li>
+          <li><b>Gemini CLI</b> — <code>.<wbr>gemini/settings.<wbr>json</code>의 <code>telemetry.<wbr>enabled: true</code>. 보내는 곳 기본값이 <code>localhost:4317</code>이다. 프롬프트가 기본으로 남으니 <code>logPrompts: false</code>도 같이(14)</li>
         </ul>
       </article>
     </div>
   </div>
   <p class="easy"><b>해 보면</b>04의 그림이 내 Agent로 그려진다. 막대 한 줄 한 줄이 방금 내가 시킨 일이다.</p>
-  <p class="note">기본 설정으로는 프롬프트 원문이 남지 않는다(13). 회사에서 관리자가 OTel 설정을 내려 주고 있다면 그 설정이 우선할 수 있다.</p>
+  <p class="note">기본 설정으로는 프롬프트 원문이 남지 않는다(14). 회사에서 관리자가 관리형 설정(managed settings)으로 OTel을 내려 주고 있다면 그 설정이 우선한다. 실제로 그런 환경이 다음 장(13)이다.</p>
+</div></section>
+
+<section class="slide" id="found"><div class="inner">
+  <span class="kicker">13 — 실제 사례 · 사내 LLM Gateway</span>
+  <h2>설정을 못 찾겠다면 계층을 올라가라</h2>
+  <p class="lede">“우리 Claude Code의 OTel 설정은 어디 있지?” 코드 리포를 아무리 뒤져도 0건이었다. 답은 리포가 아니라 <b>설정 계층 맨 위(managed settings)</b>에 있었다.</p>
+  <div class="grid split">
+    <ol class="steps">
+      <li><div><b>작업 중인 리포</b> — <code>otel</code> · <code>opentelemetry</code> · <code>OTEL_</code></div><span class="tag">0건</span></li>
+      <li><div><b>범위 넓히기</b> — <code>telemetry</code> · <code>otlp</code> · <code>exporter</code> · <code>collector</code><small>git 히스토리·브랜치·stash까지</small></div><span class="tag">0건</span></li>
+      <li><div><b>사용자 설정</b> <code>~/.<wbr>claude/<wbr>settings.<wbr>json</code><small><code>OTEL_<wbr>RESOURCE_<wbr>ATTRIBUTES</code> 한 줄뿐. 보내는 곳(endpoint)이 없다</small></div><span class="tag amber">단서</span></li>
+      <li class="found"><div><b>관리형 설정</b> <code>/etc/<wbr>claude-code/</code><small><code>managed-settings.<wbr>d/<wbr>50-gateway.<wbr>json</code>(gateway CLI가 쓰는 drop-in)과 <code>managed-settings.<wbr>json</code>에 같은 값이 있다. 고칠 때는 둘 다 본다</small></div><span class="tag green">찾음</span></li>
+    </ol>
+<pre class="code"><span class="c">// 관리형 설정의 env (주소는 가렸다)</span>
+CLAUDE_CODE_ENABLE_TELEMETRY         1
+CLAUDE_CODE_ENHANCED_TELEMETRY_BETA  1  <span class="c">// trace</span>
+
+OTEL_TRACES_EXPORTER    otlp   <span class="c">// 신호 셋 다</span>
+OTEL_METRICS_EXPORTER   otlp
+OTEL_LOGS_EXPORTER      otlp
+OTEL_EXPORTER_OTLP_PROTOCOL  http/protobuf
+OTEL_EXPORTER_OTLP_ENDPOINT  <span class="h">http://</span>&lt;collector-host&gt;:80
+<span class="c">//  신호별 경로만 다르다: /v1/{traces,metrics,logs}</span>
+
+<span class="h">OTEL_LOG_USER_PROMPTS   1</span>  <span class="c">// 프롬프트 원문</span>
+<span class="h">OTEL_LOG_TOOL_CONTENT   1</span>  <span class="c">// tool 결과</span>
+<span class="h">OTEL_LOG_TOOL_DETAILS   1</span>  <span class="c">// 명령·인자</span>
+OTEL_METRICS_INCLUDE_VERSION     true
+OTEL_METRICS_INCLUDE_ENTRYPOINT  true</pre>
+  </div>
+  <div class="grid g3">
+    <article class="plain"><h3>리포 0건 ≠ 설정 없음</h3><p>계측 설정은 코드가 아니라 환경에 있는 경우가 많다. Claude Code는 리포의 <code>.<wbr>claude/<wbr>settings.<wbr>json</code>에 적힌 OTel 보내기 변수를 아예 무시한다.</p></article>
+    <article class="plain"><h3>반쪽만 있으면 위를 본다</h3><p>이름표는 있는데 보내는 곳이 없었다. 나머지를 더 높은 계층이 채운다는 신호다. 관리형 설정은 모든 계층 위에 있고, 관리형이 정한 endpoint는 개발자가 바꿔도 시작할 때 지워진다.</p></article>
+    <article class="plain"><h3>원문 기록은 본인이 모른다</h3><p>프롬프트·tool 내용 기록이 켜져 있었다. 기본값은 꺼짐이니 누군가 고른 값이다(14의 ②). 내 <code>settings.<wbr>json</code>만 봐서는 보이지 않는다.</p></article>
+  </div>
+  <div class="callout warn"><b>토론거리</b> 보내는 길이 평문 <code>http://</code>인데 그 위로 프롬프트와 tool 결과 원문이 간다. “사내망이니 괜찮다”는 가정이 어디까지 유효한가?</div>
+  <p class="easy"><b>찾아 헤매기 전에</b>Claude Code에서 <code>/status</code>를 친다. 어느 설정 파일과 어느 관리형 소스를 읽었는지 바로 나온다.</p>
+  <p class="note"><code>OTEL_<wbr>RESOURCE_<wbr>ATTRIBUTES</code>에는 <code>service.<wbr>name=claude-code,user.<wbr>id=&lt;사번&gt;@&lt;회사&gt;</code>가 있었다. 그런데 문서상 사용자 키가 내장 <code>user.<wbr>id</code>(익명 ID)와 겹치면 내장 값을 쓴다. 사람별로 나눠 보려면 자동으로 붙는 <code>user.<wbr>email</code>이나 겹치지 않는 키(<code>team.<wbr>id</code> 등)를 쓴다. collector 뒤에서 어디에 저장·시각화되는지는 이 환경에서 볼 수 없었다.</p>
 </div></section>
 
 <section class="slide" id="content"><div class="inner">
-  <span class="kicker">13 — Prompt도 남길까</span>
+  <span class="kicker">14 — Prompt도 남길까</span>
   <h2>송장에 상자 속 내용까지 적지는 않는다</h2>
   <div class="grid g3">
     <article class="card"><h3>① 안 남긴다 <span class="tag green">기본값</span></h3><p>모델·토큰·시간·tool 이름만 남긴다. 04~07의 수사는 이것만으로 다 됐다.</p></article>
@@ -442,10 +487,11 @@ export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
   </table>
   <p class="easy"><b>쉽게 말하면</b>송장에는 “서류 1박스”까지만 적는다. 내용물 사진은 따로 금고에 넣고, 송장에는 금고 번호만 적는다.</p>
   <p class="note">스펙: “계측은 기본으로 지시문·입력·출력을 남기지 말아야 하고(SHOULD NOT), 사용자가 켤 수 있는 옵션을 줘야 한다.” ③은 스펙이 운영 환경에 권하는 방식이다.</p>
+  <p class="note"><span class="tag amber">13의 사례</span> 사내 Gateway 환경은 ②였다. 관리형 설정이 <code>OTEL_<wbr>LOG_<wbr>USER_<wbr>PROMPTS</code>·<code>OTEL_<wbr>LOG_<wbr>TOOL_<wbr>CONTENT</code>를 켜 두었다. Claude Code의 tool 결과는 span 이벤트(<code>tool.<wbr>output</code>, 기본 60KB까지)로 trace에 바로 실린다.</p>
 </div></section>
 
 <section class="slide" id="when"><div class="inner">
-  <span class="kicker">14 — 언제 쓰나</span>
+  <span class="kicker">15 — 언제 쓰나</span>
   <h2>첫 질문 하나로 고른다</h2>
   <p class="q">Agent가 “왜 그랬는지”를 숫자로 설명해야 하나?</p>
   <div class="yn">
@@ -467,11 +513,11 @@ export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
       </ul>
     </div>
   </div>
-  <p class="easy"><b>시작 순서</b>① 쓰고 있는 코딩 Agent에서 켜 본다(12) → ② 만드는 Agent에 붙인다(15) → ③ 내 MCP 서버·tool까지 송장 번호를 잇는다(07).</p>
+  <p class="easy"><b>시작 순서</b>① 쓰고 있는 코딩 Agent에서 켜 본다(12) → ② 만드는 Agent에 붙인다(16) → ③ 내 MCP 서버·tool까지 송장 번호를 잇는다(07).</p>
 </div></section>
 
 <section class="slide" id="build"><div class="inner">
-  <span class="kicker">15 — 내가 만드는 Agent에 붙이기</span>
+  <span class="kicker">16 — 내가 만드는 Agent에 붙이기</span>
   <h2>세 갈래 중 쉬운 길부터</h2>
   <div class="grid split split-r">
     <div class="grid">
@@ -495,7 +541,7 @@ tracer = trace.get_tracer(<span class="s">"meeting-summarizer"</span>)
 </div></section>
 
 <section class="slide" id="status"><div class="inner">
-  <span class="kicker">16 — 2026년 10월 현재</span>
+  <span class="kicker">17 — 2026년 10월 현재</span>
   <h2>뼈대는 굳었고, 이름표는 아직 고치는 중</h2>
   <div class="grid g4">
     <article class="plain"><h3>2025-08</h3><p>v1.37 대개편(<code>gen_ai.<wbr>system</code> → <code>gen_ai.<wbr>provider.<wbr>name</code> 등). framework마다 “옛 이름 / 새 이름” 모드가 생긴 이유</p></article>
@@ -555,8 +601,9 @@ tracer = trace.get_tracer(<span class="s">"meeting-summarizer"</span>)
     <div>⑯ <a href="https://github.com/open-telemetry/opentelemetry-python-genai" target="_blank" rel="noreferrer">opentelemetry-python-genai</a><small> — OTel 공식 GenAI 계측 패키지</small></div>
     <div>⑰ <a href="https://github.com/Arize-ai/openinference/blob/main/spec/semantic_conventions.md" target="_blank" rel="noreferrer">OpenInference semantic conventions</a><small> — 자체 이름표</small></div>
     <div>⑱ framework 문서: <a href="https://adk.dev/observability/traces/" target="_blank" rel="noreferrer">Google ADK</a> · <a href="https://pydantic.dev/docs/ai/integrations/logfire/" target="_blank" rel="noreferrer">Pydantic AI</a> · <a href="https://learn.microsoft.com/agent-framework/agents/observability" target="_blank" rel="noreferrer">Microsoft Agent Framework</a> · <a href="https://ai-sdk.dev/docs/ai-sdk-core/telemetry" target="_blank" rel="noreferrer">Vercel AI SDK</a> · <a href="https://github.com/openai/openai-agents-python/blob/main/docs/tracing.md" target="_blank" rel="noreferrer">OpenAI Agents SDK</a></div>
+    <div>⑲ <a href="https://code.claude.com/docs/en/settings" target="_blank" rel="noreferrer">Claude Code — Settings</a> · <a href="https://code.claude.com/docs/en/managed-settings" target="_blank" rel="noreferrer">Managed settings</a><small> — 설정 계층 · 관리형 설정이 맨 위 · /status</small></div>
   </div>
-  <p class="note">읽는 법: span·Metric 이름은 ①~⑤의 main 브랜치를 따르되, 아직 릴리스되지 않은 이름에는 main 표시를 붙였다. 03~08의 회의록 사건과 08의 분포 그림은 설명용 <span class="tag api">예시</span>다. 11의 비교표는 ⑩⑪을 발표자가 나란히 놓은 것이다.</p>
+  <p class="note">읽는 법: span·Metric 이름은 ①~⑤의 main 브랜치를 따르되, 아직 릴리스되지 않은 이름에는 main 표시를 붙였다. 03~08의 회의록 사건과 08의 분포 그림은 설명용 <span class="tag api">예시</span>다. 11의 비교표는 ⑩⑪을 발표자가 나란히 놓은 것이다. 13은 사내 환경에서 실제로 찾아간 기록이고, 내부 주소와 계정은 가렸다.</p>
   <div class="footer">Agent Observability + OpenTelemetry · AI Agent 스터디 발표 자료 · 사실 확인 기준일 2026-10-08</div>
 </div></section>
 
