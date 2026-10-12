@@ -206,7 +206,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
     <article class="card"><h3>익명은 일부러 그렇게 만든 것이다</h3><p><code>short_id</code>는 추측할 수 없는 무작위 12자다. 주소를 아는 것 자체가 접근 권한이라(capability URL) 로그인 없이 받는다. 접근 로그는 <code>short_id</code>와 토큰을 가린다. 로그인하지 않은 요청은 접근 기록 테이블에 남기지 않는다. 바꿀 생각이 없는 원칙이다.</p></article>
     <article class="card"><h3>알리는 곳과 쓰는 곳도 다르다</h3><p>웹 알림은 브라우저에서 본다. 스킬은 에이전트 세션에서 쓰인다. 웹 알림을 받아도 CLI 사용자는 놓치기 쉽다.</p></article>
   </div>
-  <div class="callout warn"><b>그래서</b> “서버가 설치자 명단을 들고 알림을 보낸다”는 방식은 쓸 수 없다. 명단을 만들려면 익명 URL을 사람마다 다르게 바꿔야 한다.</div>
+  <div class="callout warn"><b>그래서</b> “서버가 설치자 명단을 들고 알림을 보낸다”는 방식은 쓰지 않는다. 명단을 만들려면 익명 URL을 사람마다 다르게 바꿔야 하는데, 그러면 익명성 원칙이 깨진다. 그래서 이 방식은 검토 단계에서 기각했다(06의 A안).</div>
 </div></section>
 
 <section class="slide" id="serving"><div class="inner">
