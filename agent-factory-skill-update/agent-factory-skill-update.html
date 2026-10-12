@@ -15,6 +15,7 @@
   --accent-soft:#e8edff; --green:#2e6f5c; --green-soft:#dcebe5; --amber:#8a5a00; --amber-soft:#fff1c7;
   --red:#a63a1e; --red-soft:#f7e4dd; --shadow:0 1px 2px rgba(27,32,40,.06),0 8px 24px rgba(27,32,40,.06);
   --bar-amber:#c98a12;
+  --term-bg:#1b2028; --term-ink:#e7eaee; --term-dim:#8a94a1; --term-line:#3d4650; --term-acc:#91a7ff; --term-ok:#5faf95; --term-warn:#f0bf54;
   --font-display:"Bricolage Grotesque","IBM Plex Sans KR",system-ui,sans-serif;
   --font-body:"IBM Plex Sans","IBM Plex Sans KR",system-ui,sans-serif;
   --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -27,6 +28,7 @@
     --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
     --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
     --bar-amber:#f0bf54; color-scheme:dark;
+    --term-bg:#0e1115; --term-line:#2c333c;
   }
 }
 :root[data-theme="dark"]{
@@ -35,6 +37,7 @@
   --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
   --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
   --bar-amber:#f0bf54; color-scheme:dark;
+  --term-bg:#0e1115; --term-line:#2c333c;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -116,6 +119,19 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 .sim-vals b{font:600 1.05rem var(--font-mono)}
 .sim-out{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.7rem 1rem;display:grid;gap:.25rem}
 .sim-out b{font-size:1.05rem}.sim-out.warn{border-left-color:var(--red);background:var(--red-soft)}
+/* 가상 화면 */
+.screen{display:grid;gap:.9rem}
+.term{border:1px solid var(--line-strong);background:var(--term-bg);color:var(--term-ink);box-shadow:var(--shadow);font:.84rem/1.6 var(--font-mono);display:grid;align-content:start;min-height:18rem}
+.term-bar{display:flex;align-items:center;gap:.35rem;padding:.45rem .7rem;border-bottom:1px solid var(--term-line);color:var(--term-dim);font-size:.72rem}
+.term-bar i{width:.6rem;height:.6rem;border-radius:50%;background:var(--term-line);display:inline-block}
+.term-bar span{margin-left:.4rem}
+.term-body{padding:.8rem 1rem;display:grid;gap:.7rem;white-space:pre-wrap;word-break:break-word}
+.term .u{color:var(--term-acc)}.term .u::before{content:"> ";font-weight:600}
+.term .a{padding-left:1.1rem;text-indent:-1.1rem}.term .a::before{content:"● ";color:var(--term-ink)}
+.term .t{padding-left:1.1rem;text-indent:-1.1rem;color:var(--term-ok)}.term .t::before{content:"● "}
+.term .d{color:var(--term-dim);padding-left:1.1rem}
+.term b{color:var(--term-warn);font-weight:600}
+.screen-side{display:grid;gap:.7rem;align-content:start}
 .h-a{color:var(--accent-ink)}.h-b{color:var(--green)}.h-c{color:var(--red)}
 .source-list{display:grid;gap:.45rem;font-size:.88rem}.source-list a{text-decoration:none}.source-list small{color:var(--muted)}.source-list h3{font-size:.8rem;font-family:var(--font-mono);letter-spacing:.1em;color:var(--muted);margin-top:.5rem}.footer{padding:1rem 0 0;border-top:1px solid var(--line);color:var(--muted);font:.74rem var(--font-mono)}
 .hint{position:fixed;right:1rem;bottom:1rem;z-index:10;padding:.3rem .5rem;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);font:.7rem var(--font-mono);color:var(--muted)}
@@ -141,14 +157,15 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
   <a href="#sim"><span class="n">12</span><span>판정 따라가 보기</span></a>
   <a href="#budget"><span class="n">13</span><span>hook 한 번의 시간표</span></a>
   <a href="#notice"><span class="n">14</span><span>Claude가 받는 안내</span></a>
-  <a href="#reinstall"><span class="n">15</span><span>자동 재설치 안전장치</span></a>
-  <a href="#failsafe"><span class="n">16</span><span>조용히 실패한다</span></a>
-  <a href="#config"><span class="n">17</span><span>사용자가 만지는 것</span></a>
-  <a href="#web"><span class="n">18</span><span>웹 쪽 보조 채널</span></a>
-  <a href="#verify"><span class="n">19</span><span>어떻게 검증하나</span></a>
-  <a href="#limits"><span class="n">20</span><span>한계와 열린 질문</span></a>
-  <a href="#wrap"><span class="n">21</span><span>정리</span></a>
-  <a href="#refs"><span class="n">22</span><span>출처</span></a>
+  <a href="#screen"><span class="n">15</span><span>사용자가 보는 화면</span></a>
+  <a href="#reinstall"><span class="n">16</span><span>자동 재설치 안전장치</span></a>
+  <a href="#failsafe"><span class="n">17</span><span>조용히 실패한다</span></a>
+  <a href="#config"><span class="n">18</span><span>사용자가 만지는 것</span></a>
+  <a href="#web"><span class="n">19</span><span>웹 쪽 보조 채널</span></a>
+  <a href="#verify"><span class="n">20</span><span>어떻게 검증하나</span></a>
+  <a href="#limits"><span class="n">21</span><span>한계와 열린 질문</span></a>
+  <a href="#wrap"><span class="n">22</span><span>정리</span></a>
+  <a href="#refs"><span class="n">23</span><span>출처</span></a>
 </nav>
 <main>
 
@@ -247,7 +264,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
     <article class="plain"><h3><code>check</code>가 곧 갱신이다</h3><p><code>npx skills check</code>는 확인만 하지 않고 실제로 갱신한다. 안내 문구에 “확인 명령”으로 내세울 수 없다.</p></article>
     <article class="plain"><h3>로컬 수정을 지키는 도구가 없다</h3><p>조사한 도구 모두 사용자가 고친 내용을 보호하지 않는다. 자동 재설치를 하려면 그 감지는 직접 만들어야 한다.</p></article>
   </div>
-  <p class="note">조사일 2026-10-08, 공식 문서와 소스 기준. 출처는 22에 있다.</p>
+  <p class="note">조사일 2026-10-08, 공식 문서와 소스 기준. 출처는 23에 있다.</p>
 </div></section>
 
 <section class="slide" id="options"><div class="inner">
@@ -296,7 +313,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
       <div class="box"><b>serving 버전 선택</b><small>verified 우선, 그다음 최신 seq. 되돌리면 핀으로 고정</small></div>
       <div class="box hl"><b>well-known 인덱스</b><small><code>/skills/&lt;short_id&gt;/.well-known/agent-skills/index.json</code> · 익명 · ETag</small></div>
       <div class="box"><b>컴포넌트 zip</b><small><code>npx skills</code>가 내려받는 실제 파일</small></div>
-      <div class="box opt"><b>웹 인앱 알림</b><small>로그인 사용자용 보조 채널(18)</small></div>
+      <div class="box opt"><b>웹 인앱 알림</b><small>로그인 사용자용 보조 채널(19)</small></div>
     </div>
   </div>
   <p class="easy"><b>핵심</b>업데이트 확인에서 서버가 하는 일은 <b>인덱스에 지문 하나 더 싣기</b>뿐이다. 판단·안내·재설치는 모두 사용자 PC의 plugin이 한다. 서버는 누가 이 plugin으로 묻는지 기록하지 않는다.</p>
@@ -464,8 +481,34 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
   <p class="note">위 예시의 스킬 이름과 버전은 설명을 위해 지어낸 값이다. 문장 형식은 plugin의 <code>notice.mjs</code>를 그대로 옮겼다.</p>
 </div></section>
 
+<section class="slide" id="screen"><div class="inner">
+  <span class="kicker">15 — 화면</span>
+  <h2>사용자는 이렇게 보게 된다</h2>
+  <p class="lede">hook이 넣은 글은 사용자가 직접 읽지 않는다. Claude가 읽고 <b>첫 프롬프트에 대한 답</b>에서 전한다. 기본은 알리기만 하고, 재설치는 사용자가 원할 때 Claude가 기존 명령으로 한다.</p>
+  <div class="screen" id="screen-box">
+    <div class="sim-tabs" role="tablist" aria-label="화면 시나리오">
+      <button type="button" role="tab" aria-selected="true" data-k="base">기본 — 안내만</button>
+      <button type="button" role="tab" aria-selected="false" data-k="auto">자동 재설치를 켰다</button>
+      <button type="button" role="tab" aria-selected="false" data-k="local">켰지만 내가 고쳤다</button>
+      <button type="button" role="tab" aria-selected="false" data-k="rollback">관리자가 되돌렸다</button>
+    </div>
+    <div class="grid split">
+      <div class="term" role="img" aria-label="Claude Code 가상 화면">
+        <div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>claude — ~/work/report</span></div>
+        <div class="term-body" id="screen-term"></div>
+      </div>
+      <div class="screen-side">
+        <article class="card"><h3>설정</h3><p id="screen-config"></p></article>
+        <article class="card"><h3>hook이 넣은 글 <span class="tag api">사용자에게는 안 보임</span></h3><pre class="code wrap" id="screen-ctx"></pre></article>
+        <div class="sim-out" id="screen-out"></div>
+      </div>
+    </div>
+  </div>
+  <p class="note">가상 화면이다. 오른쪽 글은 plugin의 <code>notice.mjs</code> 형식 그대로지만, 왼쪽 Claude의 문장은 모델이 그때그때 쓰므로 예시일 뿐이다. 스킬 이름과 버전은 14와 같은 예시 값이다.</p>
+</div></section>
+
 <section class="slide" id="reinstall"><div class="inner">
-  <span class="kicker">15 — 자동 재설치</span>
+  <span class="kicker">16 — 자동 재설치</span>
   <h2>켠 사람에게만, 일곱 단계를 거쳐</h2>
   <div class="grid split">
     <ol class="steps">
@@ -486,7 +529,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="failsafe"><div class="inner">
-  <span class="kicker">16 — fail-safe</span>
+  <span class="kicker">17 — fail-safe</span>
   <h2>무슨 일이 있어도 세션 시작을 막지 않는다</h2>
   <div class="grid g4">
     <article class="card"><h3>오프라인·프록시</h3><p>인덱스를 못 받으면 “확인 못 함”. 새 안내는 없다.</p></article>
@@ -502,7 +545,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="config"><div class="inner">
-  <span class="kicker">17 — 사용자 쪽</span>
+  <span class="kicker">18 — 사용자 쪽</span>
   <h2>사용자가 만지는 것은 파일 하나다</h2>
   <div class="grid split">
 <pre class="code"><span class="c">// ~/.agent-factory/update-check.json (없으면 기본값)</span>
@@ -528,7 +571,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="web"><div class="inner">
-  <span class="kicker">18 — 웹</span>
+  <span class="kicker">19 — 웹</span>
   <h2>로그인 사용자에게는 웹 알림도 간다</h2>
   <p class="lede">웹 알림은 보조 채널이다. 웹에서 내려받았거나 설치 명령을 복사한 로그인 사용자에게 간다. 이번 작업에서 함께 바로잡았다.</p>
   <div class="grid g2">
@@ -540,7 +583,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="verify"><div class="inner">
-  <span class="kicker">19 — 검증</span>
+  <span class="kicker">20 — 검증</span>
   <h2>어떻게 믿을 수 있나</h2>
   <div class="grid g2">
     <article class="card"><h3><span class="tag green">단위·프로세스 테스트</span> <code>node --test</code></h3>
@@ -568,7 +611,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 </div></section>
 
 <section class="slide" id="limits"><div class="inner">
-  <span class="kicker">20 — 한계</span>
+  <span class="kicker">21 — 한계</span>
   <h2>아직 안 되는 것, 일부러 안 하는 것</h2>
   <div class="grid g2">
     <div class="grid">
@@ -767,6 +810,79 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
       });
     });
     show("update");
+  }
+
+  /* 15 — 가상 화면 */
+  var CMD = "npx skills add &lt;origin&gt;/skills/&lt;short_id&gt; -s pdf-tools-af03 -a claude-code -g --copy -y";
+  var HEAD = "Agent Factory 스킬 설치본 확인 결과다. 아래 내용을 사용자에게 알리고, 재설치 명령은 사용자가 원할 때만 실행한다.\n";
+  var ASK = '<div class="u">이 PDF에서 표만 뽑아 줘</div>';
+  var SCREENS = {
+    base: {
+      config: "설정 파일 없음 — 기본값. <code>auto_reinstall.default</code>는 <code>false</code>다.",
+      ctx: HEAD + "- pdf-tools-af03 (전역): 업데이트가 있다 (`1.3.0` → `1.4.0`). 재설치: " + CMD,
+      term: ASK +
+        '<div class="a">먼저 알려 드릴 것이 있습니다. Agent Factory 스킬 pdf-tools-af03에 <b>업데이트가 있습니다(1.3.0 → 1.4.0)</b>. 원하시면 재설치해 드릴게요. 지금 요청은 설치된 1.3.0으로 진행합니다.</div>' +
+        '<div class="d">… 표 추출 …</div>' +
+        '<div class="u">업데이트해 줘</div>' +
+        '<div class="t">Bash(' + CMD + ')</div>',
+      warn: false, title: "알리기만 한다",
+      body: "hook은 아무것도 바꾸지 않는다. 사용자가 원하면 Claude가 안내에 적힌 <code>npx skills add</code>를 실행한다."
+    },
+    auto: {
+      config: "<code>\"auto_reinstall\": { \"default\": true }</code> — 사용자가 직접 켰다.",
+      ctx: HEAD + "- pdf-tools-af03 (전역): 새 serving 버전으로 자동 재설치했다 (`1.3.0` → `1.4.0`).",
+      term: ASK +
+        '<div class="a">참고로, 세션을 시작할 때 pdf-tools-af03이 <b>1.4.0으로 자동 재설치</b>됐습니다. 새 버전으로 표를 추출하겠습니다.</div>' +
+        '<div class="d">… 표 추출 …</div>',
+      warn: false, title: "켠 사람에게만, 조건을 갖췄을 때",
+      body: "R이 있고 L = R(손대지 않음)이며 링크가 아닌 복사 설치본일 때만 한다. 백업 → 설치 → 지문 검증을 거치고, 그동안 세션 시작이 기다린다(최대 120초, 13)."
+    },
+    local: {
+      config: "<code>\"auto_reinstall\": { \"default\": true }</code> — 켰지만 SKILL.md를 직접 고쳤다.",
+      ctx: HEAD + "- pdf-tools-af03 (전역): serving 버전이 바뀌었고 설치본에 로컬 수정이 있다 (`1.3.0` → `1.4.0`). 재설치하면 고친 내용이 사라진다. 재설치: " + CMD,
+      term: ASK +
+        '<div class="a">pdf-tools-af03에 새 버전(1.4.0)이 있지만, 설치된 스킬에 <b>직접 고친 내용이 있어 자동으로 바꾸지 않았습니다</b>. 재설치하면 고친 내용이 사라집니다. 그래도 재설치할까요? 지금 요청은 고친 1.3.0으로 진행합니다.</div>' +
+        '<div class="d">… 표 추출 …</div>',
+      warn: true, title: "켰어도 안내로 물러선다",
+      body: "L이 R과 다르면 내가 고친 것이다. 자동 재설치를 켰어도 덮어쓰지 않고, 사라질 내용이 있다고 알린다."
+    },
+    rollback: {
+      config: "설정 파일 없음 — 기본값.",
+      ctx: HEAD + "- pdf-tools-af03 (전역): serving 버전이 이전 버전으로 되돌려졌다 (`1.4.0` → `1.3.0`). 재설치: " + CMD,
+      term: ASK +
+        '<div class="a">Agent Factory에서 pdf-tools-af03의 배포 버전이 <b>1.4.0에서 1.3.0으로 되돌려졌습니다</b>. 맞추려면 재설치가 필요합니다. 진행할까요? 지금 요청은 설치된 1.4.0으로 진행합니다.</div>' +
+        '<div class="d">… 표 추출 …</div>',
+      warn: false, title: "“더 최신”이 아니라 serving이 기준",
+      body: "버전 번호가 내려가도 serving이 바뀌었으면 알린다. 업데이트와 문장을 달리해 “되돌려졌다”고 쓴다. 자동 재설치를 켰다면 업데이트와 같은 조건으로 따라간다."
+    }
+  };
+  var sbox = document.getElementById("screen-box");
+  if (sbox) {
+    var stabs = Array.prototype.slice.call(sbox.querySelectorAll("[role=tab]"));
+    function showScreen(k) {
+      var d = SCREENS[k];
+      stabs.forEach(function (b) {
+        var on = b.dataset.k === k;
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
+      });
+      document.getElementById("screen-term").innerHTML = d.term;
+      document.getElementById("screen-config").innerHTML = d.config;
+      document.getElementById("screen-ctx").innerHTML = d.ctx;
+      var o = document.getElementById("screen-out");
+      o.classList.toggle("warn", d.warn);
+      o.innerHTML = "<b>" + d.title + "</b><span>" + d.body + "</span>";
+    }
+    stabs.forEach(function (b, i) {
+      b.addEventListener("click", function () { showScreen(b.dataset.k); });
+      b.addEventListener("keydown", function (e) {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        var n = (i + (e.key === "ArrowRight" ? 1 : -1) + stabs.length) % stabs.length;
+        stabs[n].focus();
+        showScreen(stabs[n].dataset.k);
+      });
+    });
+    showScreen("base");
   }
 })();
 </script>
