@@ -173,7 +173,11 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
   <span class="kicker">Agent Factory · 스킬 업데이트 전파 · 2026-10</span>
   <h1>스킬이 새 버전이 됐다. <span style="color:var(--accent)">내 PC의 스킬은 언제 바뀔까?</span></h1>
   <p class="lede"><code>npx skills add</code>로 받은 스킬은 내 PC에 <b>복사본</b>으로 남는다. 서버에서 새 버전이 나와도 복사본은 그대로다. 이 발표는 그 틈을 어떻게 메웠는지 서버부터 Claude Code 세션 시작 hook까지 한 바퀴 따라간다.</p>
-  <p class="easy"><b>쉽게 말하면</b>서버는 “지금 나눠 주는 버전의 지문”만 공개한다. 내 PC는 Claude Code 세션을 열 때 자기 복사본의 지문을 떠서 맞대 본다. 다르면 Claude가 “업데이트가 있어요”라고 알려 준다.</p>
+  <ol class="steps">
+    <li><div><b>설치</b> — <code>npx skills add</code>로 스킬을 받고, 업데이트 확인 plugin을 한 번 깔아 둔다.</div></li>
+    <li><div><b>확인</b> — Claude Code 세션을 열면 hook이 내 스킬 폴더의 지문을 떠서 Agent Factory serving 버전의 지문과 맞댄다.</div></li>
+    <li class="ok"><div><b>업데이트</b> — 다르면 Claude가 재설치 명령까지 넘겨받은 채 “업데이트가 있다”고 알린다. <b>“업데이트해 줘” 한마디면 설치된다.</b></div></li>
+  </ol>
   <div class="facts">
     <div><b>0명</b><span>업데이트 확인 때 서버가 기록하는 사용자</span></div>
     <div><b>2초</b><span>세션 시작 때 확인 예산</span></div>
