@@ -174,7 +174,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
   <h1>스킬이 새 버전이 됐다. <span style="color:var(--accent)">내 PC의 스킬은 언제 바뀔까?</span></h1>
   <p class="lede"><code>npx skills add</code>로 받은 스킬은 내 PC에 <b>복사본</b>으로 남는다. 서버에서 새 버전이 나와도 복사본은 그대로다. 이 발표는 그 틈을 어떻게 메웠는지 서버부터 Claude Code 세션 시작 hook까지 한 바퀴 따라간다.</p>
   <ol class="steps">
-    <li><div><b>설치</b> — <code>npx skills add</code>로 스킬을 받고, 업데이트 확인 plugin을 한 번 깔아 둔다.</div></li>
+    <li><div><b>설치</b> — <code>npx skills add</code>로 스킬을 받고, 업데이트 확인 plugin을 한 번 깔아 둔다. 한 번만 깔면 이후에 받는 스킬 모두에 적용된다.</div></li>
     <li><div><b>확인</b> — Claude Code 세션을 열면 hook이 내 스킬 폴더의 지문을 떠서 Agent Factory serving 버전의 지문과 맞댄다.</div></li>
     <li class="ok"><div><b>업데이트</b> — 다르면 Claude가 <b>“업데이트가 있어요”</b>라고 알려 준다. 재설치 명령도 함께 넘겨받았으므로, <b>“업데이트해” 한마디면 Claude가 직접 업데이트한다.</b></div></li>
   </ol>
