@@ -203,7 +203,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
   </table>
   </div>
   <div class="grid g2">
-    <article class="card"><h3>익명은 일부러 그렇게 만든 것이다</h3><p>접근 로그는 <code>short_id</code>와 토큰을 가린다. 로그인하지 않은 요청은 접근 기록 테이블에 남기지 않는다. 바꿀 생각이 없는 원칙이다.</p></article>
+    <article class="card"><h3>익명은 일부러 그렇게 만든 것이다</h3><p><code>short_id</code>는 추측할 수 없는 무작위 12자다. 주소를 아는 것 자체가 접근 권한이라(capability URL) 로그인 없이 받는다. 접근 로그는 <code>short_id</code>와 토큰을 가린다. 로그인하지 않은 요청은 접근 기록 테이블에 남기지 않는다. 바꿀 생각이 없는 원칙이다.</p></article>
     <article class="card"><h3>알리는 곳과 쓰는 곳도 다르다</h3><p>웹 알림은 브라우저에서 본다. 스킬은 에이전트 세션에서 쓰인다. 웹 알림을 받아도 CLI 사용자는 놓치기 쉽다.</p></article>
   </div>
   <div class="callout warn"><b>그래서</b> “서버가 설치자 명단을 들고 알림을 보낸다”는 방식은 쓸 수 없다. 명단을 만들려면 익명 URL을 사람마다 다르게 바꿔야 한다.</div>
@@ -212,7 +212,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 <section class="slide" id="serving"><div class="inner">
   <span class="kicker">04 — 용어</span>
   <h2>업데이트 = serving 버전이 앞으로 움직인 것</h2>
-  <p class="lede">스킬은 여러 버전을 갖는다. 서버는 그중 하나를 <b>serving 버전</b>으로 정해 모든 설치 경로에 내준다. 고르는 규칙은 “보안 검사를 통과한(verified) 버전 우선, 그다음 최신 순번(seq)”이다.</p>
+  <p class="lede">스킬은 여러 버전을 갖는다. 서버는 그중 하나를 <b>serving 버전</b>으로 정해 모든 설치 경로에 내준다. 버전이 바뀔 때마다 “보안 검사를 통과한(verified) 버전 우선, 그다음 최신 순번(seq)” 규칙으로 다시 골라 저장한다. 관리자가 특정 버전으로 되돌리면 그 버전에 <b>핀</b>이 걸려, 핀을 풀 때까지 자동 규칙이 덮어쓰지 않는다.</p>
   <div class="vrow" aria-label="버전 예시">
     <div class="ver"><b>seq 5</b><span>verified</span></div>
     <div class="ver"><b>seq 6</b><span>verified</span></div>
@@ -320,7 +320,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
 }</pre>
     <div class="grid">
       <article class="card"><h3><code>seq</code> — 앞인가 뒤인가</h3><p>지난번에 본 seq보다 크면 업데이트, 작으면 후퇴다. 지문만으로는 “달라졌다”까지만 안다.</p></article>
-      <article class="card"><h3><code>tree_sha256</code> — 같은가 다른가</h3><p>zip을 풀었을 때 나오는 파일 트리의 해시. PC는 설치 폴더를 같은 방법으로 해시해 맞댄다(09).</p></article>
+      <article class="card"><h3><code>tree_sha256</code> — 같은가 다른가</h3><p>zip을 풀었을 때 나오는 파일 트리의 해시. PC는 설치 폴더를 같은 방법으로 해시해 맞댄다(09). 스킬 항목마다 따로 붙어서, 한 아이템에 스킬이 여럿이면 <code>seq</code>는 같고 지문은 저마다 다르다.</p></article>
       <article class="card"><h3>호환성</h3><p><code>x-</code> 접두 필드라 이 인덱스를 읽는 다른 클라이언트는 모르는 키를 무시한다. <b>사용자 정보는 들어가지 않는다.</b></p></article>
     </div>
   </div>
@@ -519,7 +519,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
   "reinstall_timeout_seconds": 60
 }</pre>
     <div class="grid">
-      <article class="card"><h3>설치가 곧 동의다</h3><p>카탈로그 마켓플레이스에서 <code>agent-factory-update-check</code> plugin을 설치하면 다음 세션부터 돈다. 설치하지 않으면 아무 일도 없다.</p></article>
+      <article class="card"><h3>설치가 곧 동의다</h3><p>카탈로그 마켓플레이스에서 <code>agent-factory-update-check</code> plugin을 설치하면 다음 세션부터 돈다. 설치하지 않으면 아무 일도 없다. 단, 동봉 <code>config.json</code>의 <code>origin</code>이 비어 있으면 hook은 아무것도 하지 않는다 — 배포 때 채우거나 사용자가 <code>origin</code>을 적어야 한다.</p></article>
       <article class="card"><h3>끄는 법</h3><p><code>"check": false</code>를 두거나 plugin을 제거한다. 캐시와 백업까지 지우려면 <code>~/.agent-factory/</code>를 지운다.</p></article>
       <article class="card"><h3>hook이 쓰는 파일</h3><p><code>update-state.json</code>(확인 시각, 설치본별 R, ETag 캐시) · <code>backup/</code> · <code>reinstall.lock</code>. plugin 캐시는 버전마다 폴더가 바뀌므로 홈의 고정 경로에 둔다.</p></article>
     </div>
@@ -577,6 +577,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
       <article class="plain"><h3>R이 없는 설치본</h3><p>plugin을 깔기 전부터 있던 설치본이 이미 뒤처져 있으면 첫 판정에서 업데이트·후퇴·로컬 수정을 가를 수 없다. 서버가 “이 지문은 몇 번째 버전인가”에 답하면 풀리지만, 과거 버전 지문을 익명으로 노출하는 범위가 넓어진다.</p></article>
     </div>
     <div class="grid">
+      <article class="plain"><h3>배포는 아직이다</h3><p>서버 변경(인덱스 확장 필드·ETag)은 prod에 반영됐다. plugin을 prod 카탈로그 마켓에 등록하는 일은 남아 있어(#3307), 그 전에는 사용자가 카탈로그에서 받을 수 없다.</p></article>
       <article class="plain"><h3>plugin 자신의 갱신</h3><p>제3자 마켓이라 기본으로 자동 갱신이 꺼져 있다. hook이 자기 버전도 안내하는 기능은 보류했다.</p></article>
       <article class="plain"><h3>범위 밖: 원본 git을 따르는 설치</h3><p>내 마켓·GitHub 직행 설치는 serving 버전이 아니라 원본 저장소를 따른다. Claude Code와 git의 자체 갱신에 맡긴다.</p></article>
       <article class="plain"><h3>인덱스 호출 수</h3><p>short_id마다 한 번씩 묻는다. 스킬 수십 개 수준이면 24시간 TTL과 304로 충분하다고 본다. 묶음 조회가 필요한지는 사용량을 보고 정한다.</p></article>
@@ -593,7 +594,7 @@ table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--pane
     <article class="big"><h3>쓰는 자리에서 알린다</h3><p>Claude Code 세션 시작 hook이 2초 안에 확인하고 Claude에게 안내를 넣는다. 실패하면 조용히 넘어간다.</p></article>
     <article class="big"><h3>자동은 켠 사람만, 안전하게</h3><p>손대지 않은 복사 설치본만 잠금 → 백업 → 재확인 → 설치 → 검증 → 실패 시 복원을 거쳐 다시 설치한다.</p></article>
   </div>
-  <div class="callout"><b>한 문장으로</b> 스킬이 새 버전이 되면, 다음 Claude Code 세션(늦어도 24시간 안)에서 Claude가 “업데이트가 있다”고 말해 준다. 원하면 그 자리에서 자동으로 바꿔 준다.</div>
+  <div class="callout"><b>한 문장으로</b> plugin을 설치해 두었다면, 스킬의 serving 버전이 바뀌었을 때 다음 Claude Code 세션(늦어도 24시간 안)에서 Claude가 “업데이트가 있다”고 말해 준다. 원하면 그 자리에서 자동으로 바꿔 준다.</div>
 </div></section>
 
 <section class="slide" id="refs"><div class="inner">
