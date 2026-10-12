@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tip 발표 자료</title>
+    <meta name="description" content="AI Agent 스터디와 사내 공유용으로 만든 HTML 발표 자료 모음." />
+    <style>
+      :root {
+        --paper: #f3f4f1;
+        --panel: #ffffff;
+        --ink: #1b2028;
+        --muted: #5d6673;
+        --line: #d8dcd3;
+        --accent: #1f6388;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --paper: #15181d;
+          --panel: #1e232a;
+          --ink: #e6e9ee;
+          --muted: #9aa3ae;
+          --line: #2f363f;
+          --accent: #7cb8dc;
+          color-scheme: dark;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.6 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      }
+      main { max-width: 760px; margin: 0 auto; padding: 48px 16px 64px; }
+      h1 { font-size: 1.8rem; margin: 0 0 4px; }
+      .lead { color: var(--muted); margin: 0 0 32px; }
+      ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+      a.card {
+        display: block;
+        padding: 18px 20px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        color: inherit;
+        text-decoration: none;
+      }
+      a.card:hover, a.card:focus-visible { border-color: var(--accent); }
+      .title { font-weight: 600; color: var(--accent); }
+      .date { color: var(--muted); font-size: 0.85rem; margin-left: 8px; }
+      .desc { margin: 6px 0 0; color: var(--muted); font-size: 0.95rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Tip 발표 자료</h1>
+      <p class="lead">AI Agent 스터디와 공유용으로 만든 HTML 발표 자료 모음.</p>
+      <ul>
+        <li>
+          <a class="card" href="agent-factory-skill-update/agent-factory-skill-update.html">
+            <span class="title">Agent Factory 스킬 업데이트</span><span class="date">2026-10-12</span>
+            <p class="desc">설치한 스킬의 새 버전이 사용자 PC에 알려지고 다시 설치되는 구조 — 익명 인덱스, 세션 시작 hook, 자동 재설치 안전장치.</p>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="agent-observability/agent-observability.html">
+            <span class="title">Agent Observability</span><span class="date">2026-10-08</span>
+            <p class="desc">OpenTelemetry가 Agent·모델·tool·MCP 호출을 한 trace로 잇는 방법과 코딩 Agent에서 켜 보는 법.</p>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="webmcp/webmcp.html">
+            <span class="title">WebMCP</span><span class="date">2026-10-01</span>
+            <p class="desc">웹페이지가 기능을 tool로 내밀어 브라우저 Agent가 함수로 부르게 하는 WebMCP — MCP·ACP와의 비교.</p>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="openai-agents-api/openai-agents-api.html">
+            <span class="title">묻는 API에서, 맡기는 API로</span><span class="date">2026-09-16</span>
+            <p class="desc">OpenAI Agents API를 Chat Completions·Responses API의 흐름과 Codex ACP 사용과의 차이로 설명.</p>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="mattpocock/index.html">
+            <span class="title">Skills For Real Engineers</span><span class="date">2026-09-09</span>
+            <p class="desc">mattpocock-skills — Claude Code용 엔지니어링 스킬의 구조·설치·사용 사례·현장 팁.</p>
+          </a>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>
