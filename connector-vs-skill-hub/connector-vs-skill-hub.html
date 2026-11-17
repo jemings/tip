@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>커넥터 vs 허브 스킬 — MyAvatar</title>
+<meta name="description" content="MyAvatar가 SLSI Agent Desktop의 커넥터를 먼저 쓰는 이유 — 다 된 요리와 냉동팩의 비유로, 열쇠·안전장치·팀 공유 관점에서 설명한 자료." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f1f2f4; --panel:#fff; --panel-2:#e7e9ed; --ink:#1b2028; --ink-2:#3d4552;
+  --muted:#5d6673; --line:#d5d9df; --line-strong:#b9c0c9; --accent:#315efb; --accent-ink:#2347c3;
+  --accent-soft:#e8edff; --green:#2e6f5c; --green-soft:#dcebe5; --amber:#8a5a00; --amber-soft:#fff1c7;
+  --red:#a63a1e; --red-soft:#f7e4dd; --shadow:0 1px 2px rgba(27,32,40,.06),0 8px 24px rgba(27,32,40,.06);
+  --font-display:"Bricolage Grotesque","IBM Plex Sans KR",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans","IBM Plex Sans KR",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --rail:232px; --pad-x:clamp(1.25rem,4vw,4.5rem); color-scheme:light;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14181d; --panel:#1a1f26; --panel-2:#222932; --ink:#e7eaee; --ink-2:#b3bcc7;
+    --muted:#8a94a1; --line:#2c333c; --line-strong:#3d4650; --accent:#6d8cff; --accent-ink:#91a7ff;
+    --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
+    --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14181d; --panel:#1a1f26; --panel-2:#222932; --ink:#e7eaee; --ink-2:#b3bcc7;
+  --muted:#8a94a1; --line:#2c333c; --line-strong:#3d4650; --accent:#6d8cff; --accent-ink:#91a7ff;
+  --accent-soft:#202b4b; --green:#5faf95; --green-soft:#1c2e29; --amber:#f0bf54; --amber-soft:#352d18;
+  --red:#ff9271; --red-soft:#3a241d; --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:clamp(.95rem,.9rem + .2vw,1.06rem);line-height:1.62;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;word-break:keep-all;margin:0;line-height:1.12;letter-spacing:-.02em}h1{font-size:clamp(2.4rem,4.6vw,4.4rem);font-weight:800;max-width:18ch}h2{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:800}h3{font-size:1.05rem}p{margin:0}
+a{color:var(--accent-ink);text-underline-offset:3px;text-decoration-thickness:1px}code,.mono{font-family:var(--font-mono);font-size:.92em}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.slide{padding:clamp(3rem,6vh,5rem) var(--pad-x) clamp(2.6rem,5vh,4rem) calc(var(--pad-x) + var(--rail));border-bottom:1px solid var(--line);scroll-snap-align:start}
+.slide>.inner{max-width:1180px;margin:0 auto;display:grid;gap:clamp(1rem,2.2vh,1.7rem);align-content:center;min-height:calc(100svh - clamp(5.6rem,11vh,9rem))}
+@media(min-width:880px) and (min-height:620px){html{scroll-snap-type:y proximity}}
+.rail{position:fixed;inset:0 auto 0 0;width:var(--rail);padding:clamp(1.5rem,4vh,3rem) 0 clamp(1.5rem,4vh,3rem) clamp(1rem,2.4vw,2rem);display:flex;flex-direction:column;justify-content:safe center;gap:2px;z-index:20;border-right:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);overflow-y:auto;overscroll-behavior:contain}
+.brand{font:600 .7rem var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:1rem}.rail a{display:grid;grid-template-columns:2.1rem 1fr;align-items:baseline;gap:.35rem;padding:.3rem .5rem .3rem 0;color:var(--muted);text-decoration:none;font-size:.8rem;line-height:1.35;border-radius:3px;transition:color .15s ease}.rail a:hover,.rail a[aria-current="true"]{color:var(--ink)}.rail a[aria-current="true"]{font-weight:600}.rail .n{font:.68rem var(--font-mono);letter-spacing:.06em;color:var(--muted)}.rail a[aria-current="true"] .n{color:var(--accent-ink)}
+.kicker{font:500 .76rem var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+.lede{font-size:clamp(1.08rem,1rem + .35vw,1.28rem);color:var(--ink-2);max-width:62ch;line-height:1.55}
+.note{font-size:.86rem;color:var(--muted);max-width:84ch}
+.easy{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.7rem 1rem;font-size:1rem;color:var(--ink);max-width:84ch}.easy b{color:var(--accent-ink);margin-right:.35rem}
+.facts{display:flex;flex-wrap:wrap;gap:1.2rem 3rem;border-top:1px solid var(--line);padding-top:.8rem}.facts b{display:block;font-family:var(--font-display);font-size:clamp(1.4rem,2.6vw,2.1rem);font-weight:800;line-height:1.2}.facts span{display:block;font-size:.8rem;color:var(--muted)}
+.grid{display:grid;gap:clamp(.7rem,1.5vw,1.1rem)}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.split{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.card{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;display:grid;gap:.45rem;align-content:start;box-shadow:var(--shadow)}.card p{color:var(--ink-2);font-size:.93rem;line-height:1.55}
+.plain{border-top:2px solid var(--ink);padding-top:.7rem;display:grid;gap:.4rem;align-content:start}.plain p{color:var(--ink-2);font-size:.93rem}
+.big{border-top:3px solid var(--accent);padding-top:.9rem;display:grid;gap:.6rem;align-content:start}.big h3{font-size:clamp(1.25rem,1.1rem + .6vw,1.6rem)}.big p{color:var(--ink-2);font-size:1rem;line-height:1.6}
+.tag{display:inline-block;border:1px solid currentColor;border-radius:2px;padding:.05rem .4rem;font:.68rem var(--font-mono);letter-spacing:.04em;vertical-align:2px;white-space:nowrap}.tag.warn{color:var(--red);background:var(--red-soft)}.tag.green{color:var(--green);background:var(--green-soft)}.tag.amber{color:var(--amber);background:var(--amber-soft)}.tag.api{color:var(--accent-ink);background:var(--accent-soft)}
+.code{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;font:.9rem/1.65 var(--font-mono);white-space:pre;overflow:auto;margin:0}.code .c{color:var(--muted)}.code .k{color:var(--accent-ink);font-weight:600}.code .s{color:var(--green)}.code .h{background:var(--amber-soft);color:var(--amber)}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.8rem 1rem}.callout.warn{border-left-color:var(--red);background:var(--red-soft)}
+/* 같은 부탁, 두 방법 */
+.ask{font-size:1.1rem;font-weight:600;border:1px dashed var(--line-strong);padding:.6rem 1rem;background:var(--panel);justify-self:start}
+.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(.8rem,2vw,1.4rem)}
+.lane{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);display:grid;grid-template-rows:auto 1fr auto}
+.lane>header{padding:.7rem 1rem;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:.5rem;align-items:baseline}.lane>header h3{font-size:1.05rem}.lane>header span{font:.75rem var(--font-mono);color:var(--muted)}
+.lane ol{list-style:none;margin:0;padding:.7rem 1rem;display:grid;gap:.45rem;align-content:start;counter-reset:s}
+.lane li{display:grid;grid-template-columns:1.6rem 1fr;gap:.5rem;font-size:.95rem;color:var(--ink-2);counter-increment:s}.lane li::before{content:counter(s);font:600 .75rem/1.6rem var(--font-mono);text-align:center;border-radius:50%;width:1.6rem;height:1.6rem;background:var(--panel-2);color:var(--muted)}
+.lane li.guess::before{background:var(--red-soft);color:var(--red)}.lane.good li::before{background:var(--accent-soft);color:var(--accent-ink)}
+.lane li.look{color:var(--muted);font-size:.86rem}
+.lane>footer{padding:.6rem 1rem;border-top:1px solid var(--line);font-size:.9rem}.lane.bad>footer{color:var(--red)}.lane.good>footer{color:var(--green)}
+/* 연결 지도 */
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.link{border:1px solid var(--line);background:var(--panel);padding:1rem;display:grid;gap:.5rem;align-content:start}.link h3{font-size:1.25rem}.link .ends{font:600 .9rem var(--font-mono);color:var(--ink)}.link p{font-size:.88rem;color:var(--ink-2)}
+.link.me{border:2px solid var(--accent);background:var(--accent-soft)}.link.me .ends{color:var(--accent-ink)}
+/* 비교 표 */
+table{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--panel);border:1px solid var(--line)}th,td{text-align:left;padding:.6rem .85rem;border-bottom:1px solid var(--line);vertical-align:top}thead th{font-weight:600;font-size:.95rem;background:var(--panel-2)}tbody th{font-weight:500;color:var(--muted);font-size:.86rem;width:8.5rem}tr:last-child>*{border-bottom:0}td.we{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
+/* 누가 보나 */
+.who{display:grid;grid-template-columns:minmax(0,.8fr) auto minmax(0,1.6fr);gap:1rem;align-items:center}
+.page{border:2px solid var(--ink);background:var(--panel);padding:1rem;display:grid;gap:.5rem}.page .bar{font:.75rem var(--font-mono);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:.4rem}.page .tool{font:.85rem var(--font-mono);border:1px solid var(--accent);color:var(--accent-ink);background:var(--accent-soft);padding:.25rem .5rem;justify-self:start}
+.arrow{font-size:1.6rem;color:var(--muted)}
+.readers{display:grid;gap:.7rem}
+/* WebMCP가 정하는 범위 */
+.legs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);gap:.6rem;align-items:center}
+.legs .node{border:2px solid var(--ink);background:var(--panel);padding:.8rem .9rem;display:grid;gap:.25rem;text-align:center}.legs .node b{font-size:1rem}.legs .node span{font-size:.8rem;color:var(--muted)}
+.legs .leg{display:grid;gap:.2rem;text-align:center;font-size:.82rem;color:var(--ink-2)}.legs .leg::after{content:"";height:2px;background:var(--line-strong);order:-1;margin-bottom:.25rem}
+.legs .leg b{font-size:.9rem}.legs .leg.spec::after{background:var(--accent);height:3px}.legs .leg.spec b{color:var(--accent-ink)}
+@media(max-width:900px){.legs{grid-template-columns:1fr}.legs .leg::after{display:none}.legs .leg{padding:.2rem 0}.legs .leg b::before{content:"↓ "}}
+/* 언제 쓰나 */
+.q{font-family:var(--font-display);font-size:clamp(1.3rem,1.1rem + .9vw,1.9rem);font-weight:800;border:2px solid var(--ink);background:var(--panel);padding:.9rem 1.2rem;line-height:1.3}
+.yn{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.yn>div{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;display:grid;gap:.6rem;align-content:start}.yn h3{font-size:1.15rem}.yn .y h3{color:var(--accent-ink)}.yn .n h3{color:var(--ink-2)}
+.yn ul{margin:0;padding-left:1.1rem;display:grid;gap:.3rem;font-size:.95rem;color:var(--ink-2)}
+.source-list{display:grid;gap:.5rem;font-size:.88rem}.source-list a{text-decoration:none}.source-list small{color:var(--muted)}.footer{padding:1rem 0 0;border-top:1px solid var(--line);color:var(--muted);font:.74rem var(--font-mono)}
+.hint{position:fixed;right:1rem;bottom:1rem;z-index:10;padding:.3rem .5rem;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);font:.7rem var(--font-mono);color:var(--muted)}
+@media(max-width:900px){.rail{position:sticky;top:0;width:100%;height:auto;flex-direction:row;align-items:center;justify-content:space-between;padding:.65rem var(--pad-x);border-right:0;border-bottom:1px solid var(--line)}.rail a{display:none}.brand{margin:0}.slide{padding-left:var(--pad-x)}.slide>.inner{min-height:0}.g3,.g4,.map{grid-template-columns:repeat(2,minmax(0,1fr))}.split,.who{grid-template-columns:1fr}.arrow{transform:rotate(90deg);justify-self:center}}
+@media(max-width:620px){.g2,.g3,.g4,.split,.lanes,.map,.yn{grid-template-columns:1fr}.hint{display:none}.code{font-size:.78rem}tbody th{width:auto}}
+@media print{.rail,.hint{display:none}.slide{padding:1.5cm;break-after:page}.slide>.inner{min-height:0}}
+</style>
+</head>
+<body>
+<nav class="rail" aria-label="슬라이드 목차">
+  <span class="brand">connector-vs-frozen</span>
+  <a href="#cover"><span class="n">01</span><span>뜨끈한 요리 vs 냉동팩</span></a>
+  <a href="#summary"><span class="n">02</span><span>오늘 가져갈 세 문장</span></a>
+  <a href="#split"><span class="n">03</span><span>스킬과 커넥터는 다르다</span></a>
+  <a href="#same-ask"><span class="n">04</span><span>같은 부탁, 두 갈래 길</span></a>
+  <a href="#secret"><span class="n">05</span><span>열쇠는 누가 쥐나</span></a>
+  <a href="#gate"><span class="n">06</span><span>쓰기·외부 전송을 앱이 안다</span></a>
+  <a href="#avatar"><span class="n">07</span><span>MyAvatar는 공유되는 설계도</span></a>
+  <a href="#once"><span class="n">08</span><span>한 번 켜면 어디서나</span></a>
+  <a href="#menu"><span class="n">09</span><span>지금 차려진 메뉴</span></a>
+  <a href="#objection"><span class="n">10</span><span>예상되는 반론</span></a>
+  <a href="#when"><span class="n">11</span><span>그래도 냉동팩이 맞는 때</span></a>
+  <a href="#order"><span class="n">12</span><span>권하는 순서</span></a>
+  <a href="#wrap"><span class="n">13</span><span>정리</span></a>
+  <a href="#refs"><span class="n">14</span><span>출처</span></a>
+</nav>
+<main>
+
+<section class="slide" id="cover"><div class="inner">
+  <span class="kicker">SLSI Agent Desktop · MyAvatar · 커넥터 · 2026-11</span>
+  <h1>스킬 허브를 뒤지기 전에, <span style="color:var(--accent)">차려진 밥상</span>부터</h1>
+  <p class="lede">SLSI Agent Desktop이 이미 붙여 둔 커넥터를 MyAvatar가 쓰는 것은, 다 조리된 뜨끈한 요리를 바로 먹는 일이다. 스킬 허브에서 각자 찾아 쓰는 것은 냉동팩을 사 와서 집에서 조리하는 일이다.</p>
+  <p class="easy"><b>쉽게 말하면</b>냉동팩이 나쁜 것이 아니다. 이미 식탁에 올라온 요리가 있는데 굳이 냉동실부터 여는 이유를 묻는 자료다.</p>
+  <div class="facts">
+    <div><b>커넥터 = 요리</b><span>회사가 만들어 두고, 자격·안전장치까지 붙어 나온다</span></div>
+    <div><b>허브 스킬 = 냉동팩</b><span>각자 고르고, 설치하고, 열쇠를 챙기고, 조리한다</span></div>
+    <div><b>기준</b><span>SLSI Agent Desktop 3.260.0 · 사용 가이드</span></div>
+  </div>
+</div></section>
+
+<section class="slide" id="summary"><div class="inner">
+  <span class="kicker">요약 — 먼저 결론</span>
+  <h2>오늘 가져갈 세 문장</h2>
+  <div class="grid g3">
+    <article class="big">
+      <h3>1. 같은 저울에 올릴 물건이 아니다</h3>
+      <p>스킬은 <b>할 줄 아는 일</b>(레시피), 커넥터는 <b>닿을 수 있는 곳</b>(주방과 식재료 공급)이다. 레시피를 아무리 모아도 Jira에 닿는 길은 생기지 않는다.</p>
+    </article>
+    <article class="big">
+      <h3>2. 열쇠와 안전장치가 같이 나온다</h3>
+      <p>사내 연동은 PAT 같은 열쇠를 <b>서버가 쥐고</b>, 쓰기·외부 전송 도구에는 앱이 <b>"중요 작업"</b> 표시를 붙여 묻는다. 각자 만든 길에는 이 표시가 없다.</p>
+    </article>
+    <article class="big">
+      <h3>3. MyAvatar는 혼자 쓰는 도구가 아니라 공유되는 설계도다</h3>
+      <p>아바타 카드는 서버에서 팀에게 퍼진다. 모두가 <b>같은 커넥터</b>를 부품으로 쓰면 같은 카드가 누구 PC에서나 같게 돈다.</p>
+    </article>
+  </div>
+  <p class="easy"><b>그래서</b>순서는 <b>커넥터 → 내 스킬 → 허브</b>다. 앱이 아바타 온보딩에서 정해 둔 순서와 같다. 허브는 "없는 요리"를 보탤 때 연다.</p>
+</div></section>
+
+<section class="slide" id="split"><div class="inner">
+  <span class="kicker">03 — 먼저 갈라 놓을 것</span>
+  <h2>스킬은 레시피, 커넥터는 주방과 식재료 공급이다</h2>
+  <div class="grid g2">
+    <article class="card">
+      <h3>스킬 <span class="tag api">할 줄 아는 일</span></h3>
+      <p>"이 일은 이렇게 한다"를 적은 문서와 스크립트. 에이전트가 읽고 따른다. <b>실행 환경(Windows/WSL)과 에이전트마다 따로 설치</b>한다.</p>
+    </article>
+    <article class="card">
+      <h3>커넥터 <span class="tag green">닿을 수 있는 곳</span></h3>
+      <p>에이전트에 <b>도구</b>를 붙여 주는 MCP 서버. 사내 시스템·내 지식·외부 서비스에 닿는 길 자체다. 사내 연동은 서버가 제공하는 만큼 <b>카드가 자동으로 생긴다.</b></p>
+    </article>
+  </div>
+  <table>
+    <thead><tr><th></th><th>스킬 (허브)</th><th class="we">커넥터 (SLSI Agent Desktop)</th></tr></thead>
+    <tbody>
+      <tr><th>비유</th><td>냉동팩 + 레시피</td><td class="we">다 된 요리</td></tr>
+      <tr><th>주는 것</th><td>일하는 방법</td><td class="we">시스템에 닿는 도구</td></tr>
+      <tr><th>시작하려면</th><td>찾고 · 설치하고 · 필요한 준비를 한다</td><td class="we">카드가 이미 있다 (기본 켜짐)</td></tr>
+      <tr><th>설치 단위</th><td>실행 환경 × 에이전트마다</td><td class="we">한 번 켜면 모든 에이전트에</td></tr>
+    </tbody>
+  </table>
+  <p class="easy"><b>쉽게 말하면</b>"스킬 허브에서 골라 쓰면 되지 않나"는 질문은, 레시피 사이트를 뒤지면 식재료 공급이 해결된다는 말과 비슷하다. 둘은 서로를 대신하지 못하고 <b>함께</b> 쓴다.</p>
+  <p class="note">스킬 쪽 "실행 환경 × 에이전트마다 설치"와 커넥터 쪽 "한 번 켜면 모든 에이전트"는 사용 가이드(스킬·커넥터 페이지)에 적힌 동작이다. 표의 "비유"는 <span class="tag api">발표자 정리</span>다.</p>
+</div></section>
+
+<section class="slide" id="same-ask"><div class="inner">
+  <span class="kicker">04 — 같은 부탁, 두 갈래 길</span>
+  <h2>데워 먹느냐, 해동부터 하느냐</h2>
+  <p class="ask">"이 Jira 이슈 담당자와 최근 코멘트를 알려 줘"</p>
+  <div class="lanes">
+    <section class="lane good">
+      <header><h3>커넥터로 — 이미 차려진 카드</h3><span>jira 커넥터</span></header>
+      <ol>
+        <li><span>앱을 켜고 사내 SSO로 로그인한다 (쓰던 계정 그대로)</span></li>
+        <li><span>커넥터 화면에 <code>jira</code> 카드가 이미 켜져 있다</span></li>
+        <li><span>부탁한다 — 에이전트가 도구를 골라 부른다</span></li>
+      </ol>
+      <footer>이 PC에서는 로그인한 SSO 신원만 보낸다. 실행은 사내 서버가 한다.</footer>
+    </section>
+    <section class="lane bad">
+      <header><h3>허브 스킬로 — 각자 조리</h3><span>스킬 직접 설치 <span class="tag amber">추정</span></span></header>
+      <ol>
+        <li class="guess"><span>허브에서 Jira 스킬을 찾는다 (이름·설명·별점으로 가늠)</span></li>
+        <li class="guess"><span>지금 쓰는 실행 환경·에이전트에 설치한다 (다른 쪽에서 쓰려면 다시)</span></li>
+        <li class="guess"><span>Jira 주소와 개인 액세스 토큰을 발급해 스킬이 읽는 자리에 둔다</span></li>
+        <li class="guess"><span>사내 프록시·인증서 때문에 스크립트가 막히면 직접 푼다</span></li>
+        <li class="look"><span>그제서야 부탁한다</span></li>
+      </ol>
+      <footer>스킬이 스크립트로 Jira를 직접 부르는 방식이라면 이런 준비가 사람마다 반복된다.</footer>
+    </section>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>식당에서는 앉아서 주문하면 끝난다. 냉동팩은 사 오고, 해동하고, 불을 켜고, 설거지까지 내 몫이다.</p>
+  <p class="note">왼쪽 레인은 사용 가이드(커넥터 8절)와 README의 동작이다. 오른쪽 레인은 <span class="tag amber">추정</span> — 허브의 스킬마다 구성이 달라 모든 스킬이 이 단계를 다 거치지는 않는다. 다만 스킬 설치가 "실행 환경 × 에이전트마다"라는 점은 가이드에 그대로 적혀 있다.</p>
+</div></section>
+
+<section class="slide" id="secret"><div class="inner">
+  <span class="kicker">05 — 열쇠는 누가 쥐나</span>
+  <h2>PAT를 각자의 PC에 흩어 두지 않는다</h2>
+  <div class="grid g3">
+    <article class="big">
+      <h3>사내 연동 <span class="tag green">서버가 쥔다</span></h3>
+      <p>실제 실행과 자격 증명(PAT 등)은 <b>사내 서버</b>가 맡는다. PAT를 넣는 칸도 앱 안에 있고, 값은 서버의 <b>내 환경변수 금고</b>에 저장되어 <b>이 PC에는 남지 않는다.</b> 저장한 값은 다시 보여 주지 않는다. Knox처럼 서버가 자격을 관리하는 카드에는 입력 버튼조차 없다.</p>
+    </article>
+    <article class="big">
+      <h3>OAuth 커넥터 <span class="tag green">앱이 들고 있는다</span></h3>
+      <p>Meetzy 같은 OAuth 로그인 커넥터는 앱이 로그인해서 받은 출입증을 <b>암호화해 보관</b>한다. 에이전트는 출입증 대신 <b>앱 안의 중계 주소</b>만 받고, 앱이 요청마다 최신 출입증을 붙인다. 화면·로그·에이전트 설정에는 싣지 않는다.</p>
+    </article>
+    <article class="big">
+      <h3>각자 만든 길 <span class="tag amber">추정</span></h3>
+      <p>스킬이 스크립트로 직접 부르는 방식이면 토큰은 <b>스킬이 읽는 어딘가</b>(환경변수·설정 파일)에 있어야 한다. 사람 수만큼 토큰이 PC에 퍼지고, 그 토큰이 어디에 있는지는 각자가 관리한다.</p>
+    </article>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>식당 주방의 열쇠는 식당이 갖고 있다. 냉동팩을 가져다 집에서 조리하면, 가스 밸브·냉장고 열쇠를 내가 들고 다녀야 한다.</p>
+  <p class="note">"각자 만든 길" 칸은 <span class="tag amber">추정</span>이다. 허브 스킬이 모두 그렇다는 뜻이 아니라, 서버를 거치지 않고 직접 부르는 스킬이라면 구조상 그렇다는 것이다.</p>
+</div></section>
+
+<section class="slide" id="gate"><div class="inner">
+  <span class="kicker">06 — 안전장치</span>
+  <h2>"이 도구는 쓰기다"를 서버가 알려 주고, 앱이 묻는다</h2>
+  <div class="grid g2">
+    <article class="card">
+      <h3>중요 작업 배지 <span class="tag warn">쓰기·외부 전송</span></h3>
+      <p>사내 서버가 "이 도구는 입력을 회사 밖으로 보낸다" 또는 "이 도구는 쓰기다"(Knox 메일 보내기, Jira·Confluence 등록·수정)라고 표시한 도구가 있으면 카드에 <b>중요 작업</b> 배지가 붙는다. <b>이름이 아니라 서버의 표시</b>로 정한다.</p>
+    </article>
+    <article class="card">
+      <h3>확인 후 실행 <span class="tag green">쓰기만 묻는다</span></h3>
+      <p>승인 방식이 기본(확인 후 실행)이면 표시가 붙은 도구 호출만 승인 카드로 묻는다. 사내 연동은 <b>쓰기 명령만</b> 묻는다 — 조회는 막힘 없이 흐른다.</p>
+    </article>
+    <article class="card">
+      <h3>외부 전송은 처음에 꺼져 있다</h3>
+      <p>웹 검색처럼 입력이 회사 밖으로 나가는 커넥터는 <b>꺼진 채로 시작</b>하고, 켤 때 경고가 뜬다. <b>에이전트는 대신 켜지 못한다</b> — 동의는 사람만 한다.</p>
+    </article>
+    <article class="card">
+      <h3>회사가 막은 연동은 우회되지 않는다</h3>
+      <p>배포 설정으로 막은 연동은 화면·메뉴 어디에도 보이지 않고 에이전트도 쓸 수 없다. 이름을 바꾸거나 다른 이름으로 같은 연동을 등록해도 <b>거절</b>된다.</p>
+    </article>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>식당은 위생 점검을 받고 알레르기 표시를 붙여 낸다. 냉동팩은 포장지의 설명이 전부다.</p>
+  <div class="callout">스킬이 셸 스크립트로 서비스를 직접 부르는 경우, 앱이 "이 호출이 쓰기다"를 구분할 근거는 <b>서버의 표시뿐</b>인데 그 길에는 그 표시가 없다. <span class="tag amber">추정</span> — 위 배지·승인 규칙이 사내 연동 커넥터에 대해 가이드에 적혀 있고, 스킬 호출에는 같은 표시가 적혀 있지 않다는 데서 낸 해석이다.</div>
+</div></section>
+
+<section class="slide" id="avatar"><div class="inner">
+  <span class="kicker">07 — MyAvatar라서 더 중요한 이유</span>
+  <h2>아바타 카드는 혼자 쓰는 메모가 아니라, 팀에 퍼지는 설계도다</h2>
+  <div class="grid split">
+    <div class="grid" style="gap:.8rem">
+      <article class="plain">
+        <h3>카드는 서버에 있고, 공개 범위가 있다</h3>
+        <p>아바타 카드는 Agent Factory 서버에 있고 온보딩이 각자의 PC에 설치한다. 공개 범위는 서버가 지원하면 <b>전체 공개·팀 공개</b> 중에 고르고, 지원하지 않으면 전체 공개로 등록된다. 즉 <b>내가 만든 카드를 동료가 받아 쓴다.</b></p>
+      </article>
+      <article class="plain">
+        <h3>역할마다 필요한 MCP 연결이 있다</h3>
+        <p>내 아바타 화면은 역할 아이콘 색으로 상태를 알려 준다. 주황은 <b>필요한 MCP 연결이 끊긴 것</b> — "도구 없이 실행될 수 있습니다"라는 경고가 붙는다.</p>
+      </article>
+      <article class="plain">
+        <h3>온보딩은 이미 커넥터부터 찾는다</h3>
+        <p>에이전트는 이 PC에 있는 것을 <b>연결 가능한 커넥터 → 내 스킬 → Agent Factory</b> 순으로 먼저 찾아 쓴다. 애매하면 번호로 고르게 한다.</p>
+      </article>
+    </div>
+    <div class="grid" style="gap:.8rem">
+      <article class="card">
+        <h3>모두가 같은 커넥터를 부품으로 쓸 때</h3>
+        <p>카드가 "jira 커넥터로 읽는다"고 적으면 <b>누구의 PC에서나 같은 부품</b>이 있다. 받는 즉시 같은 방식으로 돈다.</p>
+      </article>
+      <article class="card">
+        <h3>사람마다 다른 허브 스킬을 쓸 때 <span class="tag amber">추정</span></h3>
+        <p>카드가 허브 스킬 이름을 가리키면 받는 쪽은 "그 스킬이 설치돼 있나, 같은 판인가"부터 확인해야 한다. 같은 카드가 PC마다 다르게 돌 여지가 생긴다.</p>
+      </article>
+    </div>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>한 팀이 같은 레시피북을 쓰려면 같은 주방 기구가 있어야 한다. 팀원마다 다른 기구를 쓰면 같은 레시피도 다르게 나온다.</p>
+</div></section>
+
+<section class="slide" id="once"><div class="inner">
+  <span class="kicker">08 — 한 번 켜면 어디서나, 고치면 모두 한꺼번에</span>
+  <h2>관리해야 할 사본이 사람 수만큼 늘지 않는다</h2>
+  <div class="grid g3">
+    <article class="big">
+      <h3>모든 에이전트에 한 번에</h3>
+      <p>커넥터 탭에 등록한 MCP는 에이전트별 투영이 <b>기본 켜짐</b>이다. 한 번 갖춰 두면 Claude Code와 OpenCode 어느 쪽 대화에서나 쓴다. 아바타도 <b>양쪽에 같은 모양으로</b> 설치된다.</p>
+    </article>
+    <article class="big">
+      <h3>스킬은 사본이다</h3>
+      <p>스킬은 실행 환경과 에이전트마다 따로 설치되는 <b>사본</b>이다. 새 판이 나오면 스킬 카드에 <b>업데이트 표시</b>가 뜨고 각자 다시 설치한다. 그 구조는 <a href="../agent-factory-skill-update/agent-factory-skill-update.html">Agent Factory 스킬 업데이트</a> 자료에 정리해 두었다.</p>
+    </article>
+    <article class="big">
+      <h3>서버가 고치면 모두 같은 날 <span class="tag amber">추정</span></h3>
+      <p>사내 연동은 실행이 서버에서 일어난다. 서버가 고치면 사용자 PC에 새 사본을 깔 필요 없이 같은 동작이 모두에게 닿는다고 보는 것이 자연스럽다.</p>
+    </article>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>식당 레시피를 바꾸면 모든 손님의 접시가 바뀐다. 냉동팩은 이미 팔려 나간 것은 그대로 남는다.</p>
+  <p class="note">"서버가 고치면 모두 같은 날"은 가이드의 "실제 실행은 사내 서버가 맡는다"에서 이끌어 낸 <span class="tag amber">추정</span>이다. 구체적인 배포 일정은 서버 운영 쪽 사정에 따른다.</p>
+</div></section>
+
+<section class="slide" id="menu"><div class="inner">
+  <span class="kicker">09 — 지금 차려진 메뉴</span>
+  <h2>이미 있는 요리를 먼저 보자</h2>
+  <div class="grid g3">
+    <article class="card">
+      <h3>사내 시스템 <span class="tag green">자동 생성</span></h3>
+      <p>Knox · Jira · Confluence 등. 서버가 제공하는 연동마다 카드가 <b>자동으로</b> 생기고 기본으로 켜져 있다. 슬라이드·다이어그램(drawio) 같은 연동은 결과물을 서버 보관함에 저장하고 채팅의 <b>결과물 탭</b>에 모아 준다.</p>
+    </article>
+    <article class="card">
+      <h3>내 지식 <span class="tag green">이 PC에서</span></h3>
+      <p>Mail Knowledges · Document Knowledges. 지정한 메일·문서 폴더가 재료가 된다. 문서 지식은 접근 키와 허용 IP로 <b>팀원의 PC가 검색하게 열 수 있고</b>, 메일 지식은 다른 PC와 나누지 않는다.</p>
+    </article>
+    <article class="card">
+      <h3>회의록 등 OAuth 서비스</h3>
+      <p>Meetzy처럼 로그인으로만 붙는 서비스는 카드의 <b>[연결하기]</b> 한 번으로 끝난다. 관리자가 모든 사용자 화면에 미리 깔아 둘 수도 있다.</p>
+    </article>
+    <article class="card">
+      <h3>웹 <span class="tag warn">검색은 꺼짐이 기본</span></h3>
+      <p>앱 도구 <code>web_fetch</code>는 이 PC의 망(사내 프록시·인증서)으로 웹 페이지를 읽어 준다. 웹 검색 커넥터는 외부 전송이라 처음에 꺼져 있고 켜려면 경고에 동의해야 한다.</p>
+    </article>
+    <article class="card">
+      <h3>API 없는 화면 <span class="tag warn">꺼짐이 기본</span></h3>
+      <p>SLSI Browser는 앱 전용 Edge 창에서 근태·결재처럼 API가 없는 사내 화면을 사람처럼 누르고 입력한다. 비밀번호는 읽지도 넣지도 못한다.</p>
+    </article>
+    <article class="card">
+      <h3>DRM 사내 문서 <span class="tag api">기본 탑재 스킬</span></h3>
+      <p>이 카드만 커넥터가 아니라 <b>앱에 기본으로 들어 있는 스킬</b>이다. ds-docvision이 Word · PowerPoint · Excel · PDF를 설치된 Office로 다룬다. 고치기 전에 백업하고 실패하면 되돌린다. 스킬도 앱이 먼저 챙겨 주는 것이 있다는 예다.</p>
+    </article>
+  </div>
+  <p class="note">연동 목록은 사내 서버의 설정과 배포 정책에 따라 사용자마다 다를 수 있다. 위는 사용 가이드와 README에 적힌 대표 예다. 어느 카드가 보이는지는 앱의 <b>커넥터</b> 화면에서 확인한다.</p>
+</div></section>
+
+<section class="slide" id="objection"><div class="inner">
+  <span class="kicker">10 — 예상되는 반론</span>
+  <h2>"스킬 허브 뒤져서 각자 쓰면 되지 않나요?"</h2>
+  <table>
+    <thead><tr><th>반론</th><th>답</th></tr></thead>
+    <tbody>
+      <tr><th>"내게 맞는 걸 고르는 게 더 낫다"</th><td>고르는 비용이 사람 수만큼 든다. 같은 Jira에 닿는 스킬을 열 명이 열 번 찾고, 판이 다르고, 결과가 다르다. <b>고르는 일을 한 번 해 둔 것</b>이 커넥터다.</td></tr>
+      <tr><th>"스킬 하나면 Jira도 되는데?"</th><td>되는 스킬이 있을 수 있다. 그 스킬이 <b>어떤 열쇠로, 어떤 길로</b> 부르는지는 설치한 사람이 확인해야 한다. 커넥터는 서버가 열쇠를 쥐고, 쓰기에는 앱이 묻는다.</td></tr>
+      <tr><th>"커넥터에 없는 일은요?"</th><td>그때가 스킬 차례다. 앱 온보딩도 <b>"새 기능이 필요할 때만"</b> 커넥터 다음에 허브를 찾는다. 반대가 아니다.</td></tr>
+      <tr><th>"커넥터는 내가 못 고친다"</th><td>맞다. 대신 <b>직접 등록</b>도 된다 — 원격(HTTP)·로컬 실행·JSON 방식. 쓰고 싶은 MCP가 있으면 커넥터 화면의 <b>[커넥터 등록]</b>으로 붙인다.</td></tr>
+      <tr><th>"허브가 더 최신 아닌가요?"</th><td>스킬의 최신판을 쓰는 것이 필요한 일이라면 스킬을 쓰면 된다. 다만 <b>시스템에 닿는 길</b>을 최신으로 유지하는 일을 사용자마다 하게 하지는 않는다는 것이 이 자료의 요지다.</td></tr>
+    </tbody>
+  </table>
+  <p class="easy"><b>쉽게 말하면</b>"요리 솜씨가 있으니 냉동팩이 낫다"는 말은 맞을 수 있다. 하지만 <b>팀 전원이 매일 같은 점심</b>을 먹어야 한다면 식당이 낫다.</p>
+</div></section>
+
+<section class="slide" id="when"><div class="inner">
+  <span class="kicker">11 — 공정하게 보면</span>
+  <h2>그래도 냉동팩이 맞는 때</h2>
+  <div class="yn">
+    <div class="y">
+      <h3>커넥터가 맞는 때</h3>
+      <ul>
+        <li>사내 시스템(Knox·Jira·Confluence)에 닿아야 할 때</li>
+        <li>내 메일·문서를 찾아 쓸 때</li>
+        <li>아바타 카드를 <b>팀에 공유</b>할 때</li>
+        <li>쓰기·외부 전송에 <b>승인과 차단</b>이 필요할 때</li>
+        <li>PAT·출입증을 PC에 흩어 두고 싶지 않을 때</li>
+      </ul>
+    </div>
+    <div class="n">
+      <h3>스킬(허브)이 맞는 때</h3>
+      <ul>
+        <li><b>일하는 방법</b>을 붙이고 싶을 때 — 보고서 문체, 검토 절차, 코딩 규칙</li>
+        <li>커넥터에 아직 없는 <b>개인 업무</b>의 반복 작업</li>
+        <li>외부 서비스 없이 <b>이 PC 안에서</b> 끝나는 작업</li>
+        <li>Agent Factory 카탈로그에 이미 검증된 <b>팀 표준 스킬</b>이 있을 때</li>
+        <li>커넥터가 줄 수 없는 <b>전문 도메인 지식</b>을 입힐 때</li>
+      </ul>
+    </div>
+  </div>
+  <p class="easy"><b>쉽게 말하면</b>밥은 식당에서, 입맛에 맞는 양념은 내 냉장고에서. 둘은 경쟁하지 않는다. 다만 <b>순서</b>가 있다.</p>
+  <p class="note">MyAvatar도 스킬을 쓴다. 이 자료는 "스킬 금지"가 아니라 "시스템에 닿는 길은 커넥터로 통일하자"는 제안이다.</p>
+</div></section>
+
+<section class="slide" id="order"><div class="inner">
+  <span class="kicker">12 — 권하는 순서</span>
+  <h2>MyAvatar를 만들 때: 커넥터 → 내 스킬 → 허브</h2>
+  <div class="grid g3">
+    <article class="big">
+      <h3>1. 커넥터 화면부터 본다</h3>
+      <p>내가 쓸 시스템이 이미 카드로 있는지 확인한다. 있으면 켜져 있는지, <b>중요 작업</b> 배지가 있는지, PAT 입력이 필요한지 본다.</p>
+    </article>
+    <article class="big">
+      <h3>2. 내 스킬로 방법을 붙인다</h3>
+      <p>"어떻게 하는지"는 내 업무 방식이다. 스킬 한 장(SKILL.md)으로 붙인다. 이미 써 둔 내 스킬이 있으면 그것부터 쓴다.</p>
+    </article>
+    <article class="big">
+      <h3>3. 모자라면 허브를 연다</h3>
+      <p>커넥터에도 내 스킬에도 없는 일만 Agent Factory에서 찾는다. 설치 전에 <b>누가 만들었고 무엇을 하는지</b> 본다.</p>
+    </article>
+  </div>
+  <div class="callout"><b>한 줄 점검표</b> — ① 닿아야 할 곳이 커넥터에 있는가 ② 쓰기·외부 전송이 있다면 승인 방식을 정했는가 ③ 카드에 쓴 부품 이름을 팀원도 가졌는가 ④ 허브 스킬을 더했다면 판과 출처를 적어 뒀는가</div>
+  <p class="easy"><b>쉽게 말하면</b>먼저 식당 메뉴판을 보고, 없는 것만 마트에서 사 온다.</p>
+</div></section>
+
+<section class="slide" id="wrap"><div class="inner">
+  <span class="kicker">정리</span>
+  <h2>냉동팩은 훌륭한 식재료다. 하지만 점심은 식당에서 먹자.</h2>
+  <div class="grid g2">
+    <article class="big">
+      <h3>커넥터를 쓰면</h3>
+      <p>준비 없이 <b>닿고</b>, 열쇠는 <b>서버가 쥐고</b>, 쓰기는 <b>앱이 묻고</b>, 팀의 아바타 카드는 <b>같은 부품</b>으로 돈다.</p>
+    </article>
+    <article class="big">
+      <h3>허브 스킬은</h3>
+      <p>커넥터에 없는 <b>방법과 도메인</b>을 보탤 때 쓴다. 순서는 <b>커넥터 → 내 스킬 → 허브</b>.</p>
+    </article>
+  </div>
+  <p class="easy"><b>한 문장</b>MyAvatar는 SLSI Agent Desktop이 차려 둔 커넥터를 먼저 쓰자 — 뜨끈한 요리가 이미 식탁에 있다.</p>
+</div></section>
+
+<section class="slide" id="refs"><div class="inner">
+  <span class="kicker">출처</span>
+  <h2>근거 자료</h2>
+  <div class="source-list">
+    <div>① SLSI Agent Desktop 사용 가이드 — <b>커넥터</b><small> — 사내 연동 커넥터(8절) · 중요 작업 커넥터(11절) · SLSI Browser(12절) · OAuth 로그인 커넥터(13절)</small></div>
+    <div>② SLSI Agent Desktop 사용 가이드 — <b>아바타</b><small> — 아바타 카드 구조(1절) · 온보딩의 탐색 순서(3절) · 역할 아이콘 색</small></div>
+    <div>③ SLSI Agent Desktop 사용 가이드 — <b>스킬</b><small> — 스킬은 실행 환경과 에이전트마다 따로 설치(1·3절) · 업데이트 상태(4절)</small></div>
+    <div>④ SLSI Agent Desktop README·SHOWCASE<small> — "이미 붙여 둔 연동을 그대로 쓴다" · 사내 인증서·프록시는 앱이 갖춤</small></div>
+    <div>⑤ <a href="../agent-factory-skill-update/agent-factory-skill-update.html">Agent Factory 스킬 업데이트</a><small> — 이 저장소의 앞선 자료 · 스킬 사본이 새 판을 받는 구조</small></div>
+  </div>
+  <p class="note">읽는 법: 표시가 없는 문장은 위 사용 가이드·README에 적힌 동작이다. <span class="tag amber">추정</span>은 가이드에 직접 적혀 있지 않아 발표자가 짐작한 것이고, <span class="tag api">발표자 정리</span>는 가이드 내용을 발표자가 묶어 비교한 것이다. 여기서 허브는 앱의 스킬 화면이 찾아 주는 Agent Factory 카탈로그를 가리키며, 거기에 어떤 스킬이 있는지는 이 자료가 조사한 범위가 아니다 — 스킬 쪽 서술은 구조에 대한 것이지 특정 스킬의 품질 평가가 아니다.</p>
+  <div class="footer">커넥터 vs 허브 스킬 · MyAvatar 설득 자료 · 사실 확인 기준일 2026-11-17 (SLSI Agent Desktop 3.260.0)</div>
+</div></section>
+
+</main>
+
+<script>
+const links=[...document.querySelectorAll('.rail a')];
+const sections=[...document.querySelectorAll('.slide')];
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.setAttribute('aria-current','false'));const a=document.querySelector(`.rail a[href="#${e.target.id}"]`);if(a)a.setAttribute('aria-current','true')}})},{threshold:.45});
+sections.forEach(s=>obs.observe(s));
+const current=()=>sections.findIndex(s=>{const r=s.getBoundingClientRect();return r.top>=-10&&r.top<window.innerHeight*.5});
+addEventListener('keydown',e=>{
+  if(e.target.closest('input,textarea,select,[contenteditable]'))return;
+  const i=current();
+  if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();if(i<sections.length-1)sections[i+1].scrollIntoView();}
+  if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();if(i>0)sections[i-1].scrollIntoView();}
+});
+</script>
+</body>
+</html>
