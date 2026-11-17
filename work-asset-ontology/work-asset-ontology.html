@@ -139,7 +139,19 @@ td code,th code{white-space:nowrap}
 /* 둘 나누기 */
 .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
 .duo>section{border:1px solid var(--line);background:var(--panel);padding:1rem 1.1rem;display:grid;gap:.5rem;align-content:start}
-.gate .ex{font-size:.84rem;color:var(--muted)}.duo h3{font-size:1.15rem}.duo li,.fix p,.todo p,.step li{overflow-wrap:anywhere}.duo ul{margin:0;padding-left:1.1rem;display:grid;gap:.35rem;font-size:.93rem;color:var(--ink-2)}
+.gate .ex{font-size:.84rem;color:var(--muted)}.tri{display:grid;gap:.5rem}
+.tri>div{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1.1fr);gap:.5rem;align-items:center}
+.tri .s,.tri .o{border:1.5px solid var(--ink);background:var(--panel);padding:.45rem .7rem;font-size:.92rem;overflow-wrap:anywhere}
+.tri .s.f,.tri .o.f{border-radius:2px;font-family:var(--font-mono);font-size:.8rem}
+.tri .s.t,.tri .o.t{border-radius:999px;border-color:var(--accent);background:var(--accent-soft);text-align:center;font-weight:600}
+.tri .r{text-align:center;font-size:.85rem;color:var(--ink-2);border-bottom:2px solid var(--line-strong);padding-bottom:.2rem}
+.tri .r code{display:block;font-size:.8rem;color:var(--accent-ink)}
+.ask{font-weight:600;color:var(--ink)}.chain{font-family:var(--font-mono);font-size:.8rem;background:var(--bg);border:1px dashed var(--line-strong);padding:.45rem .6rem;line-height:1.7;overflow-wrap:anywhere}
+.gloss{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem 1.6rem}
+.gloss>div{border-bottom:1px solid var(--line);padding:.35rem 0;font-size:.9rem;color:var(--ink-2)}
+.gloss b{color:var(--ink);margin-right:.4rem}
+@media(max-width:620px){.tri{gap:.9rem}.tri>div{grid-template-columns:1fr;gap:.25rem;padding-bottom:.9rem;border-bottom:1px dashed var(--line-strong)}.tri .r{border-bottom:none}.gloss{grid-template-columns:1fr}}
+.duo h3{font-size:1.15rem}.duo li,.fix p,.todo p,.step li{overflow-wrap:anywhere}.duo ul{margin:0;padding-left:1.1rem;display:grid;gap:.35rem;font-size:.93rem;color:var(--ink-2)}
 .duo .v1{border-top:4px solid var(--blue)}.duo .on{border-top:4px solid var(--accent)}
 .fig .rel.der{stroke:var(--blue);stroke-dasharray:9 4 2 4;stroke-width:2}.fig .lbl.der{fill:var(--blue)}.fig .mk.der{fill:var(--blue)}
 @media(max-width:900px){.links3{grid-template-columns:1fr}}
@@ -159,19 +171,25 @@ td code,th code{white-space:nowrap}
   <a href="#limits"><span class="n">08</span><span>v1 다음 과제 다섯</span></a>
   <a href="#why-not-fields"><span class="n">09</span><span>필드를 더하면 되지 않나</span></a>
   <a href="#loop"><span class="n">10</span><span>자산이 잠드는 고리</span></a>
-  <a href="#library"><span class="n">11</span><span>온톨로지 = 목록</span></a>
-  <a href="#picture"><span class="n">12</span><span>한 장으로 보기</span></a>
-  <a href="#answers"><span class="n">13</span><span>다섯 과제에 대한 답</span></a>
-  <a href="#example"><span class="n">14</span><span>같은 질문, 두 갈래</span></a>
-  <a href="#entry"><span class="n">15</span><span>입구·시간·주인</span></a>
-  <a href="#objection"><span class="n">16</span><span>예상되는 반론</span></a>
-  <a href="#rules"><span class="n">17</span><span>온톨로지도 방치되나</span></a>
-  <a href="#road"><span class="n">18</span><span>단계 계획</span></a>
-  <a href="#hardened"><span class="n">19</span><span>계획에서 고친 것</span></a>
-  <a href="#ask"><span class="n">20</span><span>v1과 함께 정할 것</span></a>
-  <a href="#now"><span class="n">21</span><span>지금 할 수 있는 일</span></a>
-  <a href="#wrap"><span class="n">22</span><span>정리</span></a>
-  <a href="#refs"><span class="n">23</span><span>출처</span></a>
+  <a href="#concept"><span class="n">11</span><span>온톨로지란</span></a>
+  <a href="#sentence"><span class="n">12</span><span>온톨로지를 읽는 법</span></a>
+  <a href="#compare"><span class="n">13</span><span>폴더·태그·검색과 비교</span></a>
+  <a href="#library"><span class="n">14</span><span>관계 일곱 가지</span></a>
+  <a href="#picture"><span class="n">15</span><span>한 장으로 보기</span></a>
+  <a href="#reasoning"><span class="n">16</span><span>관계를 따라가면</span></a>
+  <a href="#build"><span class="n">17</span><span>누가 어떻게 만드나</span></a>
+  <a href="#answers"><span class="n">18</span><span>다섯 과제에 대한 답</span></a>
+  <a href="#example"><span class="n">19</span><span>같은 질문, 두 갈래</span></a>
+  <a href="#entry"><span class="n">20</span><span>입구·시간·주인</span></a>
+  <a href="#objection"><span class="n">21</span><span>예상되는 반론</span></a>
+  <a href="#rules"><span class="n">22</span><span>온톨로지도 방치되나</span></a>
+  <a href="#road"><span class="n">23</span><span>단계 계획</span></a>
+  <a href="#hardened"><span class="n">24</span><span>계획에서 고친 것</span></a>
+  <a href="#ask"><span class="n">25</span><span>v1과 함께 정할 것</span></a>
+  <a href="#now"><span class="n">26</span><span>지금 할 수 있는 일</span></a>
+  <a href="#wrap"><span class="n">27</span><span>정리</span></a>
+  <a href="#glossary"><span class="n">28</span><span>낱말 풀이</span></a>
+  <a href="#refs"><span class="n">29</span><span>출처</span></a>
 </nav>
 <main>
 
@@ -348,10 +366,61 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
   <p class="note"><span class="tag blue">발표자 정리</span> 고리는 과제 1~5와 계획의 세 증상을 인과로 이어 본 것이다. 에이전트가 자산을 저장·제안하는 흐름이 늘수록 ②가 빨라진다.</p>
 </div></section>
 
-<section class="slide" id="library"><div class="inner">
+<section class="slide" id="concept"><div class="inner">
   <span class="kicker">11 — 온톨로지란</span>
-  <h2>온톨로지는 업무 문서용 도서관 목록이다</h2>
-  <p class="lede">온톨로지는 <b>업무에서 쓰는 말(용어)과, 그 말들·문서들 사이의 관계를 정리한 목록</b>이다. 도서관은 같은 문제를 오래전에 겪고 <b>통제 어휘</b>(시소러스)로 풀었다 — 정해진 표제어, "→ 보라" 참조, 상위어·하위어, 관련어. 워크에셋 온톨로지는 그 위에 업무 문서에 필요한 관계를 더한 것이다.</p>
+  <h2>온톨로지는 "무엇이 있고, 서로 어떤 사이인지"를 적어 둔 지도다</h2>
+  <p class="lede">이름이 낯설 뿐, 우리는 이미 매일 온톨로지를 쓰고 있다. 공통점은 <b>대상의 목록</b>에 <b>대상끼리의 관계</b>를 더했다는 것이다. 관계가 적혀 있기 때문에 질문에 답할 수 있다.</p>
+  <div class="grid g3">
+    <article class="big"><h3>회사 조직도</h3><p>대상: 사람, 팀<br>관계: "~ 팀 소속이다", "~에게 보고한다"</p><p>그래서 <b>"이 결재는 누구에게 올려야 하지?"</b>에 답할 수 있다. 명단만 있으면 답할 수 없다.</p></article>
+    <article class="big"><h3>지하철 노선도</h3><p>대상: 역<br>관계: "다음 역이다", "갈아탈 수 있다"</p><p>실제 거리와 모양은 버리고 관계만 남겼다. 그래서 <b>"어디서 갈아타지?"</b>가 한눈에 보인다.</p></article>
+    <article class="big"><h3>쇼핑몰 분류</h3><p>대상: 상품 분류<br>관계: "운동화는 신발의 한 종류", "스니커즈 = 운동화"</p><p>그래서 <b>"스니커즈"로 찾아도 운동화가 나오고</b>, 신발 할인 쿠폰이 운동화에도 적용된다.</p></article>
+  </div>
+  <div class="links3">
+    <div><h3>① 용어</h3><p>업무에서 쓰는 말 하나하나. 대표 이름 하나와 다른 이름들을 함께 가진다.</p><p class="then" style="color:var(--accent-ink)">예: <b>주간 보고</b> (다른 이름: 위클리 리포트, WBR)</p></div>
+    <div><h3>② 관계</h3><p>용어와 용어, 문서와 문서 사이의 사이. <b>종류가 정해져 있다</b>(일곱 가지).</p><p class="then" style="color:var(--accent-ink)">예: 주간 보고는 <b>보고서의 한 종류</b>다</p></div>
+    <div><h3>③ 근거</h3><p>그 용어·관계를 <b>어느 파일의 어느 판에서</b> 읽었는지. 확인할 수 있어야 믿을 수 있다.</p><p class="then" style="color:var(--accent-ink)">예: <code>보고서공통/policy.md</code>, 11월 17일 판</p></div>
+  </div>
+  <p class="easy"><b>워크에셋 온톨로지를 한 문장으로</b>업무 폴더에 흩어진 문서들에서 "어떤 업무·문서·팀이 있고, 서로 어떤 사이인지"를 뽑아 <b>근거와 함께</b> 적어 둔 지도. 에이전트는 이 지도를 보고 읽을 파일을 고른다.</p>
+  <p class="note">온톨로지(ontology)는 원래 철학에서 "무엇이 존재하는가"를 묻는 분야의 이름이다. 정보 분야에서는 "어떤 분야의 개념과 관계를 명시적으로 정해 둔 것"이라는 뜻으로 쓴다(Gruber, 1993). 낯선 낱말은 맨 뒤 <a href="#glossary">낱말 풀이</a>에 모았다.</p>
+</div></section>
+
+<section class="slide" id="sentence"><div class="inner">
+  <span class="kicker">12 — 온톨로지를 읽는 법</span>
+  <h2>온톨로지의 내용은 모두 "무엇 — 어떤 사이 — 무엇" 한 문장이다</h2>
+  <p class="lede">온톨로지에 들어 있는 것은 이런 세 칸짜리 문장들뿐이다. 사람은 문장으로 읽고, 프로그램은 화살표를 따라간다. 둥근 칸은 <b>용어</b>, 네모 칸은 <b>파일</b>이다.</p>
+  <p class="note" style="font-size:.92rem;color:var(--ink-2)">읽는 법: 첫 줄은 "주간 보고는 보고서의 <b>한 종류다</b>", 둘째 줄은 "위클리 리포트는 주간 보고의 <b>다른 이름이다</b>"처럼 왼쪽에서 오른쪽으로 읽는다.</p>
+  <div class="tri">
+    <div><span class="s t">주간 보고</span><span class="r">한 종류다 →<code>is-a</code></span><span class="o t">보고서</span></div>
+    <div><span class="s t">위클리 리포트</span><span class="r">다른 이름이다 →<code>동의어</code></span><span class="o t">주간 보고</span></div>
+    <div><span class="s t">주간 보고</span><span class="r">함께 보면 좋다 ↔<code>related-to</code></span><span class="o t">월간 실적</span></div>
+    <div><span class="s f">보고서공통/policy.md</span><span class="r">적용된다 →<code>applies-to</code></span><span class="o t">보고서</span></div>
+    <div><span class="s f">위클리리포트/workflow.md</span><span class="r">대체한다(새 판) →<code>supersedes</code></span><span class="o f">위클리리포트-2025/workflow.md</span></div>
+    <div><span class="s f">팀B보고/policy.md</span><span class="r">갈라져 나왔다 →<code>derived-from</code></span><span class="o f">보고서공통/policy.md</span></div>
+  </div>
+  <p class="easy"><b>왜 관계의 종류를 정해 두나</b>"관련 있음" 한 가지 선만 있으면 프로그램은 그 선을 보고 무엇을 해야 할지 모른다. 종류가 정해져 있으면 할 일도 정해진다 — <b>"한 종류다"</b>면 위의 규칙을 물려주고, <b>"대체한다"</b>면 옛 판을 뒤로 미루고, <b>"갈라져 나왔다"</b>면 원본이 바뀔 때 알린다. 온톨로지의 힘은 용어 목록이 아니라 <b>관계의 종류</b>에서 나온다.</p>
+  <p class="note">이런 세 칸 문장을 전문 용어로 트리플(triple)이라고 부른다. 일곱 관계 중 여기 없는 하나는 "두 문서가 서로 어긋난다"(<code>conflicts-with</code>)다. 전체 목록은 다음다음 장의 표에 있다.</p>
+</div></section>
+
+<section class="slide" id="compare"><div class="inner">
+  <span class="kicker">13 — 이미 있는 것들과 비교</span>
+  <h2>폴더·태그·검색으로는 왜 부족한가</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>방식</th><th>무엇을 적어 두나</th><th>잘하는 것</th><th>어려운 것</th></tr></thead>
+    <tbody>
+      <tr><td><b>폴더</b></td><td>파일의 위치 하나</td><td>한 가지 기준으로 나누기. 누구나 익숙하다</td><td>한 파일이 두 분류에 속할 수 없다. "새 판이다", "갈라져 나왔다"를 적을 곳이 없다</td></tr>
+      <tr><td><b>태그</b></td><td>파일에 붙인 자유 낱말</td><td>여러 분류에 동시에 넣기</td><td>낱말끼리의 관계가 없다. "주간보고"·"주간 보고"·"WBR" 태그가 따로 논다</td></tr>
+      <tr><td><b>키워드 검색</b><br><small>(지금의 v1 검색)</small></td><td>글자</td><td>정확한 낱말을 알면 확실히 찾는다</td><td>다른 이름, 띄어쓰기 차이. 찾은 것이 옛 판인지 모른다</td></tr>
+      <tr><td><b>벡터 검색</b><br><small>(AI 임베딩)</small></td><td>뜻이 가까운 정도</td><td>표현이 달라도 비슷한 글을 찾는다</td><td>"비슷하다"와 "지금 유효하다"를 구별하지 못한다. 작년 판과 올해 판이 함께 위에 뜬다</td></tr>
+      <tr><td><b>온톨로지</b></td><td>정해진 용어 + 종류가 있는 관계 + 근거</td><td>다른 이름 묶기, 상위 규칙 물려받기, 새 판·갈래 구별, 왜 그 파일을 골랐는지 설명</td><td>관계를 누군가 적거나 뽑아야 한다 → 대부분 파일에서 자동으로 뽑고 사람은 확인만(17장)</td></tr>
+    </tbody>
+  </table></div>
+  <p class="easy"><b>버리는 것이 아니라 더하는 것</b>온톨로지는 폴더와 검색을 없애지 않는다. 폴더 이름은 용어의 첫 재료가 되고, 검색은 온톨로지가 넓혀 준 낱말(동의어)로 더 잘 찾는다.</p>
+</div></section>
+
+<section class="slide" id="library"><div class="inner">
+  <span class="kicker">14 — 온톨로지란</span>
+  <h2>관계 일곱 가지 — 도서관 목록과 나란히 보기</h2>
+  <p class="lede">관계 일곱 가지를 한 표로 모았다. 도서관은 같은 문제를 오래전에 겪고 <b>통제 어휘</b>(시소러스)로 풀었다 — 정해진 표제어, "→ 보라" 참조, 상위어·하위어, 관련어. 워크에셋 온톨로지는 그 위에 업무 문서에 필요한 관계를 더한 것이다.</p>
   <div class="tbl"><table>
     <thead><tr><th>도서관 목록</th><th class="we">워크에셋 온톨로지</th><th>예</th></tr></thead>
     <tbody>
@@ -370,7 +439,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="picture"><div class="inner">
-  <span class="kicker">12 — 한 장으로 보기</span>
+  <span class="kicker">15 — 한 장으로 보기</span>
   <h2>용어는 둥근 상자, 파일은 네모. 모든 선에는 근거가 달린다</h2>
   <figure class="fig" style="margin:0">
     <svg viewBox="0 0 1000 440" role="img" aria-labelledby="figT figD">
@@ -419,8 +488,49 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
   </ol>
 </div></section>
 
+<section class="slide" id="reasoning"><div class="inner">
+  <span class="kicker">16 — 관계를 따라가면 생기는 일</span>
+  <h2>관계를 이어 따라가면, 어디에도 직접 적히지 않은 답이 나온다</h2>
+  <p class="lede">앞 장 그림의 관계만으로 할 수 있는 일 네 가지. 질문 → 따라간 길 → 결과 순서로 읽으면 된다.</p>
+  <div class="fix">
+    <article><h3>1. 다른 이름을 같은 것으로</h3>
+      <p class="ask">"WBR 양식 있어?"</p>
+      <p class="chain">WBR —다른 이름→ 주간 보고 → 주간 보고 문서</p>
+      <p class="why">키워드 검색은 파일에 "WBR"이라는 글자가 없으면 0건이다.</p></article>
+    <article><h3>2. 위로 올라가 규칙 물려받기</h3>
+      <p class="ask">"주간 보고 쓸 때 지킬 규칙은?"</p>
+      <p class="chain">주간 보고 —한 종류→ 보고서 ←적용— 보고서공통/policy.md</p>
+      <p class="why">"이 정책은 주간 보고에 적용된다"는 문장은 어디에도 없다. 관계 두 개를 이어서 얻은 답이다.</p></article>
+    <article><h3>3. 새 판과 옛 판 구별</h3>
+      <p class="ask">비슷한 workflow.md 두 개가 함께 검색됐다</p>
+      <p class="chain">올해 판 —대체→ 2025년 판 ⇒ 올해 판을 앞에, 옛 판엔 "대체됨"</p>
+      <p class="why">두 파일은 내용이 거의 같아서, 글자나 뜻만 보고는 어느 쪽이 유효한지 정할 수 없다.</p></article>
+    <article><h3>4. 아무도 모르던 어긋남 알아채기</h3>
+      <p class="ask">아무도 묻지 않았지만</p>
+      <p class="chain">팀B보고 —갈라져 나옴→ 보고서공통 (기록 이후 원본이 바뀜) ⇒ "원본 바뀜"</p>
+      <p class="why">두 파일 중 어느 쪽을 열어 봐도 알 수 없다. 관계와 그때의 판(근거)이 기록돼 있어야 보인다.</p></article>
+  </div>
+  <p class="easy"><b>목록과 온톨로지의 차이</b>목록은 적힌 것만 돌려준다. 온톨로지는 관계를 이어 <b>적히지 않은 답</b>(2번)과 <b>눈에 안 보이던 어긋남</b>(4번)까지 낸다. 단, 정해진 일곱 관계의 규칙대로만 잇는다 — 짐작으로 잇지 않는다.</p>
+</div></section>
+
+<section class="slide" id="build"><div class="inner">
+  <span class="kicker">17 — 누가, 어떻게 만드나</span>
+  <h2>사람이 처음부터 입력하는 지도가 아니다 — 파일에서 뽑고, 사람은 확인한다</h2>
+  <div class="road">
+    <div class="step"><span class="id">1 · 재료</span><h3>이미 있는 파일</h3><p>새로 써야 할 문서는 없다.</p>
+      <ul><li>폴더 이름, 문서 첫 제목</li><li><code>owner</code>·<code>project</code>·<code>role_id</code></li><li>카드 <code>pipeline.json</code>의 Task</li><li>(선택) 머리말 <code>aliases</code> 등 다섯 키</li></ul></div>
+    <div class="step"><span class="id">2 · 자동</span><h3>앱이 뽑는다</h3><p>모델 없이, 규칙대로. 항상 동작하고 밖으로 나가는 것이 없다.</p>
+      <ul><li>폴더 "주간보고" → 용어 "주간 보고"</li><li><code>applies_to: [보고서]</code> → 적용 관계</li><li>모든 항목에 근거(파일·판)를 붙인다</li></ul></div>
+    <div class="step"><span class="id">3 · 선택</span><h3>모델이 초안을 더한다</h3><p>사용자가 저장소별로 켰을 때만.</p>
+      <ul><li>본문에서 동의어·관계 후보</li><li>일곱 관계 밖의 것은 버린다</li><li>켜기 전에는 아무것도 전송되지 않는다</li></ul></div>
+    <div class="step"><span class="id">4 · 사람</span><h3>확인하고 고친다</h3><p>온톨로지 화면과 현황에서.</p>
+      <ul><li>[동의어로 추가], 틀린 관계 끄기</li><li>고친 것은 다시 만들어도 남는다</li><li>화면 수정 &gt; 파일 선언 &gt; 자동 순으로 따른다</li></ul><span class="dep">파일이 바뀌면 바뀐 부분만 1부터 다시</span></div>
+  </div>
+  <p class="easy"><b>흔한 오해 세 가지</b>① <b>"누군가 따로 관리하는 거대한 문서다"</b> — 아니다. 파일에서 만드는 색인이라 지워도 다시 만든다. ② <b>"모두가 관계를 일일이 입력해야 한다"</b> — 아니다. 대부분 폴더·머리말에서 자동으로 나오고, 사람은 확인하거나 몇 줄 더할 뿐이다. ③ <b>"AI가 지식을 지어낸다"</b> — 아니다. 모델은 켜야만 쓰고, 정해진 관계만, 근거와 함께 남긴다.</p>
+</div></section>
+
 <section class="slide" id="answers"><div class="inner">
-  <span class="kicker">13 — 다섯 과제에 대한 답</span>
+  <span class="kicker">18 — 다섯 과제에 대한 답</span>
   <h2>온톨로지가 맡는 것과 v1이 맡을 것을 나눈다</h2>
   <div class="tbl"><table>
     <thead><tr><th>과제</th><th class="we">온톨로지가 맡는 것</th><th>v1이 맡을 것</th></tr></thead>
@@ -436,7 +546,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="example"><div class="inner">
-  <span class="kicker">14 — 같은 질문, 두 갈래</span>
+  <span class="kicker">19 — 같은 질문, 두 갈래</span>
   <h2>"주간 보고 쓰는 규칙 알려 줘"</h2>
   <pre class="file">업무폴더/위클리리포트/workflow.md       ← 첫 머리글 "위클리 리포트 작성 절차"
 업무폴더/위클리리포트-2025/workflow.md  ← 작년 판. 복사해서 만들었고 지우지 않았다
@@ -463,11 +573,11 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
       <footer>올해 절차와 공통 정책으로 쓴다. 어떻게 찾았는지가 남는다.</footer>
     </section>
   </div>
-  <p class="note">덧붙여 — 동의어는 저절로 생기지 않는다. 머리말 <code>aliases</code>, 사용자가 켠 모델 보강(옵트인), 현황의 [동의어로 추가]에서만 온다. 그래서 새 업무 폴더를 만들 때 "다른 이름으로는 뭐라고 부르나요?"를 묻게 했다(15장).</p>
+  <p class="note">덧붙여 — 동의어는 저절로 생기지 않는다. 머리말 <code>aliases</code>, 사용자가 켠 모델 보강(옵트인), 현황의 [동의어로 추가]에서만 온다. 그래서 새 업무 폴더를 만들 때 "다른 이름으로는 뭐라고 부르나요?"를 묻게 했다(20장).</p>
 </div></section>
 
 <section class="slide" id="entry"><div class="inner">
-  <span class="kicker">15 — v1 위에서 더한 장치</span>
+  <span class="kicker">20 — v1 위에서 더한 장치</span>
   <h2>쌓인 뒤 치우기보다 입구에서 묻고, 시간과 주인을 붙인다</h2>
   <div class="fix">
     <article><h3>저장할 때 비슷한 것을 먼저 보인다</h3>
@@ -487,7 +597,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="objection"><div class="inner">
-  <span class="kicker">16 — 예상되는 반론</span>
+  <span class="kicker">21 — 예상되는 반론</span>
   <h2>"LLM이나 벡터 검색이 알아서 하지 않나요?"</h2>
   <div class="qa">
     <div><h3>"전부 프롬프트에 넣으면"</h3>
@@ -503,7 +613,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="rules"><div class="inner">
-  <span class="kicker">17 — "온톨로지도 결국 방치되지 않을까요?"</span>
+  <span class="kicker">22 — "온톨로지도 결국 방치되지 않을까요?"</span>
   <h2>그렇게 되지 않도록 처음부터 정해 둔 다섯 가지</h2>
   <ol class="rules">
     <li><b>파일이 원본이다</b><p>온톨로지는 지워도 파일에서 다시 만든다. 지금처럼 편집기로 파일만 고쳐도 온톨로지가 따라 바뀐다.</p><span class="if">없으면: 원본이 둘이 된다</span></li>
@@ -517,7 +627,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="road"><div class="inner">
-  <span class="kicker">18 — 계획 #2128 (2026-11-17 개정)</span>
+  <span class="kicker">23 — 계획 #2128 (2026-11-17 개정)</span>
   <h2>현황부터 보고, 찾기 → 위생 → 기준 선택 순서로 쌓는다</h2>
   <div class="road">
     <div class="step"><span class="id">M0 · #2123</span><h3>현황 1차</h3><p>온톨로지 없이 지금 데이터로. 효과를 비교할 <b>기준선</b>.</p>
@@ -534,7 +644,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="hardened"><div class="inner">
-  <span class="kicker">19 — 계획도 같은 눈으로 점검했다</span>
+  <span class="kicker">24 — 계획도 같은 눈으로 점검했다</span>
   <h2>계획에서 빈틈 여덟 개를 찾아 보완했다</h2>
   <div class="tbl"><table>
     <thead><tr><th>찾은 빈틈</th><th class="we">고친 방법</th></tr></thead>
@@ -553,7 +663,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="ask"><div class="inner">
-  <span class="kicker">20 — v1과 함께 정할 것</span>
+  <span class="kicker">25 — v1과 함께 정할 것</span>
   <h2>함께 정하고 싶은 것은 작고, v1 자산이 얻는 것은 크다</h2>
   <div class="duo">
     <section class="v1"><h3>v1과 함께 정하고 싶은 것</h3>
@@ -575,7 +685,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="now"><div class="inner">
-  <span class="kicker">21 — 동료들에게</span>
+  <span class="kicker">26 — 동료들에게</span>
   <h2>구현을 기다리지 않고 지금 할 수 있는 일</h2>
   <div class="todo">
     <div><b>폴더 이름은 사람이 부르는 이름으로</b><p>v1에서 파일 이름은 넷뿐이라 폴더 이름과 첫 머리글이 유일한 구분자다. <code>tmp2</code>·<code>새 폴더</code> 대신 "주간보고", "검증-릴리스".</p></div>
@@ -597,6 +707,31 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
   <p class="lede" style="font-size:1rem">v1이 파일마다 형식을 정해 둔 덕분에 이 계획이 현실적인 크기가 되었다. 동료들이 공들여 쓴 문서가 필요한 순간에 제대로 쓰이도록, 그 위의 층도 함께 만들어 가면 좋겠다.</p>
 </div></section>
 
+<section class="slide" id="glossary"><div class="inner">
+  <span class="kicker">부록 — 낱말 풀이</span>
+  <h2>이 자료에 나오는 낱말</h2>
+  <div class="gloss">
+    <div><b>워크에셋</b>업무 폴더에 두는 업무 지식 파일. 에이전트가 일할 때 쓴다</div>
+    <div><b>v1 표준</b>워크에셋 파일의 형식 규칙. 폴더마다 네 파일, 필수 머리말</div>
+    <div><b>머리말</b>파일 맨 위 <code>---</code> 사이에 적는 항목(<code>owner</code>, <code>project</code> 등)</div>
+    <div><b>기준</b>실행할 때마다 에이전트 지침에 자동으로 들어가는 파일(<code>policy.md</code>는 늘 기준)</div>
+    <div><b>참고자료</b>에이전트가 필요할 때 검색해서 읽는 파일</div>
+    <div><b>48,000자</b>한 번 실행에 넣을 수 있는 기준의 글자 수 한도. 넘으면 실행이 멈춘다</div>
+    <div><b>온톨로지</b>용어와 그 사이의 관계를 근거와 함께 적어 둔 지도</div>
+    <div><b>용어</b>업무에서 쓰는 말. 대표 이름 하나 + 다른 이름들</div>
+    <div><b>동의어</b>같은 것을 부르는 다른 이름. 위클리 리포트 = 주간 보고</div>
+    <div><b>관계</b>두 용어·파일 사이의 사이. 일곱 종류로 정해져 있다</div>
+    <div><b>근거</b>그 내용을 읽은 파일과 그때의 판(해시)</div>
+    <div><b>해시</b>파일 내용의 지문. 한 글자만 바뀌어도 달라진다</div>
+    <div><b>대체</b>새 판이 옛 판을 대신한다(<code>supersedes</code>)</div>
+    <div><b>갈래</b>복사해서 갈라져 나왔고 둘 다 유효하다(<code>derived-from</code>)</div>
+    <div><b>상속</b>"한 종류다" 관계를 따라 위의 규칙이 아래로 적용되는 것</div>
+    <div><b>모델 보강</b>AI 모델이 동의어·관계 초안을 더하는 기능. 켤 때만 동작</div>
+    <div><b>현황</b>워크에셋의 상태를 보여 주는 화면(읽힌 적 없는 자료, 한도 게이지 등)</div>
+    <div><b>정리 후보</b>사람이 한번 볼 만한 파일 목록. 표시만 하고 지우지 않는다</div>
+  </div>
+</div></section>
+
 <section class="slide" id="refs"><div class="inner">
   <span class="kicker">출처</span>
   <h2>근거 자료</h2>
@@ -608,6 +743,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
     <div>⑤ Furnas, G. W., Landauer, T. K., Gomez, L. M., Dumais, S. T. (1987). <b>The vocabulary problem in human-system communication.</b> <i>Communications of the ACM</i> 30(11), 964–971.<small> — 같은 대상에 두 사람이 같은 낱말을 고를 확률이 0.2 미만(과제 5의 배경)</small></div>
     <div>⑥ Liu, N. F. 외 (2024). <b>Lost in the Middle: How Language Models Use Long Contexts.</b> <i>TACL</i> 12.<small> — 긴 맥락의 가운데 정보를 덜 쓴다</small></div>
     <div>⑦ <b>ISO 25964-1:2011</b> Thesauri and interoperability with other vocabularies<small> — 시소러스 관계 USE/UF·BT/NT·RT</small></div>
+    <div>⑧ Gruber, T. R. (1993). <b>A translation approach to portable ontology specifications.</b> <i>Knowledge Acquisition</i> 5(2), 199–220.<small> — 정보 분야에서 쓰는 온톨로지의 정의</small></div>
   </div>
   <p class="note">읽는 법: 표시가 없는 문장은 위 설계·ADR·이슈·코드에 적힌 내용이고, 07장은 실행 결과다. <span class="tag blue">발표자 정리</span>는 그 내용을 묶어 비유한 것이다. "계획된 동작"으로 적은 검색·화면 동작은 아직 구현되지 않았다. 계획의 재현율·용량 수치는 합성 코퍼스 기준이며 운영 수치가 아니다.</p>
   <div class="footer">문서 사이의 문법 · 워크에셋 v1과 온톨로지 · 사실 확인 기준일 2026-11-17 (SLSI Agent Desktop 3.260.0, main 7dd26fdc9)</div>
