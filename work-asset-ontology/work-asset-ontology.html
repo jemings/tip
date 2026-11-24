@@ -55,6 +55,7 @@ a{color:var(--accent-ink);text-underline-offset:3px;text-decoration-thickness:1p
 .big{border-top:3px solid var(--accent);padding-top:.9rem;display:grid;gap:.6rem;align-content:start}.big h3{font-size:clamp(1.15rem,1.05rem + .6vw,1.5rem)}.big p{color:var(--ink-2);font-size:1rem;line-height:1.6}
 .tag{display:inline-block;border:1px solid currentColor;border-radius:2px;padding:.05rem .4rem;font:.68rem var(--font-mono);letter-spacing:.04em;vertical-align:2px;white-space:nowrap}.tag.warn{color:var(--red);background:var(--red-soft)}.tag.green{color:var(--accent-ink);background:var(--accent-soft)}.tag.amber{color:var(--amber);background:var(--amber-soft)}.tag.blue{color:var(--blue);background:var(--blue-soft)}
 .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:.8rem 1rem;max-width:90ch}.callout.warn{border-left-color:var(--red);background:var(--red-soft)}
+.use~.grid .callout{font-size:.88rem}
 /* 세 관문 */
 .gates{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,.8fr);gap:.6rem;align-items:stretch}
 .gate{border:2px solid var(--ink);background:var(--panel);padding:.9rem 1rem;display:grid;gap:.35rem;align-content:start}.gate h3{font-size:1.2rem}.gate p{font-size:.9rem;color:var(--ink-2)}.gate .fail{font-size:.85rem;color:var(--red);border-top:1px dashed var(--line-strong);padding-top:.4rem}
@@ -157,6 +158,119 @@ td code,th code{white-space:nowrap}
 @media(max-width:900px){.links3{grid-template-columns:1fr}}
 @media(max-width:620px){.duo{grid-template-columns:1fr}.tty{font-size:.72rem}}
 </style>
+<style>
+/* 샘플: 파일 → 온톨로지 */
+.sx{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:clamp(.8rem,1.6vw,1.3rem);align-items:start}
+.sx-files{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem}
+.wf{border:1px solid var(--line-strong);background:var(--panel);box-shadow:var(--shadow);display:grid;align-content:start;min-width:0}
+.wf>header{display:flex;justify-content:space-between;gap:.4rem;align-items:baseline;padding:.32rem .55rem;border-bottom:1px solid var(--line);background:var(--panel-2);font:600 .72rem var(--font-mono);color:var(--ink);overflow-wrap:anywhere}
+.wf>header small{font:500 .64rem var(--font-mono);color:var(--muted);white-space:nowrap}
+.wf pre{margin:0;padding:.4rem .55rem .5rem;font:.69rem/1.55 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink-2)}
+.wf .d{color:var(--muted)}
+.wf .ln{display:inline-block;border-radius:2px;padding:0 .2rem;margin:0 -.2rem;transition:background-color .35s ease,color .35s ease,box-shadow .35s ease}
+.wf .ln.hot{background:var(--amber-soft);color:var(--ink);box-shadow:0 0 0 1.5px var(--amber)}
+.wf .ln.used{background:color-mix(in srgb,var(--accent-soft) 70%,transparent);color:var(--accent-ink)}
+.wf .ln.edit{background:var(--red-soft);color:var(--red);box-shadow:0 0 0 1.5px var(--red)}
+.wf .path.hot{box-shadow:inset 0 -2px 0 var(--amber)}
+.sx-graph{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:.4rem;display:grid;gap:.4rem}
+.sx-graph svg{display:block;width:100%;height:auto}
+.og .term rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.og .term .t{fill:var(--accent-ink);font:700 16px var(--font-body)}
+.og .term.small rect{stroke-width:1.5}.og .term.small .t{font-size:13px}
+.og .term.warn rect{stroke:var(--amber);fill:var(--amber-soft)}
+.og .file rect{fill:var(--panel);stroke:var(--ink);stroke-width:1.5}
+.og .file .t{fill:var(--ink);font:600 12.5px var(--font-mono)}
+.og .s{fill:var(--muted);font:11.5px var(--font-body)}
+.og .s.mono{font-family:var(--font-mono)}
+.og .chip rect{fill:var(--panel);stroke:var(--accent);stroke-width:1.2;stroke-dasharray:3 2}
+.og .chip .t{fill:var(--accent-ink);font:600 11.5px var(--font-body)}
+.og .rel{fill:none;stroke:var(--ink-2);stroke-width:1.8}
+.og .rel.ev{stroke:var(--line-strong);stroke-width:1.2;stroke-dasharray:2 3}
+.og .rel.sup{stroke:var(--amber);stroke-dasharray:7 5}
+.og .rel.der{stroke:var(--blue);stroke-dasharray:9 4 2 4;stroke-width:2}
+.og .rel.inh{stroke:var(--muted);stroke-dasharray:2 5;stroke-width:1.6}
+.og .rel.prj{stroke:var(--amber);stroke-width:1.2;stroke-dasharray:2 3}
+.og .rel.der.changed{stroke:var(--red);stroke-width:2.6}
+.og .lbl{fill:var(--ink-2);font:600 11.5px var(--font-mono)}
+.og .lbl.sup{fill:var(--amber)}.og .lbl.der{fill:var(--blue)}.og .lbl.inh{fill:var(--muted);font-family:var(--font-body)}.og .lbl.ev{fill:var(--muted);font-weight:500}
+.og .lbl.red{fill:var(--red)}
+.og .mk{fill:var(--ink-2)}.og .mk.sup{fill:var(--amber)}.og .mk.der{fill:var(--blue)}.og .mk.inh{fill:var(--muted)}.og .mk.red{fill:var(--red)}
+.og .badge rect{rx:3}
+.og .badge.amber rect{fill:var(--amber-soft);stroke:var(--amber)}.og .badge.amber text{fill:var(--amber);font:700 11px var(--font-body)}
+.og .badge.red rect{fill:var(--red-soft);stroke:var(--red)}.og .badge.red text{fill:var(--red);font:700 11px var(--font-body)}
+.og .hash{fill:var(--accent-ink);font:600 11px var(--font-mono)}
+.og .hash.flash{fill:var(--red)}
+.og [data-s]{opacity:0;transform-box:fill-box;transform-origin:center;transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.og [data-s].on{opacity:1}
+.og g[data-s]:not(.on){transform:scale(.92)}
+.og path[data-s].draw{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .8s ease .1s,opacity .2s}
+.og path[data-s].draw.on{stroke-dashoffset:0}
+.og .dimmed{opacity:.28!important}
+.sx-ctl{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.sx-ctl button{font:600 .74rem var(--font-mono);border:1px solid var(--line-strong);background:var(--panel);color:var(--ink-2);padding:.28rem .55rem;border-radius:3px;cursor:pointer}
+.sx-ctl button:hover{border-color:var(--accent);color:var(--ink)}
+.sx-ctl button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.sx-ctl .play{margin-left:auto}
+.sx-cap{display:grid;grid-template-columns:auto 1fr;gap:.2rem .8rem;align-items:baseline;border-left:3px solid var(--accent);background:var(--accent-soft);padding:.55rem .8rem;min-height:4.3rem}
+.sx-cap b{font:700 .78rem var(--font-mono);color:var(--accent-ink);grid-row:span 2}
+.sx-cap strong{font-size:1rem;color:var(--ink)}
+.sx-cap span{font-size:.88rem;color:var(--ink-2)}
+.sx-count{display:flex;gap:1.2rem;flex-wrap:wrap;font:.74rem var(--font-mono);color:var(--muted)}
+.sx-count b{font:800 1.15rem var(--font-display);color:var(--ink);margin-right:.25rem;display:inline-block;min-width:1ch;transition:color .3s}
+.sx-count b.bump{color:var(--accent)}
+.sx-count .sig b{color:var(--amber)}
+.fly{position:fixed;z-index:50;pointer-events:none;font:600 .7rem var(--font-mono);background:var(--amber-soft);color:var(--ink);border:1.5px solid var(--amber);border-radius:3px;padding:0 .25rem;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+/* 저장되는 모양 */
+.store{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.5fr);gap:clamp(.8rem,1.6vw,1.3rem);align-items:start}
+.tree{font:.78rem/1.75 var(--font-mono);border:1px solid var(--line);background:var(--panel);padding:.7rem .85rem;margin:0;white-space:pre;overflow-x:auto;color:var(--ink-2)}
+.tree .src{color:var(--ink);font-weight:600}.tree .gen{color:var(--accent-ink);font-weight:600}.tree .usr{color:var(--blue);font-weight:600}.tree .c{color:var(--muted);font-family:var(--font-body);font-size:.74rem}
+.legend3{display:grid;gap:.35rem;font-size:.84rem;color:var(--ink-2)}
+.legend3 div{display:grid;grid-template-columns:.8rem 1fr;gap:.5rem;align-items:baseline}
+.legend3 i{display:block;width:.8rem;height:.8rem;border-radius:2px;transform:translateY(.1rem)}
+.panes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}
+.pane{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);display:grid;grid-template-rows:auto 1fr;min-width:0}
+.pane>header{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;padding:.38rem .7rem;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pane>header h3{font-size:.92rem}.pane>header span{font:.68rem var(--font-mono);color:var(--muted)}
+.pane.gen{border-top:3px solid var(--accent)}.pane.usr{border-top:3px solid var(--blue)}.pane.out{border-top:3px solid var(--line-strong)}
+.code{margin:0;padding:.5rem .7rem;font:.7rem/1.6 var(--font-mono);white-space:pre;overflow-x:auto;color:var(--ink-2)}
+.code .k{color:var(--muted)}.code .v{color:var(--ink)}.code .tm{color:var(--accent-ink);font-weight:600}.code .h{color:var(--accent-ink);background:var(--accent-soft);border-radius:2px;padding:0 .15rem}
+.code .sp{color:var(--amber)}.code .dv{color:var(--blue)}.code .r{color:var(--red);font-weight:600}.code .c{color:var(--muted);font-family:var(--font-body)}
+.code .row{display:block;border-radius:2px;margin:0 -.3rem;padding:0 .3rem;transition:background-color .2s}
+.code .row:hover{background:var(--panel-2)}
+@media(max-width:1100px){.sx,.store{grid-template-columns:1fr}}
+@media(max-width:620px){.sx-files,.panes{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.og [data-s],.og path[data-s].draw,.wf .ln{transition:none}}
+</style>
+<style>
+/* 샘플 ③: 쓰는 과정 */
+.use{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:clamp(.8rem,1.6vw,1.3rem);align-items:start}
+.seq .lane rect{fill:var(--panel-2);stroke:var(--line-strong)}
+.seq .lane text{fill:var(--ink);font:700 13px var(--font-body)}.seq .lane .sub{fill:var(--muted);font:500 10px var(--font-body)}
+.seq .life{stroke:var(--line-strong);stroke-dasharray:3 5;fill:none}
+.seq .msg{fill:none;stroke:var(--ink-2);stroke-width:1.7}
+.seq .msg.plan{stroke:var(--blue);stroke-dasharray:6 3}
+.seq .ml{fill:var(--ink);font:600 12px var(--font-body);paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.seq .ml.mono{font-family:var(--font-mono);font-size:11.5px}.seq .ml.small{font-size:11px;font-weight:500;fill:var(--ink-2)}
+.seq .ml.plan{fill:var(--blue)}.seq .ml.q{font-size:13px;fill:var(--accent-ink)}
+.seq .mn{fill:var(--muted);font:500 10.5px var(--font-body)}.seq .mn.red{fill:var(--red);font-weight:600}
+.seq .pin rect{fill:var(--accent-soft);stroke:var(--accent)}.seq .pin .pt{fill:var(--accent-ink);font:700 11px var(--font-body)}.seq .pin .pm{fill:var(--ink-2);font:500 10.5px var(--font-mono)}
+.seq .dot{fill:var(--amber);stroke:var(--panel);stroke-width:2;opacity:0;transition:opacity .3s}
+.seq .dot.on{opacity:1}
+.seq g[data-s].cur .msg{stroke-width:2.4}
+.filter{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);padding:.8rem .9rem;display:grid;gap:.55rem;align-content:start}
+.filter h3{font-size:1rem}.filter .rule{font-size:.86rem;color:var(--ink-2);border-left:3px solid var(--blue);padding-left:.6rem}
+.filter ul{list-style:none;margin:0;padding:0;display:grid;gap:.35rem}
+.filter li{display:grid;grid-template-columns:1fr auto;gap:.1rem .5rem;border:1px solid var(--line);padding:.35rem .5rem;font-size:.82rem;transition:opacity .4s,background-color .4s,border-color .4s}
+.filter .cl{color:var(--ink)}.filter .ev{grid-column:1;font:.72rem var(--font-mono);color:var(--muted)}
+.filter .vd{grid-row:1/span 2;grid-column:2;align-self:center;font:700 .74rem var(--font-body);white-space:nowrap}
+.filter.judged li[data-pass="1"]{border-color:var(--accent);background:var(--accent-soft)}
+.filter.judged li[data-pass="1"] .vd{color:var(--accent-ink)}
+.filter.judged li[data-pass="0"]{opacity:.55}
+.filter.judged li[data-pass="0"] .cl{text-decoration:line-through}
+.filter.judged li[data-pass="0"] .vd{color:var(--muted);white-space:normal;max-width:9rem;text-align:right;font-weight:600}
+.filter .why{font-size:.82rem;color:var(--ink-2)}
+@media(max-width:1100px){.use{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <nav class="rail" aria-label="슬라이드 목차">
@@ -178,18 +292,21 @@ td code,th code{white-space:nowrap}
   <a href="#picture"><span class="n">15</span><span>한 장으로 보기</span></a>
   <a href="#reasoning"><span class="n">16</span><span>관계를 따라가면</span></a>
   <a href="#build"><span class="n">17</span><span>누가 어떻게 만드나</span></a>
-  <a href="#answers"><span class="n">18</span><span>다섯 과제에 대한 답</span></a>
-  <a href="#example"><span class="n">19</span><span>같은 질문, 두 갈래</span></a>
-  <a href="#entry"><span class="n">20</span><span>입구·시간·주인</span></a>
-  <a href="#objection"><span class="n">21</span><span>예상되는 반론</span></a>
-  <a href="#rules"><span class="n">22</span><span>온톨로지도 방치되나</span></a>
-  <a href="#road"><span class="n">23</span><span>단계 계획</span></a>
-  <a href="#hardened"><span class="n">24</span><span>계획에서 고친 것</span></a>
-  <a href="#ask"><span class="n">25</span><span>워크에셋 v1과 함께 정할 것</span></a>
-  <a href="#now"><span class="n">26</span><span>지금 할 수 있는 일</span></a>
-  <a href="#wrap"><span class="n">27</span><span>정리</span></a>
-  <a href="#glossary"><span class="n">28</span><span>낱말 풀이</span></a>
-  <a href="#refs"><span class="n">29</span><span>출처</span></a>
+  <a href="#sample"><span class="n">18</span><span>샘플 ① 구축하면</span></a>
+  <a href="#sample-store"><span class="n">19</span><span>샘플 ② 저장 모양</span></a>
+  <a href="#sample-use"><span class="n">20</span><span>샘플 ③ 에이전트가 쓰는 과정</span></a>
+  <a href="#answers"><span class="n">21</span><span>다섯 과제에 대한 답</span></a>
+  <a href="#example"><span class="n">22</span><span>같은 질문, 두 갈래</span></a>
+  <a href="#entry"><span class="n">23</span><span>입구·시간·주인</span></a>
+  <a href="#objection"><span class="n">24</span><span>예상되는 반론</span></a>
+  <a href="#rules"><span class="n">25</span><span>온톨로지도 방치되나</span></a>
+  <a href="#road"><span class="n">26</span><span>단계 계획</span></a>
+  <a href="#hardened"><span class="n">27</span><span>계획에서 고친 것</span></a>
+  <a href="#ask"><span class="n">28</span><span>워크에셋 v1과 함께 정할 것</span></a>
+  <a href="#now"><span class="n">29</span><span>지금 할 수 있는 일</span></a>
+  <a href="#wrap"><span class="n">30</span><span>정리</span></a>
+  <a href="#glossary"><span class="n">31</span><span>낱말 풀이</span></a>
+  <a href="#refs"><span class="n">32</span><span>출처</span></a>
 </nav>
 <main>
 
@@ -201,7 +318,7 @@ td code,th code{white-space:nowrap}
   <div class="facts">
     <div><b>워크에셋 v1 = 문서의 문법</b><span>네 파일, 필수 머리말, 형식 검사</span></div>
     <div><b>온톨로지 = 문서 사이의 문법</b><span>파일을 읽어 만드는 색인. 지워도 언제든 다시 만들 수 있다</span></div>
-    <div><b>기준</b><span>앱 3.260.0 · main 7dd26fdc9 · 계획 #2128 · ADR 0034·0035·0040</span></div>
+    <div><b>기준</b><span>앱 3.260.0 · main 7dd26fdc9 · 계획 #2128 · ADR 0034·0035·0040 · 보강 11-24(아바타 플러그인 기준)</span></div>
   </div>
 </div></section>
 
@@ -529,8 +646,261 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
   <p class="easy"><b>흔한 오해 세 가지</b>① <b>"누군가 따로 관리하는 거대한 문서다"</b> — 아니다. 파일에서 만드는 색인이라 지워도 다시 만든다. ② <b>"모두가 관계를 일일이 입력해야 한다"</b> — 아니다. 대부분 폴더·머리말에서 자동으로 나오고, 사람은 확인하거나 몇 줄 더할 뿐이다. ③ <b>"AI가 지식을 지어낸다"</b> — 아니다. 모델은 켜야만 쓰고, 정해진 관계만, 근거와 함께 남긴다.</p>
 </div></section>
 
+<section class="slide" id="sample"><div class="inner">
+  <span class="kicker">18 — 샘플 ① 구축하면 무엇이 생기나</span>
+  <h2>워크에셋 v1 파일 넷이 용어 다섯, 관계 넷이 된다</h2>
+  <div class="sx" id="sx">
+    <div class="sx-files" aria-label="워크에셋 v1 샘플 파일 네 개">
+      <article class="wf"><header><span class="path" data-s="1" data-fly="n-report">보고서/policy.md</span><small>기준</small></header>
+<pre><span class="d">---</span>
+<span class="ln" data-s="6">work_asset_id: report-policy</span>
+<span class="d">asset_type: policy
+work_asset_kind: criterion</span>
+<span class="ln" data-s="5" data-fly="n-owner">owner: 기획팀</span>
+<span class="ln" data-s="3" data-fly="e-app">applies_to: [보고서]</span>
+<span class="d">---</span>
+# 보고서 공통 정책
+<span class="ln" id="sx-edit" data-s="7">- 결론을 첫 문단에 쓴다</span></pre></article>
+      <article class="wf"><header><span class="path">보고서/주간보고/workflow.md</span><small>참고자료</small></header>
+<pre><span class="d">---</span>
+<span class="ln" data-s="6">work_asset_id: weekly-2026</span>
+<span class="d">asset_type: workflow
+work_asset_kind: reference</span>
+<span class="ln" data-s="5">owner: 기획팀</span>
+<span class="ln" data-s="5" data-fly="n-prj">project: A 프로젝트</span>
+<span class="ln" data-s="2" data-fly="n-syn">aliases: [위클리 리포트, WBR]</span>
+<span class="ln" data-s="4" data-fly="e-sup">supersedes: weekly-2025</span>
+<span class="d">review_by: 2027-03-31</span>
+<span class="d">---</span>
+<span class="ln" data-s="1" data-fly="n-weekly"># 주간 보고</span></pre></article>
+      <article class="wf"><header><span class="path">주간보고-2025/workflow.md</span><small>참고자료</small></header>
+<pre><span class="d">---</span>
+<span class="ln" data-s="6">work_asset_id: weekly-2025</span>
+<span class="d">asset_type: workflow
+work_asset_kind: reference</span>
+<span class="ln" data-s="5">owner: 기획팀</span>
+<span class="ln" data-s="5">project: A 프로젝트</span>
+<span class="d">---</span>
+<span class="ln" data-s="1" data-fly="n-weekly"># 주간 보고</span>
+<span class="d">작년 판. 복사해 만들고 남겨 둠</span></pre></article>
+      <article class="wf"><header><span class="path">팀B보고/policy.md</span><small>기준</small></header>
+<pre><span class="d">---</span>
+<span class="ln" data-s="6">work_asset_id: teamb-policy</span>
+<span class="d">asset_type: policy
+work_asset_kind: criterion</span>
+<span class="ln" data-s="5" data-fly="n-owner">owner: 팀B</span>
+<span class="ln" data-s="5" data-fly="n-prj">project: A-프로젝트</span>
+<span class="ln" data-s="4" data-fly="e-der">derived_from: report-policy</span>
+<span class="d">---</span>
+# 팀B 보고 정책</pre></article>
+    </div>
+    <div class="sx-graph">
+      <svg class="og" viewBox="0 0 640 470" role="img" aria-labelledby="sxT sxD">
+        <title id="sxT">샘플 파일에서 만든 온톨로지</title>
+        <desc id="sxD">용어 보고서, 주간 보고, A 프로젝트, 기획팀, 팀B와 파일 네 개. 주간 보고 part-of 보고서, 공통 정책 applies-to 보고서, 올해 판 supersedes 작년 판, 팀B 정책 derived-from 공통 정책. 아래 단계 설명에 같은 내용을 글로 적었다.</desc>
+        <defs>
+          <marker id="og-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0,0L10,5L0,10z"/></marker>
+          <marker id="og-ms" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk sup" d="M0,0L10,5L0,10z"/></marker>
+          <marker id="og-md" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk der" d="M0,0L10,5L0,10z"/></marker>
+          <marker id="og-mr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk red" d="M0,0L10,5L0,10z"/></marker>
+          <marker id="og-mi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk inh" d="M0,0L10,5L0,10z"/></marker>
+        </defs>
+        <!-- 선 -->
+        <path class="rel ev" data-s="1" d="M330,163 C276,163 250,196 202,198"/>
+        <path class="rel ev" data-s="1" d="M330,259 C276,259 250,214 202,212"/>
+        <text class="lbl ev" data-s="1" x="232" y="248">근거</text>
+        <path class="rel draw" data-s="1" pathLength="1" d="M110,176 L110,80" marker-end="url(#og-m)"/>
+        <text class="lbl" data-s="1" x="118" y="124">part-of</text>
+        <text class="s" data-s="1" x="118" y="140">폴더 경로</text>
+        <path id="e-app" class="rel draw" data-s="3" pathLength="1" d="M330,49 L206,49" marker-end="url(#og-m)"/>
+        <text class="lbl" data-s="3" x="268" y="40" text-anchor="middle">applies-to</text>
+        <path class="rel inh" data-s="3" d="M330,66 C284,104 252,156 206,188" marker-end="url(#og-mi)"/>
+        <text class="lbl inh" data-s="3" x="206" y="92">상속(계산)</text>
+        <path id="e-sup" class="rel sup" data-s="4" d="M455,188 L455,230" marker-end="url(#og-ms)"/>
+        <text class="lbl sup" data-s="4" x="463" y="214">supersedes</text>
+        <path id="e-der" class="rel der" data-s="4" d="M580,357 C630,330 630,78 584,54" marker-end="url(#og-md)"/>
+        <text id="e-der-l" class="lbl der" data-s="4" x="628" y="206" text-anchor="middle" transform="rotate(90 628 206)">derived-from</text>
+        <path class="rel prj" data-s="5" d="M330,180 C282,206 252,330 202,348"/>
+        <path class="rel prj" data-s="5" d="M330,360 L202,360"/>
+        <text class="lbl sup" data-s="5" x="250" y="354">project</text>
+        <!-- 용어 -->
+        <g id="n-report" class="term" data-s="1"><rect x="20" y="24" width="180" height="52" rx="22"/><text class="t" x="110" y="48" text-anchor="middle">보고서</text><text class="s" x="110" y="66" text-anchor="middle">업무 · 폴더 이름에서</text></g>
+        <g id="n-weekly" class="term" data-s="1"><rect x="20" y="176" width="180" height="54" rx="22"/><text class="t" x="110" y="200" text-anchor="middle">주간 보고</text><text class="s" x="110" y="218" text-anchor="middle">문서 유형 · 첫 머리글에서</text></g>
+        <g id="n-syn" data-s="2">
+          <g class="chip"><rect x="16" y="240" width="112" height="24" rx="12"/><text class="t" x="72" y="256" text-anchor="middle">위클리 리포트</text></g>
+          <g class="chip"><rect x="134" y="240" width="62" height="24" rx="12"/><text class="t" x="165" y="256" text-anchor="middle">WBR</text></g>
+          <text class="s" x="110" y="280" text-anchor="middle">동의어</text>
+        </g>
+        <g id="n-prj" class="term warn" data-s="5"><rect x="20" y="334" width="180" height="46" rx="22"/><text class="t" x="110" y="356" text-anchor="middle">A 프로젝트</text><text class="s" x="110" y="372" text-anchor="middle">프로젝트</text></g>
+        <g class="badge amber" data-s="5"><rect x="14" y="388" width="192" height="22"/><text x="110" y="403" text-anchor="middle">⚠ 표기 갈림: A-프로젝트 (D20)</text></g>
+        <g id="n-owner" data-s="5">
+          <g class="term small"><rect x="250" y="424" width="84" height="30" rx="15"/><text class="t" x="292" y="444" text-anchor="middle">기획팀</text></g>
+          <g class="term small"><rect x="342" y="424" width="64" height="30" rx="15"/><text class="t" x="374" y="444" text-anchor="middle">팀B</text></g>
+          <text class="s" x="414" y="444">owner → 주인별 정리</text>
+        </g>
+        <!-- 파일 -->
+        <g class="file"><rect x="330" y="24" width="250" height="50" rx="2"/><text class="t" x="344" y="45">보고서/policy.md</text><text class="s mono" x="344" y="64">report-policy · 기준</text><text id="h-pol" class="hash" data-s="6" x="568" y="64" text-anchor="end">#e4b1</text></g>
+        <g class="file"><rect x="330" y="138" width="250" height="50" rx="2"/><text class="t" x="344" y="159">보고서/주간보고/workflow.md</text><text class="s mono" x="344" y="178">weekly-2026 · 참고자료</text><text class="hash" data-s="6" x="568" y="178" text-anchor="end">#7c2e</text></g>
+        <g class="file"><rect x="330" y="234" width="250" height="50" rx="2"/><text class="t" x="344" y="255">주간보고-2025/workflow.md</text><text class="s mono" x="344" y="274">weekly-2025 · 참고자료</text><text class="hash" data-s="6" x="568" y="274" text-anchor="end">#19ab</text></g>
+        <g class="badge amber" data-s="4"><rect x="446" y="290" width="134" height="22"/><text x="513" y="305" text-anchor="middle">대체됨 → 정리 후보</text></g>
+        <g class="file"><rect x="330" y="332" width="250" height="50" rx="2"/><text class="t" x="344" y="353">팀B보고/policy.md</text><text class="s mono" x="344" y="372">teamb-policy · 기준</text><text class="hash" data-s="6" x="568" y="372" text-anchor="end">#5d0a</text></g>
+        <g class="badge red" data-s="7"><rect x="470" y="388" width="110" height="22"/><text x="525" y="403" text-anchor="middle">⚠ 원본 바뀜</text></g>
+        <text class="lbl red" data-s="7" x="578" y="108" text-anchor="end">갈래 기록 때 #e4b1 ≠ 지금 #9f07</text>
+      </svg>
+      <div class="sx-count" aria-live="polite">
+        <span><b data-c="0">0</b>용어</span><span><b data-c="1">0</b>동의어</span><span><b data-c="2">0</b>관계(저장)</span><span class="sig"><b data-c="3">0</b>정리 신호</span>
+      </div>
+      <div class="sx-ctl" role="group" aria-label="단계">
+        <button type="button" data-go="0">0 재료</button><button type="button" data-go="1">1 용어</button><button type="button" data-go="2">2 동의어</button><button type="button" data-go="3">3 적용</button><button type="button" data-go="4">4 대체·갈래</button><button type="button" data-go="5">5 팀·프로젝트</button><button type="button" data-go="6">6 근거</button><button type="button" data-go="7">7 파일이 바뀌면</button>
+        <button type="button" class="play" data-play>▶ 처음부터</button>
+      </div>
+      <p class="sx-cap" aria-live="polite"><b id="sx-n">0</b><strong id="sx-t"></strong><span id="sx-d"></span></p>
+    </div>
+  </div>
+  <p class="note">모두 합성 예시다. 모델 없이 규칙대로 만드는 부분(결정론 바닥)만 그렸고, 간단히 하려고 <code>schema_version: 1</code>과 폴더 용어 일부(팀B 보고 등)는 뺐다. 유형을 알 수 없는 용어의 기본 유형, 이름 정규화 규칙은 1단계(#2124) 구현 때 정한다.</p>
+</div></section>
+
+<section class="slide" id="sample-store"><div class="inner">
+  <span class="kicker">19 — 샘플 ② 저장되는 모양</span>
+  <h2>한 줄이 주장 하나, 주장마다 근거가 붙는다</h2>
+  <div class="store">
+    <div style="display:grid;gap:.7rem;align-content:start">
+<pre class="tree" aria-label="저장 위치"><span class="src">업무폴더/</span>
+├─ <span class="src">보고서/policy.md</span>            <span class="c">원본</span>
+├─ <span class="src">보고서/주간보고/workflow.md</span> <span class="c">원본</span>
+├─ <span class="src">주간보고-2025/workflow.md</span>   <span class="c">원본</span>
+├─ <span class="src">팀B보고/policy.md</span>           <span class="c">원본</span>
+├─ <span class="gen">ontology.md</span>                 <span class="c">사람이 읽는 요약</span>
+└─ .workassets/                <span class="c">앱 관리, 검색 제외</span>
+   ├─ <span class="gen">ontology/claims</span>         <span class="c">주장</span>
+   ├─ <span class="usr">ontology/edits</span>          <span class="c">화면 수정</span>
+   └─ <span class="gen">index/2gram</span>             <span class="c">검색 색인</span></pre>
+      <div class="legend3">
+        <div><i style="background:var(--ink)"></i><span><b>원본</b> — 사람이 쓰고 고친다. 이것만이 실행 입력이다</span></div>
+        <div><i style="background:var(--accent)"></i><span><b>파생</b> — 지워도 원본에서 다시 만든다</span></div>
+        <div><i style="background:var(--blue)"></i><span><b>사용자 수정</b> — 다시 만들 수 없으니 백업에 넣는다</span></div>
+      </div>
+    </div>
+    <div class="panes">
+      <section class="pane gen"><header><h3>주장 <code>claims</code></h3><span>파생 · 앞 장의 결과</span></header>
+<pre class="code"><span class="row"><span class="k">{</span><span class="k">"kind":</span><span class="tm">"term"</span>, <span class="k">"type":</span><span class="v">"문서 유형"</span>,
+ <span class="k">"key":</span><span class="tm">"주간 보고"</span>,
+ <span class="k">"evidence":</span>[[<span class="v">"weekly-2026"</span>,<span class="h">"7c2e"</span>,<span class="c">"첫 머리글"</span>]],
+             [<span class="v">"weekly-2025"</span>,<span class="h">"19ab"</span>,<span class="c">"첫 머리글"</span>]]<span class="k">}</span></span><span class="row"><span class="k">{</span><span class="k">"kind":</span><span class="tm">"synonym"</span>,
+ <span class="k">"key":</span>[<span class="tm">"주간 보고"</span>,<span class="tm">"위클리 리포트"</span>],
+ <span class="k">"evidence":</span>[[<span class="v">"weekly-2026"</span>,<span class="h">"7c2e"</span>,<span class="c">"aliases"</span>]]<span class="k">}</span></span><span class="row"><span class="k">{</span><span class="k">"kind":</span><span class="v">"part-of"</span>,
+ <span class="k">"key":</span>[<span class="tm">"주간 보고"</span>,<span class="tm">"보고서"</span>],
+ <span class="k">"evidence":</span>[[<span class="v">"weekly-2026"</span>,<span class="h">"7c2e"</span>,<span class="c">"폴더 경로"</span>]]<span class="k">}</span></span><span class="row"><span class="k">{</span><span class="k">"kind":</span><span class="v">"applies-to"</span>,
+ <span class="k">"key":</span>[<span class="v">"report-policy"</span>,<span class="tm">"보고서"</span>],
+ <span class="k">"evidence":</span>[[<span class="v">"report-policy"</span>,<span class="h">"e4b1"</span>,<span class="c">"applies_to"</span>]]<span class="k">}</span></span><span class="row"><span class="k">{</span><span class="k">"kind":</span><span class="sp">"supersedes"</span>,
+ <span class="k">"key":</span>[<span class="v">"weekly-2026"</span>,<span class="v">"weekly-2025"</span>],
+ <span class="k">"evidence":</span>[[<span class="v">"weekly-2026"</span>,<span class="h">"7c2e"</span>,<span class="c">"supersedes"</span>]],
+ <span class="k">"ends":</span>{<span class="v">"weekly-2026"</span>:<span class="h">"7c2e"</span>,<span class="v">"weekly-2025"</span>:<span class="h">"19ab"</span>}<span class="k">}</span></span><span class="row"><span class="k">{</span><span class="k">"kind":</span><span class="dv">"derived-from"</span>,
+ <span class="k">"key":</span>[<span class="v">"teamb-policy"</span>,<span class="v">"report-policy"</span>],
+ <span class="k">"evidence":</span>[[<span class="v">"teamb-policy"</span>,<span class="h">"5d0a"</span>,<span class="c">"derived_from"</span>]],
+ <span class="k">"ends":</span>{<span class="v">"teamb-policy"</span>:<span class="h">"5d0a"</span>,<span class="v">"report-policy"</span>:<span class="h">"e4b1"</span>}<span class="k">}</span>
+ <span class="r">  ↑ 지금 report-policy 는 9f07 → "원본 바뀜"</span></span></pre></section>
+      <section class="pane usr"><header><h3>화면 수정 <code>edits</code></h3><span>사용자 · 다시 만들어도 남는다</span></header>
+<pre class="code"><span class="row"><span class="k">{</span><span class="k">"op":</span><span class="v">"add-synonym"</span>,
+ <span class="k">"key":</span>[<span class="tm">"주간 보고"</span>,<span class="tm">"주간업무보고"</span>]<span class="k">}</span>  <span class="c">← [동의어로 추가]</span></span><span class="row"><span class="k">{</span><span class="k">"op":</span><span class="v">"reject"</span>,
+ <span class="k">"key":</span>[<span class="tm">"주간 보고"</span>,<span class="v">"related-to"</span>,<span class="tm">"월간 실적"</span>]<span class="k">}</span></span><span class="row"><span class="k">{</span><span class="k">"op":</span><span class="v">"seen-origin-change"</span>,
+ <span class="k">"key":</span>[<span class="v">"teamb-policy"</span>,<span class="dv">"derived-from"</span>,<span class="v">"report-policy"</span>],
+ <span class="k">"now":</span><span class="h">"9f07"</span><span class="k">}</span>  <span class="c">← [원본 바뀜 확인]</span></span>
+<span class="c">키는 자동 번호가 아니라 이름·(시작, 종류, 끝)이다.
+그래서 온톨로지를 다시 만들어도 수정이 남는다.</span></pre></section>
+      <section class="pane out"><header><h3><code>ontology.md</code></h3><span>사람용 요약 · 에이전트는 읽지 않는다</span></header>
+<pre class="code"><span class="c">&lt;!-- 생성물. 수정은 앱 화면이나 원본 머리말에서 --&gt;</span>
+<span class="v"># 워크에셋 온톨로지</span>
+<span class="v">## 용어</span>
+- <span class="tm">주간 보고</span> (문서 유형) — 위클리 리포트, WBR
+    part-of 보고서 · 자료 2
+- <span class="tm">보고서</span> (업무) — 적용 기준: 보고서/policy.md
+<span class="v">## 정리 후보</span>
+- <span class="sp">대체됨</span>  주간보고-2025/workflow.md
+- <span class="r">원본 바뀜</span>  팀B보고/policy.md ← 보고서/policy.md
+- <span class="sp">표기 갈림</span>  "A-프로젝트" ≈ "A 프로젝트"</pre></section>
+      <section class="pane out"><header><h3>에이전트가 받는 답</h3><span><code>search</code> 결과</span></header>
+<pre class="code"><span class="v">search("주간보고 규칙")</span>
+<span class="k">matched_by:</span> <span class="tm">term</span>  <span class="c">(용어 "주간 보고")</span>
+ <span class="v">① 보고서/주간보고/workflow.md</span>
+    <span class="c">용어에 바로 연결</span>
+ <span class="v">② 보고서/policy.md</span>
+    <span class="c">주간 보고 part-of 보고서 ← applies-to</span>
+ <span class="sp">⚑ 주간보고-2025/workflow.md</span>
+    <span class="c">대체됨 — 뒤로 미룸</span></pre></section>
+    </div>
+  </div>
+  <p class="easy"><b>읽는 법</b>온톨로지는 큰 문서가 아니라 <b>근거가 달린 짧은 주장들의 목록</b>이다. 근거의 해시(<code>7c2e</code> 같은 값)가 원본 파일과 다르면 그 주장은 "근거 낡음"이 되고, 파일이 사라지면 지우지 않고 후보로 낮춘다. 사람이 고친 것만 따로(<code>edits</code>) 남는다.</p>
+  <p class="note">파일 이름(<code>claims</code>·<code>edits</code>·<code>index/2gram</code>)과 JSON 모양은 이해를 돕기 위한 예시다. 설계가 정한 것은 "주장마다 근거 목록", "화면 수정은 정체성 키로", "<code>ontology.md</code>는 저장소 루트에 하나"까지이고, 실제 형식은 1단계(#2124) 구현에서 정한다.</p>
+</div></section>
+
+<section class="slide" id="sample-use"><div class="inner">
+  <span class="kicker">20 — 샘플 ③ 에이전트가 쓰는 과정</span>
+  <h2>에이전트는 지금처럼 찾고 읽는다 — 관계를 따라가는 일은 앱이 한다</h2>
+  <div class="use" id="use">
+    <div class="sx-graph">
+      <svg class="og seq" viewBox="0 0 720 500" role="img" aria-labelledby="useT useD">
+        <title id="useT">질문 하나가 처리되는 순서</title>
+        <desc id="useD">사용자, 앱, 에이전트, 워크에셋 파일과 온톨로지 사이에 오가는 일곱 단계. 아래 단계 설명에 같은 내용을 글로 적었다.</desc>
+        <defs><marker id="sq-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk" d="M0,0L10,5L0,10z"/></marker>
+          <marker id="sq-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="mk der" d="M0,0L10,5L0,10z"/></marker></defs>
+        <g class="lane"><rect x="14" y="8" width="112" height="34" rx="17"/><text x="70" y="30" text-anchor="middle">사용자</text></g>
+        <g class="lane"><rect x="200" y="8" width="140" height="34" rx="3"/><text x="270" y="25" text-anchor="middle">앱</text><text class="sub" x="270" y="37" text-anchor="middle">아바타 플러그인</text></g>
+        <g class="lane"><rect x="414" y="8" width="112" height="34" rx="3"/><text x="470" y="30" text-anchor="middle">에이전트</text></g>
+        <g class="lane"><rect x="580" y="8" width="136" height="34" rx="3"/><text x="648" y="25" text-anchor="middle">파일 · 온톨로지</text><text class="sub" x="648" y="37" text-anchor="middle">업무 폴더</text></g>
+        <path class="life" d="M70,44V494M270,44V494M470,44V494M648,44V494"/>
+        <!-- 1 대화 시작 · 판 고정 -->
+        <g data-s="1"><path class="msg" d="M74,84H264" marker-end="url(#sq-m)"/><text class="ml" x="170" y="78" text-anchor="middle">대화 시작</text>
+          <path class="msg" d="M274,106H642" marker-end="url(#sq-m)"/><text class="ml" x="458" y="100" text-anchor="middle">연결 범위 파일의 판(해시)을 고정</text></g>
+        <g data-s="1" class="pin"><rect x="560" y="114" width="156" height="56" rx="3"/><text class="pt" x="568" y="130">이 대화의 고정본</text><text class="pm" x="568" y="146">report-policy #e4b1</text><text class="pm" x="568" y="161">weekly-2026 #7c2e …</text></g>
+        <!-- 2 매 턴 지시 -->
+        <g data-s="2"><path class="msg" d="M274,196H464" marker-end="url(#sq-m)"/><text class="ml" x="368" y="174" text-anchor="middle">매 턴 지시: 기준 본문</text><text class="ml" x="368" y="189" text-anchor="middle">+ 도구 토큰</text>
+          <text class="mn" x="282" y="214">3단계: 조건부 기준은 요청이 용어에 맞을 때만</text>
+          <text class="mn red" x="282" y="228">⚠ 이 지시가 실패하면 지금은 조용히 빠진다 → #2932</text></g>
+        <!-- 3 질문 -->
+        <g data-s="3"><path class="msg" d="M74,262H464" marker-end="url(#sq-m)"/><text class="ml q" x="270" y="256" text-anchor="middle">“주간보고 규칙 알려 줘”</text></g>
+        <!-- 4 search -->
+        <g data-s="4"><path class="msg" d="M466,296H276" marker-end="url(#sq-m)"/><text class="ml mono" x="370" y="290" text-anchor="middle">search("주간보고 규칙")</text>
+          <path class="msg plan" d="M274,320H642" marker-end="url(#sq-g)"/><text class="ml plan" x="458" y="314" text-anchor="middle">용어 먼저 — 주간보고 ≈ 주간 보고</text></g>
+        <!-- 5 거르고 돌려줌 -->
+        <g data-s="5"><path class="msg plan" d="M644,346H276" marker-end="url(#sq-g)"/><text class="ml plan" x="458" y="340" text-anchor="middle">근거가 고정본에 있는 주장만</text>
+          <path class="msg" d="M274,390H464" marker-end="url(#sq-m)"/><text class="ml small" x="368" y="364" text-anchor="middle">① 주간보고 workflow · ② 공통 정책(상속)</text><text class="ml small" x="368" y="378" text-anchor="middle">⚑ 2025 판 대체됨 · matched_by: term</text></g>
+        <!-- 6 read -->
+        <g data-s="6"><path class="msg" d="M466,414H276" marker-end="url(#sq-m)"/><text class="ml mono" x="370" y="408" text-anchor="middle">read(weekly-2026)</text>
+          <path class="msg" d="M274,440H464" marker-end="url(#sq-m)"/><text class="ml small" x="368" y="434" text-anchor="middle">고정 판 본문 · 읽은 출처 기록</text></g>
+        <!-- 7 답 -->
+        <g data-s="7"><path class="msg" d="M466,476H76" marker-end="url(#sq-m)"/><text class="ml" x="270" y="470" text-anchor="middle">올해 절차 + 공통 정책으로 답 · 출처 표시</text></g>
+        <circle id="use-dot" class="dot" r="6" cx="70" cy="44"/>
+      </svg>
+      <div class="sx-ctl" role="group" aria-label="단계">
+        <button type="button" data-go="0">0 등장</button><button type="button" data-go="1">1 판 고정</button><button type="button" data-go="2">2 매 턴 지시</button><button type="button" data-go="3">3 질문</button><button type="button" data-go="4">4 search</button><button type="button" data-go="5">5 거르기</button><button type="button" data-go="6">6 read</button><button type="button" data-go="7">7 답</button>
+        <button type="button" class="play" data-play>▶ 처음부터</button>
+      </div>
+      <p class="sx-cap" aria-live="polite"><b data-n>0</b><strong><span data-t></span> <span class="tag" data-k></span></strong><span data-d></span></p>
+    </div>
+    <aside class="filter" aria-label="범위·판 거르기">
+      <h3>5단계에서 앱이 거르는 법</h3>
+      <p class="rule">한 규칙: <b>근거 (파일 id, 해시)가 이 대화의 고정본에 있는 주장만</b> 쓴다</p>
+      <ul>
+        <li data-pass="1"><span class="cl">동의어 <b>주간 보고 = 위클리 리포트</b></span><span class="ev">weekly-2026 #7c2e</span><span class="vd"></span></li>
+        <li data-pass="1"><span class="cl"><b>주간 보고</b> part-of <b>보고서</b></span><span class="ev">weekly-2026 #7c2e</span><span class="vd"></span></li>
+        <li data-pass="1"><span class="cl">공통 정책 applies-to <b>보고서</b></span><span class="ev">report-policy #e4b1</span><span class="vd"></span></li>
+        <li data-pass="0" data-why="범위 밖 — 이 아바타에 연결 안 된 폴더"><span class="cl">동의어 <b>주간 보고 = 주보</b></span><span class="ev">영업팀/workflow.md</span><span class="vd"></span></li>
+        <li data-pass="0" data-why="대화 시작 뒤 바뀐 판"><span class="cl">공통 정책 applies-to <b>보고서</b></span><span class="ev">report-policy #9f07</span><span class="vd"></span></li>
+      </ul>
+      <p class="why">이 한 규칙으로 <b>다른 아바타의 자료가 섞이지 않고</b>, <b>대화 도중 파일이 바뀌어도 답이 흔들리지 않는다</b>. 지금의 워크에셋이 대화마다 판을 고정하는 방식을 온톨로지에도 그대로 적용한 것이다.</p>
+    </aside>
+  </div>
+  <div class="grid g3">
+    <p class="callout"><b>에이전트는 읽기만</b> — 온톨로지를 지침에 넣지 않고, 쓰는 것도 지금처럼 자료 저장·제안뿐이다. 새 도구도 없다(<code>desktop_work_assets</code>의 <code>search</code>가 넓어진다).</p>
+    <p class="callout"><b>못 찾으면</b> — 0건이면 이름이 가까운 용어(<code>near_terms</code>)를 같이 돌려줘 다시 찾게 한다. 찾기에 실패한 말은 현황에 모이고, 동의어로 붙일지는 사람이 정한다.</p>
+    <p class="callout warn"><b>검토에서 찾은 것</b> — 위 그림 2번의 매 턴 지시는 플러그인 훅으로 들어오는데, 훅이 실패하면 지금은 기준 없이 턴이 돈다(#2932). 온톨로지 3단계(기준 선택)도 같은 길이라 그 전에 실패 계약을 정한다.</p>
+  </div>
+  <p class="note"><span class="tag green">지금</span> 표시 단계(판 고정, 매 턴 지시, read와 출처 기록)는 오늘 아바타 플러그인이 하는 일이고, <span class="tag blue">계획</span> 표시 단계(용어 먼저 찾기, 근거로 거르기)는 1단계(#2124)의 계획된 동작이다. 질의를 용어에 맞추는 규칙은 3단계 기준 선택과 같은 함수로 계획에 적는다(#2930).</p>
+</div></section>
+
 <section class="slide" id="answers"><div class="inner">
-  <span class="kicker">18 — 다섯 과제에 대한 답</span>
+  <span class="kicker">21 — 다섯 과제에 대한 답</span>
   <h2>온톨로지가 맡는 것과 워크에셋 v1이 맡을 것을 나눈다</h2>
   <div class="tbl"><table>
     <thead><tr><th>과제</th><th class="we">온톨로지가 맡는 것</th><th>워크에셋 v1이 맡을 것</th></tr></thead>
@@ -546,7 +916,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="example"><div class="inner">
-  <span class="kicker">19 — 같은 질문, 두 갈래</span>
+  <span class="kicker">22 — 같은 질문, 두 갈래</span>
   <h2>"주간 보고 쓰는 규칙 알려 줘"</h2>
   <pre class="file">업무폴더/위클리리포트/workflow.md       ← 첫 머리글 "위클리 리포트 작성 절차"
 업무폴더/위클리리포트-2025/workflow.md  ← 작년 판. 복사해서 만들었고 지우지 않았다
@@ -573,11 +943,11 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
       <footer>올해 절차와 공통 정책으로 쓴다. 어떻게 찾았는지가 남는다.</footer>
     </section>
   </div>
-  <p class="note">덧붙여 — 동의어는 저절로 생기지 않는다. 머리말 <code>aliases</code>, 사용자가 켠 모델 보강(옵트인), 현황의 [동의어로 추가]에서만 온다. 그래서 새 업무 폴더를 만들 때 "다른 이름으로는 뭐라고 부르나요?"를 묻게 했다(20장).</p>
+  <p class="note">덧붙여 — 동의어는 저절로 생기지 않는다. 머리말 <code>aliases</code>, 사용자가 켠 모델 보강(옵트인), 현황의 [동의어로 추가]에서만 온다. 그래서 새 업무 폴더를 만들 때 "다른 이름으로는 뭐라고 부르나요?"를 묻게 했다(23장).</p>
 </div></section>
 
 <section class="slide" id="entry"><div class="inner">
-  <span class="kicker">20 — 워크에셋 v1 위에서 더한 장치</span>
+  <span class="kicker">23 — 워크에셋 v1 위에서 더한 장치</span>
   <h2>쌓인 뒤 치우기보다 입구에서 묻고, 시간과 주인을 붙인다</h2>
   <div class="fix">
     <article><h3>저장할 때 비슷한 것을 먼저 보인다</h3>
@@ -597,7 +967,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="objection"><div class="inner">
-  <span class="kicker">21 — 예상되는 반론</span>
+  <span class="kicker">24 — 예상되는 반론</span>
   <h2>"LLM이나 벡터 검색이 알아서 하지 않나요?"</h2>
   <div class="qa">
     <div><h3>"전부 프롬프트에 넣으면"</h3>
@@ -613,7 +983,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="rules"><div class="inner">
-  <span class="kicker">22 — "온톨로지도 결국 방치되지 않을까요?"</span>
+  <span class="kicker">25 — "온톨로지도 결국 방치되지 않을까요?"</span>
   <h2>그렇게 되지 않도록 처음부터 정해 둔 다섯 가지</h2>
   <ol class="rules">
     <li><b>파일이 원본이다</b><p>온톨로지는 지워도 파일에서 다시 만든다. 지금처럼 편집기로 파일만 고쳐도 온톨로지가 따라 바뀐다.</p><span class="if">없으면: 원본이 둘이 된다</span></li>
@@ -627,25 +997,25 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="road"><div class="inner">
-  <span class="kicker">23 — 계획 #2128 (2026-11-17 개정)</span>
+  <span class="kicker">26 — 계획 #2128 (2026-11-17 개정)</span>
   <h2>현황부터 보고, 찾기 → 위생 → 기준 선택 순서로 쌓는다</h2>
   <div class="road">
     <div class="step"><span class="id">M0 · #2123</span><h3>현황 1차</h3><p>온톨로지 없이 지금 데이터로. 효과를 비교할 <b>기준선</b>.</p>
-      <ul><li>읽힌 적 없는 참고자료, 연결 안 된 자료</li><li>기준 글자 예산 게이지 (… / 48,000)</li><li><b>확인 필요를 사유별로</b> — 식별자 충돌 맨 위, 비표준 문서 수</li><li><b>범위 값 불일치 의심</b>(D20)</li></ul><span class="dep">막힘 없음</span></div>
+      <ul><li>읽힌 적 없는 참고자료, 연결 안 된 자료</li><li>기준 글자 예산 게이지 (… / 48,000)</li><li><b>확인 필요를 사유별로</b> — 식별자 충돌 맨 위, 비표준 문서 수</li><li><b>범위 값 불일치 의심</b>(D20)</li></ul><span class="dep">⛔ #2930(계획 정정) 뒤</span></div>
     <div class="step"><span class="id">M1 · #2124</span><h3>찾기</h3><p>워크에셋 v1 파일과 <code>pipeline.json</code>에서 용어·관계를 만들고, 색인을 두어 검색할 때마다 모든 파일을 읽는 일을 없앤다.</p>
-      <ul><li><code>search</code>가 용어 먼저, 0건이면 <code>near_terms</code></li><li>선택 머리말 다섯 키를 워크에셋 v1 안내에</li><li>새 폴더에 다른 이름 묻기</li><li>온톨로지 화면 — 목록·그래프</li></ul><span class="dep">⛔ #2123 뒤</span></div>
+      <ul><li><code>search</code>가 용어 먼저, 0건이면 <code>near_terms</code></li><li>선택 머리말 다섯 키를 워크에셋 v1 안내에</li><li>새 폴더에 다른 이름 묻기</li><li>온톨로지 화면 — 목록·그래프(고른 용어 중심 동심원)</li></ul><span class="dep">⛔ #2123 뒤</span></div>
     <div class="step"><span class="id">M2 · #2125</span><h3>위생</h3><p>정리 후보함 — <b>표시만</b>, owner별로.</p>
       <ul><li>중복·<b>폴더 복사본 의심</b>·겹침(상하위 폴더 포함)</li><li>대체됨·<b>원본 바뀜</b>·<b>검토 기한 지남</b>·읽힌 적 없음</li><li>저장 결과의 <code>similar</code></li></ul><span class="dep">⛔ #2124 뒤</span></div>
     <div class="step"><span class="id">M3 · #2126</span><h3>기준 선택 적용</h3><p>사용자가 <code>applies_to</code>를 선언한 기준만, 요청이 그 용어와 관련될 때만 <b>앱(서버)이</b> 넣는다.</p>
-      <ul><li><code>policy.md</code>는 늘 적용</li><li>Task별 선택(#2216 후속)은 Task 용어로</li><li>한도 48,000자는 그대로, 빠진 기준은 목록으로 보여 준다</li></ul><span class="dep">⛔ #2124 뒤 · 착수 때 ADR</span></div>
+      <ul><li><code>policy.md</code>는 늘 적용</li><li>Task별 선택(#2216 후속)은 Task 용어로</li><li>한도 48,000자는 그대로, 빠진 기준은 목록으로 보여 준다</li></ul><span class="dep">⛔ #2124 · #2932 뒤 · 착수 때 ADR</span></div>
   </div>
   <p class="easy"><b>왜 이 순서인가</b>현황을 먼저 내야 사용자 자신이 "나아졌나"를 본다(사내 실데이터 측정은 하지 않기로 했다). 찾기가 위생과 기준 선택의 바탕이고, 기준 선택은 "필수 기준을 임의로 자르지 않는다"는 약속을 좁히는 일이라 마지막이다.</p>
-  <p class="note">굵게 쓴 항목이 워크에셋 v1 반영으로 더한 것. 설계 개정은 문서 PR #2445, 하위 이슈 네 건 본문도 같은 날 고쳤다.</p>
+  <p class="note">굵게 쓴 항목이 워크에셋 v1 반영으로 더한 것. 설계 개정은 문서 PR #2445, 하위 이슈 네 건 본문도 같은 날 고쳤다. 2026-11-24: 워크에셋 코드가 아바타 플러그인으로 옮겨져 계획의 코드 위치·화면·PR 위치를 고친다(#2930, M0 앞). 매 턴 기준을 싣는 훅의 실패 계약(#2932)은 M3 앞에 둔다.</p>
 </div></section>
 
 <section class="slide" id="hardened"><div class="inner">
-  <span class="kicker">24 — 계획도 같은 눈으로 점검했다</span>
-  <h2>계획에서 빈틈 여덟 개를 찾아 보완했다</h2>
+  <span class="kicker">27 — 계획도 같은 눈으로 점검했다</span>
+  <h2>계획에서 빈틈을 찾아 보완했다 — 11-24 검토에서 셋 더</h2>
   <div class="tbl"><table>
     <thead><tr><th>찾은 빈틈</th><th class="we">고친 방법</th></tr></thead>
     <tbody>
@@ -657,13 +1027,16 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
       <tr><td>위생 장치가 모두 사후 표시였다</td><td class="we">저장 결과의 <code>similar</code>(입구 확인)</td></tr>
       <tr><td>새 판 없이 시간이 지나 낡는 문서를 잡지 못했다</td><td class="we"><code>review_by</code> → "검토 기한 지남"</td></tr>
       <tr><td>검증이 재현율만 봐서 "찾았는데 옛 판"을 못 잡았고, 질의와 코퍼스를 같은 손이 쓸 수 있었다</td><td class="we">워크에셋 v1 모양 코퍼스(복사본·상하위 정책·표기 갈린 값), 옛 판이 위에 오는 비율의 상한, 질의를 따로 쓰기, 단계별 관찰 항목</td></tr>
-    </tbody>
+          <tr><td><span class="tag amber">11-24</span> 워크에셋 코드가 아바타 플러그인으로 옮겨졌는데(#2417), 계획은 지워진 앱 경로·앱 화면 파일·앱 의존성(<code>d3-force</code>를 앱 <code>package.json</code>에)을 가리켰다. 플러그인 화면은 정해진 부품만 쓸 수 있어 그래프를 그리는 방식부터 달라진다</td><td class="we">#2930: 경로·화면(플러그인 mod)·PR과 시험 위치를 플러그인 기준으로 고친다. 그래프는 mod 안에서 직접 배치한다 — 고른 용어를 가운데 두고 1홉·2홉을 동심원으로, 유형마다 각도 구역을 나눈다(같은 입력이면 같은 그림). 플러그인 PR은 한 줄로 쌓아 마지막 하나만 넣는다. 설계의 내용(어휘·근거·단계)은 그대로</td></tr>
+      <tr><td><span class="tag amber">11-24</span> 매 턴 기준을 싣는 플러그인 훅이 실패하면 지금은 기준 없이 턴이 조용히 돈다. 3단계의 "서버가 기준을 고른다"가 바로 이 길 위에 있다</td><td class="we">#2932: 실패 계약(막거나 보이거나)을 먼저 정하고, 3단계(#2126)를 그 뒤에 둔다</td></tr>
+      <tr><td><span class="tag amber">11-24</span> 검색 질의를 용어에 맞추는 규칙이 비어 있었다 — 에이전트는 "주간보고 규칙"처럼 낱말을 섞어 묻는데, 지금 검색은 모든 낱말이 다 들어 있어야 찾는다</td><td class="we">#2930: 3단계 기준 선택과 같은 규칙 — 정규화한 질의 안에 용어 이름·동의어가 들어 있으면 그 용어에 맞고, 남은 낱말은 거르지 않고 순위에만 쓴다(20장 4번)</td></tr>
+</tbody>
   </table></div>
   <p class="note"><b>아직 남은 한계</b>(미리 밝혀 둔다): 온톨로지는 워크에셋 v1 표준 파일만 본다 · 탐색기 복사는 입구 확인을 거치지 않는다 · 모델 보강을 안 켜면 충돌 신호가 없다 · 조건부 기준은 모르는 표현이면 빠진다(빠진 목록으로 보인다) · 모든 재현율·용량 수치는 합성 코퍼스 기준이다.</p>
 </div></section>
 
 <section class="slide" id="ask"><div class="inner">
-  <span class="kicker">25 — 워크에셋 v1과 함께 정할 것</span>
+  <span class="kicker">28 — 워크에셋 v1과 함께 정할 것</span>
   <h2>함께 정하고 싶은 것은 작고, 워크에셋 v1 자산이 얻는 것은 크다</h2>
   <div class="duo">
     <section class="v1"><h3>워크에셋 v1과 함께 정하고 싶은 것</h3>
@@ -685,7 +1058,7 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
 </div></section>
 
 <section class="slide" id="now"><div class="inner">
-  <span class="kicker">26 — 동료들에게</span>
+  <span class="kicker">29 — 동료들에게</span>
   <h2>구현을 기다리지 않고 지금 할 수 있는 일</h2>
   <div class="todo">
     <div><b>폴더 이름은 사람이 부르는 이름으로</b><p>워크에셋 v1에서 파일 이름은 넷뿐이라 폴더 이름과 첫 머리글이 유일한 구분자다. <code>tmp2</code>·<code>새 폴더</code> 대신 "주간보고", "검증-릴리스".</p></div>
@@ -739,14 +1112,14 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
     <div>① 설계 <b><code>docs/design/ontology.md</code></b> — 워크에셋 온톨로지<small> — 2026-11-09 작성, 2026-11-17 워크에셋 v1 개정(문서 PR #2445). "워크에셋 v1 위에서 본 문제"의 과제 1~5</small></div>
     <div>② <b>ADR 0040</b> 온톨로지는 워크에셋 v1 위에 선다 · <b>ADR 0034</b> 파생 구조 · <b>ADR 0035</b> 모델 보강 옵트인 · <b>ADR 0031</b> 워크에셋 원본은 업무별 공용 폴더(워크에셋 v1 반영)</div>
     <div>③ 이슈 <b>#2128</b>(계획 지도), <b>#2123~#2126</b>(M0~M3, 11-17 개정), <b>#2216</b>(워크에셋 v1 표준), <b>#2444</b>(워크에셋 v1 복사·범위 값 동작 수정과 재현 스크립트)<small> — dev-team-404/slsi-agent-desktop</small></div>
-    <div>④ 앱 코드 main <code>7dd26fdc9</code> (3.260.0)<small> — <code>work_assets_store.py</code>(<code>_within</code>·<code>_scan</code>·<code>snapshot</code>) · <code>work_assets_format.py</code>(워크에셋 v1 검사) · <code>work_assets_index.py</code>(제목·<code>matches</code>) · <code>work_assets_tools.py</code>(search) · <code>avatar_pipeline.py</code>. 07장의 출력은 이 코드를 임시 폴더의 합성 파일로 직접 불러 얻었다</small></div>
+    <div>④ 앱 코드 main <code>7dd26fdc9</code> (3.260.0)<small> — <code>work_assets_store.py</code>(<code>_within</code>·<code>_scan</code>·<code>snapshot</code>) · <code>work_assets_format.py</code>(워크에셋 v1 검사) · <code>work_assets_index.py</code>(제목·<code>matches</code>) · <code>work_assets_tools.py</code>(search) · <code>avatar_pipeline.py</code>. 07장의 출력은 이 코드를 임시 폴더의 합성 파일로 직접 불러 얻었다. 그 뒤 #2417에서 이 코드는 아바타 플러그인(v3 저장소 <code>backend/desktop-plugins/avatar/service/avatar_service/work_assets/</code>)으로 옮겨졌다 — 20장의 "지금" 동작(대화마다 판 고정 <code>runtime.pin_snapshot</code>, 매 턴 지시 <code>hooks.turn_begin</code>, <code>desktop_work_assets</code>의 search·read)은 v3 main <code>abeb734df</code>, 앱 쪽 훅 호출은 SAD main <code>0a5705bf5</code>(<code>backend/app.py</code>·<code>plugin_conv.py</code>) 기준</small></div>
     <div>⑤ Furnas, G. W., Landauer, T. K., Gomez, L. M., Dumais, S. T. (1987). <b>The vocabulary problem in human-system communication.</b> <i>Communications of the ACM</i> 30(11), 964–971.<small> — 같은 대상에 두 사람이 같은 낱말을 고를 확률이 0.2 미만(과제 5의 배경)</small></div>
     <div>⑥ Liu, N. F. 외 (2024). <b>Lost in the Middle: How Language Models Use Long Contexts.</b> <i>TACL</i> 12.<small> — 긴 맥락의 가운데 정보를 덜 쓴다</small></div>
     <div>⑦ <b>ISO 25964-1:2011</b> Thesauri and interoperability with other vocabularies<small> — 시소러스 관계 USE/UF·BT/NT·RT</small></div>
     <div>⑧ Gruber, T. R. (1993). <b>A translation approach to portable ontology specifications.</b> <i>Knowledge Acquisition</i> 5(2), 199–220.<small> — 정보 분야에서 쓰는 온톨로지의 정의</small></div>
   </div>
   <p class="note">읽는 법: 표시가 없는 문장은 위 설계·ADR·이슈·코드에 적힌 내용이고, 07장은 실행 결과다. <span class="tag blue">발표자 정리</span>는 그 내용을 묶어 비유한 것이다. "계획된 동작"으로 적은 검색·화면 동작은 아직 구현되지 않았다. 계획의 재현율·용량 수치는 합성 코퍼스 기준이며 운영 수치가 아니다.</p>
-  <div class="footer">문서 사이의 문법 · 워크에셋 v1과 온톨로지 · 사실 확인 기준일 2026-11-17 (SLSI Agent Desktop 3.260.0, main 7dd26fdc9)</div>
+  <div class="footer">문서 사이의 문법 · 워크에셋 v1과 온톨로지 · 사실 확인 기준일 2026-11-17 (SLSI Agent Desktop 3.260.0, main 7dd26fdc9) · 18~20장·26~27장 보강 2026-11-24 (SAD main 0a5705bf5, v3 main abeb734df)</div>
 </div></section>
 
 </main>
@@ -764,6 +1137,123 @@ addEventListener('keydown',e=>{
   if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();if(i<sections.length-1)sections[i+1].scrollIntoView();}
   if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();if(i>0)sections[i-1].scrollIntoView();}
 });
+</script>
+<script>
+(()=>{
+const root=document.getElementById('sx');if(!root)return;
+const STEPS=[
+  ['재료: 워크에셋 v1 파일 넷','업무 폴더에 이미 있는 파일 그대로다. 새로 써야 할 문서는 없고, 오른쪽은 아직 비어 있다.'],
+  ['폴더 이름·첫 머리글 → 용어','폴더 "보고서"와 첫 머리글 "주간 보고"가 용어가 된다. 하위 폴더라서 주간 보고 part-of 보고서. 두 파일이 같은 머리글이라 용어 하나에 근거가 둘이다.'],
+  ['aliases → 동의어','이제 "위클리 리포트"나 "WBR"로 찾아도 주간 보고에 닿는다.'],
+  ['applies_to → 적용','공통 정책이 보고서에 적용된다. 주간 보고는 보고서의 일부라 정책이 따라온다 — 이 점선은 저장하지 않고 찾을 때 계산한다.'],
+  ['supersedes · derived_from → 파일과 파일 사이','올해 판이 작년 판을 대체하니 작년 판은 "대체됨". 팀B 정책은 공통 정책을 복사해 시작한 갈래로, 둘 다 유효하다.'],
+  ['owner · project → 팀·프로젝트 용어','"A 프로젝트"와 "A-프로젝트"는 정규화하면 같다 → "표기 갈림" 신호. 값을 고치지는 않고 보여 준다. owner는 정리 후보를 주인별로 묶는다.'],
+  ['근거: 파일 id + 해시','모든 용어·동의어·관계는 읽어 온 파일의 id와 그때의 해시(내용 지문)를 함께 저장한다.'],
+  ['원본 파일이 바뀌면','기획팀이 공통 정책을 고쳐 해시가 e4b1 → 9f07이 됐다. 갈래를 기록할 때의 해시와 달라 팀B 정책에 "원본 바뀜". 따라갈지는 팀B가 정한다.']
+];
+const COUNTS=[[0,0,0,0],[2,0,1,0],[2,2,1,0],[2,2,2,0],[2,2,4,1],[5,2,4,2],[5,2,4,2],[5,2,4,3]];
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const els=[...root.querySelectorAll('svg [data-s]')];
+const lines=[...root.querySelectorAll('.wf [data-s]')];
+const btns=[...root.querySelectorAll('[data-go]')];
+const play=root.querySelector('[data-play]');
+const cnt=[...root.querySelectorAll('[data-c]')];
+const edit=document.getElementById('sx-edit'),hpol=document.getElementById('h-pol'),der=document.getElementById('e-der');
+const EDIT0=edit.textContent,EDIT1='- 결론과 요청을 첫 문단에 쓴다';
+let cur=-1,timer=null,touched=false;
+function fly(src,dst,delay){
+  const a=src.getBoundingClientRect(),b=dst.getBoundingClientRect();
+  if(!a.width||!b.width||a.bottom<0||a.top>innerHeight)return;
+  const f=document.createElement('div');f.className='fly';
+  const txt=src.textContent.trim();f.textContent=txt.length>30?txt.slice(0,29)+'…':txt;
+  f.style.left=a.left+'px';f.style.top=a.top+'px';document.body.appendChild(f);
+  const dx=b.left+b.width/2-a.left-f.offsetWidth/2,dy=b.top+b.height/2-a.top-f.offsetHeight/2;
+  const an=f.animate([{transform:'translate(0,0) scale(1)',opacity:0},{opacity:1,offset:.12},{transform:`translate(${dx*.5}px,${dy*.5-30}px) scale(1.04)`,opacity:1,offset:.55},{transform:`translate(${dx}px,${dy}px) scale(.7)`,opacity:0}],{duration:900,delay,easing:'cubic-bezier(.3,.7,.3,1)',fill:'both'});
+  an.onfinish=an.oncancel=()=>f.remove();
+}
+function go(n,{animate=true}={}){
+  n=Math.max(0,Math.min(STEPS.length-1,n));
+  const prev=cur;cur=n;
+  els.forEach(e=>e.classList.toggle('on',+e.dataset.s<=n));
+  lines.forEach(l=>{const s=+l.dataset.s;l.classList.toggle('hot',s===n&&n!==7);l.classList.toggle('used',s<n&&s!==7);l.classList.toggle('edit',s===7&&n===7)});
+  const changed=n>=7;
+  edit.textContent=changed?EDIT1:EDIT0;
+  hpol.textContent=changed?'#9f07':'#e4b1';hpol.classList.toggle('flash',changed);
+  der.classList.toggle('changed',changed);der.setAttribute('marker-end',changed?'url(#og-mr)':'url(#og-md)');
+  btns.forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.go===n)));
+  document.getElementById('sx-n').textContent=n;
+  document.getElementById('sx-t').textContent=STEPS[n][0];
+  document.getElementById('sx-d').textContent=STEPS[n][1];
+  cnt.forEach((c,i)=>{const v=String(COUNTS[n][i]);if(c.textContent!==v){c.textContent=v;if(!reduce){c.classList.add('bump');setTimeout(()=>c.classList.remove('bump'),600)}}}); // 숫자 강조를 잠깐 보였다가 거둔다
+  if(animate&&!reduce&&n>prev){
+    let k=0;
+    root.querySelectorAll(`.wf [data-s="${n}"][data-fly]`).forEach(l=>{const t=document.getElementById(l.dataset.fly);if(t)fly(l,t,k++*140)});
+  }
+}
+function stop(){clearInterval(timer);timer=null;play.textContent='▶ 처음부터'}
+function start(){stop();go(0,{animate:false});play.textContent='❚❚ 멈춤';
+  timer=setInterval(()=>{if(cur>=STEPS.length-1){stop();return}go(cur+1)},3200)} // 한 단계를 읽을 시간을 두고 넘긴다
+btns.forEach(b=>b.addEventListener('click',()=>{touched=true;stop();go(+b.dataset.go)}));
+play.addEventListener('click',()=>{touched=true;timer?stop():start()});
+go(reduce?STEPS.length-1:0,{animate:false});
+if(!reduce){
+  const io=new IntersectionObserver(es=>{es.forEach(e=>{
+    if(e.isIntersecting&&!touched&&!timer&&cur===0)start();
+    if(!e.isIntersecting&&timer)stop();
+  })},{threshold:.55});
+  io.observe(root);
+}
+})();
+</script>
+<script>
+(()=>{
+const root=document.getElementById('use');if(!root)return;
+const STEPS=[
+  ['등장','','사용자, 앱(아바타 플러그인), 에이전트, 업무 폴더의 파일과 온톨로지. 앞 장의 샘플 파일 그대로다.'],
+  ['대화를 열면 판을 고정한다','지금','앱이 연결 범위 파일의 판(해시)을 이 대화에 고정한다. 대화가 끝날 때까지, 다시 열어도 이 판만 본다.'],
+  ['매 턴 기준을 싣는다','지금','앱이 기준(policy.md 등) 본문과 그 턴의 도구 토큰을 지침에 싣는다. 온톨로지 본문은 싣지 않는다.'],
+  ['사용자가 묻는다','','파일에는 "주간 보고"와 "위클리 리포트"만 있다. "주간보고 규칙"이라는 글자는 어디에도 없다.'],
+  ['search — 용어부터 맞춘다','계획','에이전트는 지금처럼 search 를 부른다. 질의 "주간보고 규칙" 안에 용어 "주간 보고"(띄어쓰기는 정규화)가 들어 있어 그 용어에 맞는다. 남은 낱말 "규칙"은 거르지 않고 순위에만 쓴다.'],
+  ['범위와 판으로 거르고 돌려준다','계획','근거가 이 대화의 고정본에 있는 주장만 쓴다(오른쪽). 결과에는 상속으로 따라온 공통 정책과 "대체됨" 표시가 함께 온다.'],
+  ['필요한 파일만 read','지금','에이전트가 고른 파일만 읽는다. 고정된 판의 본문이 오고, 읽은 출처가 기록된다 — 현황과 [동의어로 추가]의 재료다.'],
+  ['답한다','','올해 절차와 공통 정책으로 답하고 출처를 보인다. 0건이었다면 near_terms 로 다시 찾는다 — 이때 저장되는 것은 없다.']
+];
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const groups=[...root.querySelectorAll('svg g[data-s]')],btns=[...root.querySelectorAll('[data-go]')],play=root.querySelector('[data-play]');
+const filter=root.querySelector('.filter'),dot=document.getElementById('use-dot');
+const $=s=>root.querySelector(s);
+let cur=-1,timer=null,touched=false;
+function travel(g){
+  if(reduce)return;
+  const paths=[...g.querySelectorAll('path.msg')];if(!paths.length)return;
+  dot.classList.add('on');
+  const seq=paths.flatMap(p=>{const L=p.getTotalLength();return [p.getPointAtLength(0),p.getPointAtLength(L)]});
+  const frames=seq.map(pt=>({transform:`translate(${pt.x-70}px,${pt.y-44}px)`}));
+  dot.animate(frames,{duration:700*paths.length,easing:'ease-in-out',fill:'forwards'});
+}
+function go(n,{animate=true}={}){
+  n=Math.max(0,Math.min(STEPS.length-1,n));const prev=cur;cur=n;
+  groups.forEach(g=>{const s=+g.dataset.s;g.classList.toggle('on',s<=n);g.classList.toggle('cur',s===n)});
+  filter.classList.toggle('judged',n>=5);
+  filter.querySelectorAll('li').forEach(li=>{li.querySelector('.vd').textContent=n>=5?(li.dataset.pass==='1'?'✓ 씀':'✗ '+li.dataset.why):''});
+  btns.forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.go===n)));
+  $('[data-n]').textContent=n;$('[data-t]').textContent=STEPS[n][0];
+  const k=$('[data-k]');k.textContent=STEPS[n][1];k.className='tag '+(STEPS[n][1]==='지금'?'green':STEPS[n][1]==='계획'?'blue':'');k.hidden=!STEPS[n][1];
+  $('[data-d]').textContent=STEPS[n][2];
+  if(n===0)dot.classList.remove('on');
+  if(animate&&n>prev){const g=groups.find(x=>+x.dataset.s===n);if(g)travel(g)}
+}
+function stop(){clearInterval(timer);timer=null;play.textContent='▶ 처음부터'}
+function start(){stop();go(0,{animate:false});play.textContent='❚❚ 멈춤';
+  timer=setInterval(()=>{if(cur>=STEPS.length-1){stop();return}go(cur+1)},3400)} // 한 단계를 읽을 시간을 두고 넘긴다
+btns.forEach(b=>b.addEventListener('click',()=>{touched=true;stop();go(+b.dataset.go)}));
+play.addEventListener('click',()=>{touched=true;timer?stop():start()});
+go(reduce?STEPS.length-1:0,{animate:false});
+if(!reduce){new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting&&!touched&&!timer&&cur===0)start();
+  if(!e.isIntersecting&&timer)stop();
+}),{threshold:.5}).observe(root)}
+})();
 </script>
 </body>
 </html>
