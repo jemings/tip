@@ -1,0 +1,1113 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub, 하나도 안 무서워 — 새내기를 위한 Git & GitHub</title>
+<meta name="description" content="Git과 GitHub를 처음 만나는 대학 새내기를 위한 모션그래픽 안내서. 명령어 대신 세이브 포인트·연습장·팀플·홈페이지 비유로, 무엇을 할 수 있는지부터 설명한다.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbf6ee; --panel:#fff; --panel2:#f4ede1; --ink:#1f2433; --ink2:#454c5e; --muted:#7b8294; --line:#e6dccb;
+  --coral:#ef5b3a; --coral-soft:#ffe5dc; --green:#1f9154; --green-soft:#dcf3e5; --blue:#3567d8; --blue-soft:#e2eaff;
+  --purple:#7a4bd9; --purple-soft:#eee6ff; --yellow:#e9a70c; --yellow-soft:#ffefc2; --red:#cf3b3b; --red-soft:#fde3e3;
+  --g0:#ebe4d6; --g1:#b5e3c3; --g2:#69c48b; --g3:#2b9b58; --g4:#1a683b;
+  --shadow:0 1px 2px rgba(31,36,51,.06),0 12px 32px rgba(31,36,51,.08);
+  --sans:"Pretendard Variable",Pretendard,system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --hand:"Gaegu","Pretendard Variable",cursive;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){:root{
+  --paper:#161922; --panel:#1f2330; --panel2:#282d3b; --ink:#eef0f6; --ink2:#c3c8d4; --muted:#8f96a6; --line:#343a4b;
+  --coral:#ff8466; --coral-soft:#3f2720; --green:#4cc485; --green-soft:#16321f; --blue:#82a6ff; --blue-soft:#1d2848;
+  --purple:#ad90ff; --purple-soft:#2a2145; --yellow:#ffcf5a; --yellow-soft:#3d3214; --red:#ff7b7b; --red-soft:#3d1f22;
+  --g0:#272c38; --g1:#1a4a2e; --g2:#23733f; --g3:#34a95f; --g4:#62de90;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35); color-scheme:dark;
+}}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:clamp(15px,.85rem + .3vw,18px);line-height:1.62;word-break:keep-all;overflow-wrap:break-word;overflow:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);background-size:24px 24px;opacity:.55;pointer-events:none}
+h1,h2,h3,h4{margin:0;line-height:1.22;letter-spacing:-.025em;text-wrap:balance}
+h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:850}
+h2{font-size:clamp(1.75rem,3.4vw,2.8rem);font-weight:800}
+h3{font-size:1.12rem;font-weight:750}
+p{margin:0}
+b,strong{font-weight:750}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+.hand{font-family:var(--hand);font-weight:700}
+.kicker{font-family:var(--hand);font-size:clamp(1.15rem,1rem + .5vw,1.45rem);font-weight:700;color:var(--coral);line-height:1.2}
+.lede{font-size:clamp(1.05rem,.98rem + .45vw,1.32rem);color:var(--ink2);max-width:58ch;line-height:1.6}
+.note{font-family:var(--hand);font-weight:700;font-size:clamp(1.15rem,1rem + .5vw,1.45rem);color:var(--coral);line-height:1.3}
+.small{font-size:.88rem;color:var(--muted)}
+.mono{font-family:var(--mono);font-size:.9em}
+mark{color:inherit;background:linear-gradient(transparent 55%,var(--yellow-soft) 55%) no-repeat;background-size:100% 100%;padding:0 .08em}
+.slide.active mark{animation:hl .9s ease .55s both}
+@keyframes hl{from{background-size:0 100%}}
+
+/* ---------- 덱 골격 ---------- */
+.progress{position:fixed;top:0;left:0;height:4px;width:calc(var(--p,0)*100%);background:var(--coral);z-index:40;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.topbar{position:fixed;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,40px);z-index:30;background:linear-gradient(var(--paper) 55%,transparent);pointer-events:none}
+.brand{font-family:var(--hand);font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:.45rem;pointer-events:auto;color:var(--ink);text-decoration:none}
+.brand svg{width:22px;height:22px}
+.topbar .where{font-size:.85rem;color:var(--muted)}
+.deck{position:fixed;inset:0;z-index:1}
+.slide{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:76px clamp(18px,5vw,64px) 104px;opacity:0;visibility:hidden;transform:translateX(48px);transition:opacity .45s ease,transform .6s cubic-bezier(.2,.8,.2,1),visibility 0s linear .6s}
+.slide.before{transform:translateX(-48px)}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .6s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.inner{max-width:1120px;margin:0 auto;min-height:calc(100svh - 180px);display:grid;align-content:center;gap:clamp(14px,2.4vh,26px)}
+.nav{position:fixed;left:0;right:0;bottom:0;height:78px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:30;background:linear-gradient(transparent,var(--paper) 45%)}
+.nav .arrow{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:var(--panel);font-size:1.15rem;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,border-color .2s}
+.nav .arrow:hover{transform:translateY(-2px);border-color:var(--ink)}
+.nav .arrow:disabled{opacity:.3;cursor:default;transform:none}
+.dots{display:flex;gap:6px;align-items:center}
+.dots button{width:9px;height:9px;border-radius:5px;border:0;padding:0;background:var(--line);cursor:pointer;transition:width .3s,background .3s}
+.dots button[aria-current="true"]{width:26px;background:var(--coral)}
+.count{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:4.2em;text-align:center}
+
+/* ---------- 모션 유틸 ---------- */
+.slide.active .rise{animation:rise .7s cubic-bezier(.2,.8,.2,1) var(--d,0s) both}
+.slide.active .pop{animation:pop .55s cubic-bezier(.3,1.6,.5,1) var(--d,0s) both}
+.slide.active .fade{animation:fade .8s ease var(--d,0s) both}
+.slide.active .drop{animation:drop .6s cubic-bezier(.3,1.4,.5,1) var(--d,0s) both}
+.slide.active .draw{stroke-dasharray:1;animation:draw var(--dur,1.2s) cubic-bezier(.5,0,.3,1) var(--d,0s) both}
+svg .pop,svg .pulse{transform-box:fill-box;transform-origin:center}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}}
+@keyframes pop{from{opacity:0;transform:scale(.3)}}
+@keyframes fade{from{opacity:0}}
+@keyframes drop{from{opacity:0;transform:translateY(-60px) rotate(0deg)}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes pulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(2.6)}}
+@keyframes bob{50%{transform:translateY(-6px)}}
+@keyframes nudge{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--coral) 55%,transparent)}50%{box-shadow:0 0 0 10px transparent}}
+@keyframes flash{from{background:var(--green-soft);box-shadow:0 0 0 6px var(--green-soft)}}
+
+/* ---------- 공통 부품 ---------- */
+.grid{display:grid;gap:clamp(12px,1.6vw,20px)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.split{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);align-items:center;gap:clamp(18px,3.5vw,48px)}
+.split.todo-split{grid-template-columns:minmax(0,1.6fr) minmax(0,.8fr)}
+.stack{display:grid;gap:clamp(12px,2vh,20px);align-content:start}
+.card{background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+.card p{color:var(--ink2)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn{font-weight:700;font-size:.93rem;padding:.6em 1.1em;border-radius:999px;border:1.5px solid var(--ink);background:var(--panel);cursor:pointer;transition:transform .15s,opacity .2s,background .2s}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.ghost{border-color:var(--line);color:var(--muted)}
+.btn.nudge:not(:disabled){animation:nudge 1.6s ease-in-out infinite}
+.status{min-height:1.6em;font-weight:600;color:var(--ink2)}
+.pill{display:inline-flex;align-items:center;gap:.35em;padding:.12em .7em;border-radius:999px;font-size:.82rem;font-weight:700;white-space:nowrap}
+.pill.open{background:var(--green-soft);color:var(--green)}
+.pill.merged{background:var(--purple-soft);color:var(--purple)}
+.big-line{font-size:clamp(1.15rem,1rem + .6vw,1.5rem);font-weight:700;line-height:1.5;max-width:44ch}
+.big-line b{color:var(--coral)}
+
+/* SVG 공통 */
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--sans);fill:var(--ink2);font-size:14px;font-weight:600}
+svg text.hand{font-family:var(--hand);font-weight:700;fill:var(--coral);font-size:24px}
+svg text.muted{fill:var(--muted);font-weight:500}
+svg text.halo{paint-order:stroke;stroke:var(--panel);stroke-width:6px;stroke-linejoin:round}
+.ln{fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.ln.ink{stroke:var(--ink)} .ln.coral{stroke:var(--coral)} .ln.blue{stroke:var(--blue)} .ln.green{stroke:var(--green)} .ln.yellow{stroke:var(--yellow)} .ln.purple{stroke:var(--purple)} .ln.dash{stroke:var(--muted);stroke-width:2.5;stroke-dasharray:6 7}
+.cm{stroke-width:4;fill:var(--panel)}
+.cm.ink{stroke:var(--ink)} .cm.coral{stroke:var(--coral)} .cm.blue{stroke:var(--blue)} .cm.green{stroke:var(--green)} .cm.yellow{stroke:var(--yellow)}
+.cm.merge{fill:var(--purple);stroke:var(--purple)}
+.ring{fill:none;stroke:var(--coral);stroke-width:3;opacity:0}
+.slide.active .ring.pulse{animation:pulse 1.8s ease-out 2s infinite}
+
+/* ---------- 01 표지 ---------- */
+#cover .inner{gap:clamp(16px,3vh,30px)}
+#cover h1 .accent{color:var(--coral)}
+.cover-graph{max-width:900px}
+.hint{display:inline-flex;gap:.5em;align-items:center;font-size:.9rem;color:var(--muted)}
+kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:.05em .45em;background:var(--panel);color:var(--ink2)}
+
+/* ---------- 02 파일 지옥 ---------- */
+.pile{display:flex;flex-wrap:wrap;gap:12px 14px;max-width:900px}
+.file{display:inline-flex;align-items:center;gap:.55em;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:.55em .9em;box-shadow:var(--shadow);font-weight:600;font-size:.95rem;transform:rotate(var(--r,0deg))}
+.file .ic{width:22px;height:26px;border-radius:3px 9px 3px 3px;background:var(--blue-soft);border:1.5px solid var(--blue);flex:none}
+.file.worst{border-color:var(--red);background:var(--red-soft)}
+.file.worst .ic{background:var(--red-soft);border-color:var(--red)}
+.thoughts{display:flex;flex-wrap:wrap;gap:14px}
+.thought{font-family:var(--hand);font-weight:700;font-size:clamp(1.15rem,1rem + .5vw,1.4rem);background:var(--panel2);border-radius:22px;padding:.45em 1em;position:relative}
+.thought::after{content:"";position:absolute;left:26px;bottom:-9px;width:16px;height:16px;border-radius:50%;background:var(--panel2)}
+.answer{border-left:5px solid var(--coral);padding:.2em 0 .2em 1rem}
+
+/* ---------- 03 타임라인 ---------- */
+.tl{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));--p:0}
+.tl-track,.tl-fill{position:absolute;top:15px;left:10%;height:5px;border-radius:3px}
+.tl-track{right:10%;background:var(--line)}
+.tl-fill{width:calc(var(--p)*80%);background:var(--ink);transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.tl button{position:relative;display:grid;justify-items:center;gap:8px;background:none;border:0;padding:0 2px;cursor:pointer}
+.tl .dot{width:34px;height:34px;border-radius:50%;background:var(--panel);border:4px solid var(--line);display:grid;place-items:center;font-size:.8rem;font-weight:800;color:var(--muted);transition:all .35s cubic-bezier(.3,1.6,.5,1)}
+.tl .past .dot{border-color:var(--ink);color:var(--ink)}
+.tl .on .dot{border-color:var(--coral);background:var(--coral);color:#fff;transform:scale(1.22)}
+.tl .lbl{font-size:.82rem;font-weight:600;color:var(--muted);line-height:1.3;text-align:center}
+.tl .on .lbl{color:var(--ink)}
+.tl-info{display:flex;gap:.6em;align-items:center;flex-wrap:wrap;font-size:.95rem}
+.doc{padding:0;overflow:hidden}
+.doc-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1.5px solid var(--line);font-size:.8rem;color:var(--muted);background:var(--panel2)}
+.doc-bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.doc-bar span{margin-left:8px;font-family:var(--mono)}
+.doc-body{padding:20px 24px 24px;display:grid;gap:14px;min-height:340px;align-content:start}
+.doc-body h4{font-size:1.25rem}
+.doc-body p{font-size:.98rem;color:var(--ink2);border-radius:6px}
+.doc-body .ghost{color:var(--muted);font-style:italic}
+.doc-body ol{margin:0;padding-left:1.3em;color:var(--ink2);border-radius:6px}
+.doc-body .new{animation:flash 1.4s ease both}
+.typo{text-decoration:underline wavy var(--red);text-underline-offset:4px}
+.chart{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:end;height:130px;padding:8px 10px 0;border-bottom:2px solid var(--ink2);border-radius:6px 6px 0 0;position:relative}
+.chart div{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.chart div i{display:block;width:60%;height:var(--h);background:var(--coral);border-radius:6px 6px 0 0;opacity:.85}
+.chart div:nth-child(1) i{background:var(--blue)} .chart div:nth-child(3) i{background:var(--green)}
+.chart.new div i{animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.chart span{font-size:.75rem;color:var(--muted);position:absolute;bottom:-22px}
+.chart div{position:relative}
+.chart em{position:absolute;right:0;top:-4px;font-size:.72rem;color:var(--muted);font-style:normal}
+@keyframes grow{from{height:0}}
+.doc-body .chart-wrap{padding-bottom:20px}
+
+/* ---------- 04 커밋 해부 ---------- */
+.commit{display:grid;gap:12px}
+.commit-head{display:flex;align-items:center;gap:.6em;font-size:1.05rem;font-weight:700;padding-bottom:10px;border-bottom:1.5px dashed var(--line)}
+.commit-head .hash{margin-left:auto;font-family:var(--mono);font-size:.8rem;color:var(--muted);background:var(--panel2);padding:.1em .5em;border-radius:6px}
+.crow{display:grid;grid-template-columns:7.4em 1fr;gap:12px;align-items:start}
+.crow .k{font-size:.85rem;font-weight:700;color:var(--muted);padding-top:.15em;white-space:nowrap}
+.diff{font-size:.9rem;line-height:1.55;display:grid;gap:4px}
+.diff .del{background:var(--red-soft);color:var(--red);padding:.25em .6em;border-radius:6px;text-decoration:line-through;text-decoration-thickness:1.5px}
+.diff .add{background:var(--green-soft);color:var(--green);padding:.25em .6em;border-radius:6px}
+.crow.msg .v{font-weight:800;background:var(--yellow-soft);padding:.2em .6em;border-radius:6px;justify-self:start}
+.memo{display:grid;gap:10px}
+.memo div{display:flex;align-items:center;gap:.7em;padding:.55em .9em;border-radius:12px;background:var(--panel);border:1.5px solid var(--line);font-weight:600}
+.memo .bad{color:var(--muted)} .memo .bad::before{content:"✗";color:var(--red);font-weight:900}
+.memo .good::before{content:"✓";color:var(--green);font-weight:900}
+.memo .good{border-color:var(--green)}
+
+/* ---------- 05 브랜치 ---------- */
+#branchSvg .br-path,#branchSvg .mg-path,#branchSvg .mc-path{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1s cubic-bezier(.5,0,.3,1)}
+#branchSvg .bc,#branchSvg .bl,#branchSvg .end,#branchSvg .tail{opacity:0;transform:scale(.3);transform-box:fill-box;transform-origin:center;transition:opacity .4s ease,transform .45s cubic-bezier(.3,1.6,.5,1)}
+#branchSvg.s-branch .br-path{stroke-dashoffset:0}
+#branchSvg.s-branch .bc1{opacity:1;transform:none;transition-delay:.55s}
+#branchSvg.s-branch .bc2{opacity:1;transform:none;transition-delay:.85s}
+#branchSvg.s-branch .bl{opacity:1;transform:none;transition-delay:1s}
+#branchSvg.s-merged .mg-path,#branchSvg.s-merged .mc-path,#branchSvg.s-dropped .mc-path{stroke-dashoffset:0}
+#branchSvg.s-merged .end,#branchSvg.s-dropped .end,#branchSvg.s-merged .tail,#branchSvg.s-dropped .tail{opacity:1;transform:none;transition-delay:.9s}
+#branchSvg .end{fill:var(--panel);stroke:var(--ink)}
+#branchSvg.s-merged .end{fill:var(--purple);stroke:var(--purple)}
+#branchSvg .branch-g{transition:opacity .8s ease}
+#branchSvg.s-dropped .branch-g{opacity:.16}
+#branchSvg .x{opacity:0;transition:opacity .4s ease .3s}
+#branchSvg.s-dropped .x{opacity:1}
+.branch-card{display:grid;gap:14px}
+
+/* ---------- 06 Git vs GitHub ---------- */
+.vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:stretch}
+.vs .card{display:grid;gap:6px;align-content:start}
+.vs .tagline{font-size:.82rem;font-weight:700;color:var(--muted)}
+.vs h3{font-size:1.5rem}
+.vs .git h3{color:var(--coral)} .vs .hub h3{color:var(--blue)}
+.vs .ne{align-self:center;font-family:var(--hand);font-size:2rem;font-weight:700;color:var(--muted)}
+.hub-low{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center}
+.analogy{display:flex;flex-wrap:wrap;align-items:center;gap:.6em 1em;font-weight:700;font-size:1.05rem;background:var(--panel2);border-radius:16px;padding:12px 18px}
+.analogy .eq{font-family:var(--hand);font-size:1.5rem;color:var(--coral)}
+.analogy small{flex-basis:100%;font-weight:500;color:var(--ink2);font-size:.92rem}
+.dev{fill:var(--panel);stroke:var(--ink);stroke-width:3}
+.cloud{fill:var(--blue-soft);stroke:var(--blue);stroke-width:3}
+.flowdot{fill:var(--coral)}
+
+/* ---------- 07 팀플 ---------- */
+.chat{display:grid;gap:10px;align-content:start}
+.msg{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:start}
+.msg .av,.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:800;color:#fff;background:var(--c,var(--muted))}
+.msg .b{background:var(--panel2);border-radius:4px 16px 16px 16px;padding:.45em .8em;font-size:.93rem;justify-self:start}
+.msg .b .att{display:inline-flex;gap:.4em;align-items:center;font-weight:700}
+.msg.me{grid-template-columns:1fr 34px}
+.msg.me .b{background:var(--coral-soft);border-radius:16px 4px 16px 16px;justify-self:end;grid-column:1;grid-row:1}
+.msg.me .av{grid-column:2}
+.panel-title{display:flex;align-items:center;gap:.5em;font-weight:800;font-size:1.05rem;margin-bottom:6px}
+.panel-title .pill{margin-left:auto}
+.bad-pill{background:var(--red-soft);color:var(--red)}
+.good-pill{background:var(--green-soft);color:var(--green)}
+
+/* ---------- 08 Pull Request ---------- */
+.pr{display:grid;gap:12px}
+.pr-head{display:flex;align-items:center;gap:.6em;flex-wrap:wrap;padding-bottom:10px;border-bottom:1.5px dashed var(--line)}
+.pr-head h3{font-size:1.1rem}
+.pr-head .num{color:var(--muted);font-weight:500}
+.pr-head .pill{margin-left:auto;transition:all .4s}
+.pr-events{list-style:none;margin:0;padding:0 0 0 4px;display:grid;gap:10px;position:relative}
+.pr-events::before{content:"";position:absolute;left:20px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.pr-events li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;position:relative;opacity:.0;transform:translateY(10px);transition:opacity .45s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.pr-events li.on{opacity:1;transform:none}
+.pr-events .say{font-family:var(--hand);font-weight:700;font-size:1.18rem;color:var(--ink);line-height:1.3}
+.pr-events .sys{background:var(--panel2);color:var(--ink2);border:2px solid var(--line)}
+.pr-events .m{background:var(--purple);color:#fff;border:0}
+.pr-events .plus{color:var(--green);font-weight:800}
+.pr-events .minus{color:var(--red);font-weight:800}
+.pr-events code{font-family:var(--mono);font-size:.82rem;background:var(--yellow-soft);padding:.1em .45em;border-radius:5px}
+.pr-events .merged-row{font-weight:800;color:var(--purple)}
+.why{background:var(--panel2);border-radius:16px;padding:14px 18px;font-size:.95rem;color:var(--ink2)}
+
+/* ---------- 09 갤러리 ---------- */
+.use{display:grid;gap:8px;align-content:start;position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s}
+.use:hover{transform:translateY(-4px);border-color:var(--ink)}
+.use .em{font-size:2.1rem;line-height:1;display:inline-block}
+.slide.active .use .em{animation:bob 2.6s ease-in-out infinite;animation-delay:var(--b,0s)}
+.use h3{font-size:1.15rem}
+.use p{font-size:.93rem}
+.use .see{font-size:.78rem;font-weight:700;color:var(--coral)}
+
+/* ---------- 10 Pages ---------- */
+.pages-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center}
+.pnode{display:grid;justify-items:center;gap:8px;text-align:center;padding:20px 12px}
+.pnode .em{font-size:2.6rem;line-height:1}
+.pnode b{font-size:1.05rem}
+.pnode small{color:var(--muted);font-size:.85rem}
+.parrow{width:64px}
+.urlbar{display:flex;align-items:center;gap:10px;background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:.6em 1.2em;box-shadow:var(--shadow);font-family:var(--mono);font-size:clamp(.85rem,.8rem + .3vw,1.05rem);max-width:760px;overflow:hidden}
+.urlbar .lock{color:var(--green)}
+.urlbar .typed{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.urlbar .caret{width:2px;height:1.2em;background:var(--coral);animation:blink 1s steps(1) infinite;flex:none}
+@keyframes blink{50%{opacity:0}}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:.35em .95em;font-weight:600;font-size:.93rem}
+.chip.hot{border-color:var(--coral);color:var(--coral)}
+
+/* ---------- 11 잔디 ---------- */
+.grass-card{padding:18px 20px 16px;overflow-x:auto}
+.grass-wrap{min-width:620px;display:grid;gap:6px}
+.months,.terms{display:grid;grid-template-columns:repeat(52,minmax(0,1fr));font-size:.72rem;color:var(--muted)}
+.months span{white-space:nowrap}
+.grass{display:grid;grid-template-rows:repeat(7,auto);grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:3px}
+.grass i{aspect-ratio:1;border-radius:3px;background:var(--g0)}
+.grass i.l1{background:var(--g1)} .grass i.l2{background:var(--g2)} .grass i.l3{background:var(--g3)} .grass i.l4{background:var(--g4)}
+.slide.active .grass i{animation:sprout .35s cubic-bezier(.3,1.6,.5,1) var(--d) both}
+@keyframes sprout{from{transform:scale(0);opacity:0}}
+.terms span{border-top:3px solid var(--line);padding-top:3px;font-weight:600;white-space:nowrap;overflow:hidden}
+.terms .sem{border-color:var(--green);color:var(--green)}
+.legend{display:flex;align-items:center;gap:4px;font-size:.75rem;color:var(--muted);justify-content:flex-end}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* ---------- 12 Fork / Star ---------- */
+.fork-stage{display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);align-items:center;gap:8px}
+.repo{display:grid;gap:10px;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+.repo-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.repo-top .name{font-family:var(--mono);font-weight:700;font-size:.92rem}
+.repo-top small{flex-basis:100%;color:var(--muted);font-size:.78rem}
+.star{margin-left:auto;display:inline-flex;align-items:center;gap:.3em;border:1.5px solid var(--line);background:var(--panel2);border-radius:999px;padding:.15em .7em;font-weight:700;font-size:.85rem;cursor:pointer;transition:transform .2s}
+.star.on{border-color:var(--yellow);background:var(--yellow-soft)}
+.star.bump{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.recipe{margin:0;padding-left:1.2em;display:grid;gap:3px;font-size:.95rem;color:var(--ink2)}
+.recipe .add{color:var(--green);font-weight:700;list-style:"+ "}
+.recipe .add.hide{display:none}
+.recipe .add.show{animation:flash 1.4s ease both;border-radius:5px}
+.repo.mine{border-color:var(--coral)}
+.repo.mine.hide{opacity:0;transform:translateX(-60px) scale(.9);pointer-events:none}
+.fork-arrow{display:grid;justify-items:center;gap:2px;font-family:var(--hand);font-weight:700;color:var(--coral);font-size:1.2rem;transition:opacity .4s}
+.fork-arrow.hide{opacity:0}
+.fork-arrow svg{width:70px}
+.reply{font-family:var(--hand);font-weight:700;font-size:1.12rem;color:var(--purple);background:var(--purple-soft);border-radius:12px;padding:.35em .8em}
+.reply.hide{display:none}
+.reply.show{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+
+/* ---------- 13 걱정 vs 사실 ---------- */
+.flip{perspective:1000px;background:none;border:0;padding:0;cursor:pointer;text-align:left;display:grid}
+.flip .face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;padding:18px 20px;border:1.5px solid var(--line);box-shadow:var(--shadow);transition:transform .7s cubic-bezier(.3,1.3,.5,1);display:flex;flex-direction:column;gap:8px;min-height:150px}
+.flip .front{background:var(--panel)}
+.flip .back{background:var(--green-soft);border-color:var(--green);transform:rotateY(180deg)}
+.flip[aria-pressed="true"] .front{transform:rotateY(-180deg)}
+.flip[aria-pressed="true"] .back{transform:rotateY(0)}
+.flip .q{font-family:var(--hand);font-weight:700;font-size:1.35rem;line-height:1.3}
+.flip .tap{font-size:.78rem;color:var(--muted);margin-top:auto}
+.flip .back b{color:var(--green)}
+.flip .back p{font-size:.93rem;color:var(--ink)}
+.caution{border:2px solid var(--yellow);background:var(--yellow-soft);border-radius:18px;padding:16px 20px;display:grid;gap:6px}
+.caution h3{display:flex;align-items:center;gap:.4em}
+.caution ul{margin:0;padding-left:1.2em;display:grid;gap:3px;font-size:.95rem}
+
+/* ---------- 14 단어장 ---------- */
+.term{display:grid;gap:4px;align-content:start;padding:14px 16px}
+.term .top{display:flex;align-items:center;gap:.5em}
+.term .em{font-size:1.4rem}
+.term .en{font-family:var(--mono);font-weight:700;font-size:.92rem}
+.term .ko{font-family:var(--hand);font-weight:700;font-size:1.3rem;color:var(--coral);line-height:1.1}
+.term p{font-size:.86rem;line-height:1.5}
+
+/* ---------- 15 체크리스트 ---------- */
+.todo{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.todo label{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:12px 16px;cursor:pointer;transition:border-color .2s,background .2s}
+.todo input{appearance:none;-webkit-appearance:none;width:28px;height:28px;border-radius:8px;border:2.5px solid var(--line);margin:0;display:grid;place-items:center;cursor:pointer;transition:all .25s cubic-bezier(.3,1.6,.5,1);background:var(--panel)}
+.todo input::after{content:"✓";color:#fff;font-weight:900;transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.todo input:checked{background:var(--green);border-color:var(--green)}
+.todo input:checked::after{transform:scale(1)}
+.todo label:has(input:checked){border-color:var(--green);background:color-mix(in srgb,var(--green-soft) 60%,var(--panel))}
+.todo label:has(input:checked) b{text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:2px}
+.todo b{display:block}
+.todo span small{display:block;color:var(--muted);font-size:.85rem;line-height:1.45;margin-top:2px}
+.todo .bonus{border-style:dashed}
+.meter{display:grid;gap:8px;justify-items:center;text-align:center}
+.meter svg{width:min(200px,50vw)}
+.meter .track{fill:none;stroke:var(--line);stroke-width:14}
+.meter .val{fill:none;stroke:var(--green);stroke-width:14;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
+.meter text{font-size:34px;font-weight:850;fill:var(--ink)}
+.meter text.sub{font-size:13px;font-weight:600;fill:var(--muted)}
+
+/* ---------- 16 마무리 ---------- */
+#end h2{font-size:clamp(2.1rem,5vw,4rem);font-weight:850}
+#end h2 span{color:var(--coral)}
+.end-graph{max-width:1000px}
+.repo-link{font-size:.92rem;color:var(--ink2)}
+.repo-link a{color:var(--blue);font-weight:700;text-underline-offset:3px}
+
+/* ---------- 반응형 ---------- */
+@media(max-width:920px){
+  .split,.split.todo-split,.vs,.hub-low{grid-template-columns:1fr}
+  .vs .ne{justify-self:center}
+  .g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pages-flow{grid-template-columns:1fr}
+  .parrow{transform:rotate(90deg);justify-self:center;width:48px}
+  .topbar .where{display:none}
+}
+@media(max-width:600px){
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .fork-stage{grid-template-columns:1fr}
+  .fork-arrow svg{transform:rotate(90deg)}
+  .dots{display:none}
+  .tl .lbl{font-size:.7rem}
+  .crow{grid-template-columns:1fr;gap:4px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+}
+@media print{
+  body{overflow:visible}
+  .deck{position:static}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;break-after:page;overflow:visible}
+  .nav,.topbar,.progress{display:none}
+  .pr-events li{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<header class="topbar">
+  <span class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16M6 8c0 4 12 2 12 8" fill="none" stroke="var(--coral)" stroke-width="2.6" stroke-linecap="round"/><circle cx="6" cy="4" r="2.4" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><circle cx="6" cy="20" r="2.4" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><circle cx="18" cy="16" r="2.4" fill="var(--paper)" stroke="var(--coral)" stroke-width="2"/></svg>
+    Git &amp; GitHub 첫걸음
+  </span>
+  <span class="where" id="where"></span>
+</header>
+
+<main class="deck" id="deck">
+
+<!-- 01 -->
+<section class="slide" id="cover" data-title="표지"><div class="inner">
+  <span class="kicker rise">대학 새내기를 위한 안내서</span>
+  <h1 class="rise" style="--d:.1s">GitHub,<br><span class="accent">하나도</span> 안 무서워</h1>
+  <p class="lede rise" style="--d:.25s">명령어는 몰라도 괜찮아. 오늘은 Git과 GitHub가 <mark>무엇이고, 그걸로 뭘 할 수 있는지</mark>만 알아 가자. 개념만 잡히면 나머지는 버튼 몇 번이야.</p>
+  <svg class="cover-graph" viewBox="0 0 680 230" role="img" aria-label="세이브 포인트가 줄지어 이어지다가 옆길로 갈라지고 다시 합쳐지는 그림">
+    <path class="ln ink draw" pathLength="1" d="M20 160 H650" style="--d:.4s;--dur:1.6s"/>
+    <path class="ln coral draw" pathLength="1" d="M230 160 C272 160 268 70 310 70 H410 C452 70 448 160 490 160" style="--d:1.2s;--dur:1.2s"/>
+    <circle class="cm ink pop" cx="70" cy="160" r="12" style="--d:.6s"/>
+    <circle class="cm ink pop" cx="150" cy="160" r="12" style="--d:.8s"/>
+    <circle class="cm ink pop" cx="230" cy="160" r="12" style="--d:1s"/>
+    <circle class="cm coral pop" cx="330" cy="70" r="12" style="--d:1.6s"/>
+    <circle class="cm coral pop" cx="400" cy="70" r="12" style="--d:1.85s"/>
+    <circle class="cm merge pop" cx="490" cy="160" r="13" style="--d:2.25s"/>
+    <circle class="ring pulse" cx="590" cy="160" r="13"/>
+    <circle class="cm coral pop" cx="590" cy="160" r="13" style="--d:2.5s"/>
+    <text class="muted fade" x="70" y="200" text-anchor="middle" style="--d:.8s">시작</text>
+    <text class="muted fade" x="365" y="40" text-anchor="middle" style="--d:2s">새 아이디어 실험</text>
+    <text class="muted fade" x="490" y="200" text-anchor="middle" style="--d:2.4s">합치기</text>
+    <path class="ln coral draw" pathLength="1" d="M640 70 C625 95 612 115 600 140" style="stroke-width:3;--d:2.8s;--dur:.5s"/>
+    <path class="ln coral draw" pathLength="1" d="M592 126 L600 141 L613 130" style="stroke-width:3;--d:3.2s;--dur:.3s"/>
+    <text class="hand fade" x="612" y="56" text-anchor="middle" style="--d:2.9s">너의 첫 커밋!</text>
+  </svg>
+  <p class="hint rise" style="--d:.5s"><kbd>→</kbd> 키나 아래 버튼으로 넘겨. 휴대폰이면 옆으로 밀면 돼.</p>
+</div></section>
+
+<!-- 02 -->
+<section class="slide" id="pain" data-title="이런 적 있지?"><div class="inner">
+  <span class="kicker rise">시작하기 전에, 이런 적 있지?</span>
+  <h2 class="rise" style="--d:.1s">“최종”이 일곱 개인 폴더</h2>
+  <div class="pile" aria-label="파일 이름이 점점 길어지는 레포트 파일들">
+    <span class="file drop" style="--d:.3s;--r:-2deg"><span class="ic"></span>레포트.hwp</span>
+    <span class="file drop" style="--d:.5s;--r:1.5deg"><span class="ic"></span>레포트_수정.hwp</span>
+    <span class="file drop" style="--d:.7s;--r:-1deg"><span class="ic"></span>레포트_최종.hwp</span>
+    <span class="file drop" style="--d:.9s;--r:2.5deg"><span class="ic"></span>레포트_최종_진짜.hwp</span>
+    <span class="file drop" style="--d:1.1s;--r:-2.5deg"><span class="ic"></span>레포트_최종_진짜_마지막.hwp</span>
+    <span class="file drop" style="--d:1.3s;--r:1deg"><span class="ic"></span>레포트_최종_진짜_마지막(1).hwp</span>
+    <span class="file worst drop" style="--d:1.55s;--r:-1.5deg"><span class="ic"></span>레포트_교수님피드백반영_진짜최종(2).hwp</span>
+  </div>
+  <div class="thoughts">
+    <span class="thought pop" style="--d:2.1s">어제 지운 그 문단… 어느 파일에 있더라?</span>
+    <span class="thought pop" style="--d:2.5s">조원 넷이 카톡으로 이걸 주고받으면…?</span>
+  </div>
+  <p class="big-line answer rise" style="--d:3s">Git은 바로 이 혼란을 없애려고 만든 도구야. 파일은 <b>하나만</b> 두고, 그 파일이 지나온 <b>모든 순간</b>을 대신 기억해 줘.</p>
+</div></section>
+
+<!-- 03 -->
+<section class="slide" id="timeline" data-title="Git = 세이브 포인트"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">Git이 뭐냐면</span>
+      <h2 class="rise" style="--d:.1s">게임의 <mark>세이브 포인트</mark>야</h2>
+      <p class="lede rise" style="--d:.2s">게임에서 보스 앞에서 저장해 두듯, 작업하다가 “여기까지 좋다” 싶을 때 한 번씩 찍어 두는 거야. 그러면 언제든 그 순간으로 돌아갈 수 있어.</p>
+      <div class="tl rise" id="tl" style="--d:.35s" role="group" aria-label="리포트의 세이브 포인트 다섯 개">
+        <div class="tl-track"></div><div class="tl-fill"></div>
+        <button data-i="0"><span class="dot">1</span><span class="lbl">목차 잡기</span></button>
+        <button data-i="1"><span class="dot">2</span><span class="lbl">초안 쓰기</span></button>
+        <button data-i="2"><span class="dot">3</span><span class="lbl">그래프 추가</span></button>
+        <button data-i="3"><span class="dot">4</span><span class="lbl">결론 갈아엎기</span></button>
+        <button data-i="4"><span class="dot">5</span><span class="lbl">맞춤법 정리</span></button>
+      </div>
+      <p class="tl-info rise" style="--d:.45s" id="tlInfo" aria-live="polite"></p>
+      <p class="note rise" style="--d:.6s">4번에서 결론을 갈아엎었는데 옛날 게 더 나았다면? 3번을 눌러 봐. 그때 문장이 그대로 있어.</p>
+    </div>
+    <div class="card doc pop" style="--d:.3s">
+      <div class="doc-bar"><i></i><i></i><i></i><span>도시열섬_리포트</span></div>
+      <div class="doc-body" id="docBody"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 04 -->
+<section class="slide" id="commit" data-title="커밋에는 메모가 붙어"><div class="inner">
+  <span class="kicker rise">세이브 포인트 = 커밋(commit)</span>
+  <h2 class="rise" style="--d:.1s">세이브 포인트 하나에는 이게 다 들어 있어</h2>
+  <div class="grid split">
+    <div class="card commit pop" style="--d:.25s">
+      <div class="commit-head">💾 세이브 포인트 #2 <span class="hash">a3f9c1e</span></div>
+      <div class="crow rise" style="--d:.6s"><span class="k">📸 바뀐 내용</span>
+        <div class="diff"><div class="del">도시는 덥다.</div><div class="add">여름 낮 도심은 교외보다 기온이 높다. 이것을 ‘열섬’이라 한다.</div></div></div>
+      <div class="crow rise" style="--d:1s"><span class="k">👤 누가</span><span>너</span></div>
+      <div class="crow rise" style="--d:1.25s"><span class="k">🕒 언제</span><span>2026년 3월 12일 밤 11시 40분</span></div>
+      <div class="crow msg rise" style="--d:1.5s"><span class="k">💬 메모</span><span class="v">서론에 열섬 뜻 정리</span></div>
+      <p class="small rise" style="--d:1.8s">오른쪽 위 <span class="mono">a3f9c1e</span> 같은 이상한 글자는 세이브 포인트마다 붙는 고유 번호야. 외울 필요 전혀 없어.</p>
+    </div>
+    <div class="stack">
+      <p class="note rise" style="--d:.5s">메모는 미래의 너에게 쓰는 쪽지야.</p>
+      <p class="rise" style="--d:.6s">한 달 뒤에 기록을 훑어볼 때, 메모만 보고 “아, 여기서 이걸 했구나” 알 수 있으면 성공이야.</p>
+      <div class="memo">
+        <div class="bad rise" style="--d:.8s">수정</div>
+        <div class="bad rise" style="--d:.9s">ㅇㅇ</div>
+        <div class="bad rise" style="--d:1s">최종</div>
+        <div class="good rise" style="--d:1.2s">서론에 열섬 뜻 정리</div>
+        <div class="good rise" style="--d:1.3s">그래프 1에 단위(℃) 추가</div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 05 -->
+<section class="slide" id="branch" data-title="브랜치 = 연습장"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">브랜치(branch)</span>
+      <h2 class="rise" style="--d:.1s">마음껏 망쳐도 되는 <mark>연습장</mark></h2>
+      <p class="lede rise" style="--d:.2s">결론을 확 바꿔 보고 싶은데 지금 걸 망칠까 봐 무섭지? 본문은 그대로 두고 <b>옆길</b>을 하나 내서 거기서 실험하면 돼.</p>
+      <p class="rise" style="--d:.3s">마음에 들면 본문에 <b>합치고(merge)</b>, 별로면 그냥 <b>버리면</b> 끝이야. 본문은 털끝 하나 안 다쳐.</p>
+      <p class="note rise" style="--d:.45s">오른쪽 버튼을 직접 눌러 봐 →</p>
+    </div>
+    <div class="card branch-card pop" style="--d:.25s">
+      <svg id="branchSvg" viewBox="0 0 640 250" role="img" aria-label="본문 줄기에서 실험 브랜치가 갈라지는 그림">
+        <path class="ln dash" d="M240 180 H610"/>
+        <g class="branch-g">
+          <path class="ln coral br-path" pathLength="1" d="M230 180 C272 180 268 80 310 80 H420"/>
+          <circle class="cm coral bc bc1" cx="330" cy="80" r="12"/>
+          <circle class="cm coral bc bc2" cx="410" cy="80" r="12"/>
+          <text class="bl" x="370" y="46" text-anchor="middle" style="fill:var(--coral)">실험 브랜치: 과감한 결론</text>
+          <path class="ln coral mg-path" pathLength="1" d="M420 80 C462 80 458 180 500 180"/>
+        </g>
+        <g class="x"><path class="ln" d="M355 62 l30 36 M385 62 l-30 36" style="stroke:var(--red);stroke-width:4"/></g>
+        <path class="ln ink" d="M30 180 H240"/>
+        <path class="ln ink mc-path" pathLength="1" d="M230 180 H500"/>
+        <path class="ln ink tail" d="M500 180 H600"/>
+        <circle class="cm ink" cx="70" cy="180" r="12"/>
+        <circle class="cm ink" cx="150" cy="180" r="12"/>
+        <circle class="cm ink" cx="230" cy="180" r="12"/>
+        <circle class="cm end" cx="500" cy="180" r="13" style="stroke-width:4"/>
+        <text x="30" y="222">main (본문)</text>
+      </svg>
+      <p class="status" id="branchMsg" aria-live="polite"></p>
+      <div class="btns">
+        <button class="btn primary nudge" id="bTry">🌱 옆길에서 실험하기</button>
+        <button class="btn" id="bMerge" disabled>👍 마음에 들어, 합치기</button>
+        <button class="btn" id="bDrop" disabled>🙅 별로야, 버리기</button>
+        <button class="btn ghost" id="bReset">↺ 처음부터</button>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 06 -->
+<section class="slide" id="hub" data-title="Git과 GitHub는 달라"><div class="inner">
+  <span class="kicker rise">헷갈리는 두 이름</span>
+  <h2 class="rise" style="--d:.1s">Git과 GitHub는 다른 거야</h2>
+  <div class="vs">
+    <div class="card git rise" style="--d:.25s">
+      <span class="tagline">내 컴퓨터에 까는 프로그램</span>
+      <h3>Git</h3>
+      <p>지금까지 본 <b>세이브 포인트·연습장 기능</b> 그 자체야. 인터넷이 없어도 내 컴퓨터 안에서 혼자 돌아가.</p>
+    </div>
+    <span class="ne pop" style="--d:.45s">≠</span>
+    <div class="card hub rise" style="--d:.35s">
+      <span class="tagline">인터넷에 있는 웹사이트</span>
+      <h3>GitHub</h3>
+      <p>Git으로 기록한 프로젝트를 <b>기록째로 올려 두는 온라인 집</b>이야. 백업되고, 다른 사람과 같이 쓰고, 공개해서 보여 줄 수도 있어.</p>
+    </div>
+  </div>
+  <div class="grid hub-low">
+  <div class="stack">
+  <div class="analogy rise" style="--d:.55s">
+    Git : GitHub <span class="eq">=</span> 카메라 : 인스타그램
+    <small>카메라만 있어도 사진은 찍을 수 있지(Git). 인스타에 올리면 안전하게 보관되고, 친구에게 보여 주고, 댓글도 받을 수 있어(GitHub).</small>
+  </div>
+  <p class="note rise" style="--d:.9s">노트북이 고장 나도 GitHub엔 다 남아 있어. 학교 컴퓨터에서 받아 와서 이어 하면 끝!</p>
+  </div>
+  <svg id="syncSvg" viewBox="0 0 700 270" role="img" aria-label="내 노트북에서 GitHub로 올리고, GitHub에서 학교 컴퓨터로 받아 오는 그림" class="fade" style="--d:.7s">
+    <path id="pPush" class="ln dash" d="M170 150 Q205 85 290 92"/>
+    <path id="pPull" class="ln dash" d="M412 92 Q497 85 532 150"/>
+    <path class="cloud" d="M300 126 a30 30 0 0 1 -4 -59 a44 44 0 0 1 84 -10 a34 34 0 0 1 36 69 Z"/>
+    <text x="356" y="108" text-anchor="middle" style="fill:var(--blue);font-size:18px;font-weight:800">GitHub</text>
+    <rect class="dev" x="62" y="150" width="120" height="78" rx="9"/>
+    <path class="dev" d="M44 234 H200 L190 248 H54 Z"/>
+    <path class="ln coral" d="M88 190 H156" style="stroke-width:3"/>
+    <circle class="cm coral" cx="88" cy="190" r="6" style="stroke-width:3"/><circle class="cm coral" cx="122" cy="190" r="6" style="stroke-width:3"/><circle class="cm coral" cx="156" cy="190" r="6" style="stroke-width:3"/>
+    <rect class="dev" x="520" y="150" width="124" height="80" rx="7"/>
+    <rect x="574" y="230" width="16" height="12" style="fill:var(--ink)"/><rect x="552" y="242" width="60" height="6" rx="3" style="fill:var(--ink)"/>
+    <g id="pcLine" style="opacity:.25;transition:opacity .4s"><path class="ln coral" d="M548 190 H616" style="stroke-width:3"/><circle class="cm coral" cx="548" cy="190" r="6" style="stroke-width:3"/><circle class="cm coral" cx="582" cy="190" r="6" style="stroke-width:3"/><circle class="cm coral" cx="616" cy="190" r="6" style="stroke-width:3"/></g>
+    <text x="122" y="270" text-anchor="middle">내 노트북</text>
+    <text x="582" y="270" text-anchor="middle">학교 컴퓨터 · 팀원</text>
+    <text x="196" y="74" text-anchor="middle" style="fill:var(--coral);font-weight:800">push · 올리기</text>
+    <text x="506" y="74" text-anchor="middle" style="fill:var(--coral);font-weight:800">pull · 받아오기</text>
+    <g id="flowDots"><circle class="flowdot" r="7" cx="170" cy="150" style="opacity:0"/><circle class="flowdot" r="7" cx="170" cy="150" style="opacity:0"/><circle class="flowdot" r="7" cx="170" cy="150" style="opacity:0"/></g>
+  </svg>
+  </div>
+</div></section>
+
+<!-- 07 -->
+<section class="slide" id="team" data-title="팀플이 달라져"><div class="inner">
+  <span class="kicker rise">GitHub가 진짜 빛나는 순간</span>
+  <h2 class="rise" style="--d:.1s">팀플이 이렇게 달라져</h2>
+  <div class="grid g2">
+    <div class="card rise" style="--d:.2s">
+      <div class="panel-title">💬 카톡으로 하는 팀플 <span class="pill bad-pill">혼돈</span></div>
+      <div class="chat">
+        <div class="msg rise" style="--d:.5s"><span class="av" style="--c:var(--green)">민</span><span class="b"><span class="att">📎 레포트_최종.hwp</span></span></div>
+        <div class="msg rise" style="--d:.9s"><span class="av" style="--c:var(--yellow)">하</span><span class="b">어? 나 어제 버전에 분석 썼는데…</span></div>
+        <div class="msg rise" style="--d:1.3s"><span class="av" style="--c:var(--blue)">지</span><span class="b"><span class="att">📎 레포트_최종_합침.hwp</span></span></div>
+        <div class="msg rise" style="--d:1.7s"><span class="av" style="--c:var(--green)">민</span><span class="b">누가 내 실험 부분 지웠어?? ㅠㅠ</span></div>
+        <div class="msg me rise" style="--d:2.1s"><span class="av" style="--c:var(--coral)">나</span><span class="b">그래서 어느 게 진짜 최종이야…?</span></div>
+      </div>
+    </div>
+    <div class="card rise" style="--d:.3s">
+      <div class="panel-title">🌿 GitHub로 하는 팀플 <span class="pill good-pill">평화</span></div>
+      <svg viewBox="0 0 520 270" role="img" aria-label="네 명이 각자 브랜치에서 작업하고 차례로 본문에 합치는 그림">
+        <path class="ln blue draw" pathLength="1" d="M30 240 C60 240 40 50 70 50 H160 C190 50 170 240 200 240" style="--d:.9s;--dur:1.4s"/>
+        <path class="ln green draw" pathLength="1" d="M60 240 C90 240 70 100 100 100 H240 C270 100 250 240 280 240" style="--d:1.3s;--dur:1.4s"/>
+        <path class="ln yellow draw" pathLength="1" d="M110 240 C140 240 120 150 150 150 H310 C340 150 320 240 350 240" style="--d:1.7s;--dur:1.4s"/>
+        <path class="ln coral draw" pathLength="1" d="M200 240 C230 240 210 200 240 200 H390 C420 200 400 240 430 240" style="--d:2.1s;--dur:1.4s"/>
+        <path class="ln ink draw" pathLength="1" d="M20 240 H500" style="--d:.5s;--dur:1.2s"/>
+        <circle class="cm blue pop" cx="100" cy="50" r="8" style="--d:1.5s"/><circle class="cm blue pop" cx="140" cy="50" r="8" style="--d:1.8s"/>
+        <circle class="cm green pop" cx="140" cy="100" r="8" style="--d:1.9s"/><circle class="cm green pop" cx="210" cy="100" r="8" style="--d:2.2s"/>
+        <circle class="cm yellow pop" cx="190" cy="150" r="8" style="--d:2.3s"/><circle class="cm yellow pop" cx="280" cy="150" r="8" style="--d:2.6s"/>
+        <circle class="cm coral pop" cx="280" cy="200" r="8" style="--d:2.7s"/><circle class="cm coral pop" cx="360" cy="200" r="8" style="--d:3s"/>
+        <circle class="cm merge pop" cx="200" cy="240" r="9" style="--d:2.2s"/>
+        <circle class="cm merge pop" cx="280" cy="240" r="9" style="--d:2.6s"/>
+        <circle class="cm merge pop" cx="350" cy="240" r="9" style="--d:3s"/>
+        <circle class="cm merge pop" cx="430" cy="240" r="9" style="--d:3.4s"/>
+        <text class="fade halo" x="76" y="38" style="--d:1.2s;fill:var(--blue)">지수 · 서론</text>
+        <text class="fade halo" x="106" y="88" style="--d:1.6s;fill:var(--green)">민준 · 실험</text>
+        <text class="fade halo" x="156" y="138" style="--d:2s;fill:var(--yellow)">하린 · 분석</text>
+        <text class="fade halo" x="246" y="188" style="--d:2.4s;fill:var(--coral)">나 · 발표자료</text>
+        <text class="hand fade" x="452" y="226" style="--d:3.6s">완성!</text>
+      </svg>
+      <p class="small">각자 자기 브랜치에서 일하고, 끝나면 본문(main)에 합쳐. 누가 언제 뭘 바꿨는지 전부 남아.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 08 -->
+<section class="slide" id="pr" data-title="Pull Request"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">풀 리퀘스트(Pull Request, PR)</span>
+      <h2 class="rise" style="--d:.1s">“내가 고친 거, <mark>한번 봐 줄래?</mark>”</h2>
+      <p class="lede rise" style="--d:.2s">옆길에서 작업을 끝내면 바로 본문에 넣지 않고 팀원에게 <b>검토를 부탁</b>해. 그 부탁이 Pull Request야.</p>
+      <p class="rise" style="--d:.3s">팀원은 바뀐 줄을 보면서 댓글을 달고, 고칠 게 없으면 승인해. 승인이 나면 버튼 하나로 본문에 합쳐져.</p>
+      <p class="why rise" style="--d:.45s"><b>왜 이름이 ‘Pull’ Request냐면?</b><br>“내 변경을 당겨(pull) 가 줘”라는 부탁이라서. 이름만 어렵지 뜻은 <b>검토 요청</b>이야.</p>
+      <div class="btns rise" style="--d:.55s"><button class="btn" id="prReplay">▶ 처음부터 다시 보기</button></div>
+    </div>
+    <div class="card pr pop" style="--d:.25s">
+      <div class="pr-head"><h3>3장 실험 결과 정리 <span class="num">#7</span></h3><span class="pill open" id="prState">● 검토 중</span></div>
+      <ol class="pr-events" id="prEvents" aria-live="polite">
+        <li><span class="av" style="--c:var(--blue)">지</span><div><b>지수</b>가 검토를 요청했어<p class="say">“3장 실험 결과 정리했어! 한번 봐 줄래?”</p></div></li>
+        <li><span class="av sys">±</span><div>바뀐 내용: <span class="plus">+12줄</span> <span class="minus">−3줄</span> <span class="small">· 표 1개, 그래프 1개</span></div></li>
+        <li><span class="av" style="--c:var(--green)">민</span><div><b>민준</b>이 댓글을 달았어<p class="say">“그래프 1에 단위(℃)가 빠졌어!”</p></div></li>
+        <li><span class="av" style="--c:var(--blue)">지</span><div><b>지수</b>가 고쳐서 세이브 포인트를 추가했어 <code>그래프 1에 단위 추가</code></div></li>
+        <li><span class="av" style="--c:var(--yellow)">하</span><div><b>하린</b>이 승인했어 ✅<p class="say">“좋아, 이대로 합치자!”</p></div></li>
+        <li><span class="av m">⑂</span><div class="merged-row">본문(main)에 합쳐졌어 🎉</div></li>
+      </ol>
+    </div>
+  </div>
+</div></section>
+
+<!-- 09 -->
+<section class="slide" id="uses" data-title="GitHub로 할 수 있는 것"><div class="inner">
+  <span class="kicker rise">그래서, 대학생인 너는</span>
+  <h2 class="rise" style="--d:.1s">GitHub로 이런 걸 할 수 있어</h2>
+  <div class="grid g3">
+    <article class="card use rise" style="--d:.2s;--b:0s"><span class="em">📝</span><h3>과제·리포트 타임머신</h3><p>리포트, 코딩 과제, 졸업 논문까지. 언제든 그 시점으로 돌아가고, 노트북이 망가져도 안전해.</p></article>
+    <article class="card use rise" style="--d:.3s;--b:.3s"><span class="em">👯</span><h3>팀플 본부</h3><p>Issue(할 일 쪽지)로 일을 나누고, Pull Request로 서로 검토해. 카톡 파일 지옥 끝.</p></article>
+    <article class="card use rise" style="--d:.4s;--b:.6s"><span class="em">🌐</span><h3>공짜 홈페이지</h3><p>GitHub Pages로 포트폴리오·동아리 소개 페이지를 무료로 열 수 있어.</p><span class="see">→ 다음 장: 이 페이지도 그렇게 열렸어</span></article>
+    <article class="card use rise" style="--d:.5s;--b:.9s"><span class="em">🌱</span><h3>나를 보여 주는 기록</h3><p>뭘 만들어 왔는지가 그대로 남아. 인턴·대학원에 지원할 때 링크 하나로 보여 줄 수 있어.</p><span class="see">→ 잔디 이야기</span></article>
+    <article class="card use rise" style="--d:.6s;--b:1.2s"><span class="em">🔍</span><h3>세상의 노트 구경</h3><p>강의 자료, 공부 노트, 논문 코드… 다른 사람이 공개한 걸 보고 배우고 가져다 써.</p><span class="see">→ Star와 Fork</span></article>
+    <article class="card use rise" style="--d:.7s;--b:1.5s"><span class="em">🎓</span><h3>학생 혜택</h3><p>학교 이메일로 학생 인증(GitHub Education)을 받으면 유료 기능과 여러 개발 도구를 무료로 써. AI 도우미 Copilot도 포함이야.</p></article>
+  </div>
+</div></section>
+
+<!-- 10 -->
+<section class="slide" id="pages" data-title="이 페이지도 GitHub에"><div class="inner">
+  <span class="kicker rise">GitHub Pages</span>
+  <h2 class="rise" style="--d:.1s">지금 보는 이 페이지도 GitHub가 띄워 준 거야</h2>
+  <p class="lede rise" style="--d:.2s">저장소에 웹페이지 파일을 올려 두고 설정에서 버튼 하나 켜면, GitHub가 그걸 <b>진짜 인터넷 주소</b>로 열어 줘. 서버도, 돈도 필요 없어.</p>
+  <div class="pages-flow">
+    <div class="card pnode pop" style="--d:.4s"><span class="em">📄</span><b>웹페이지 파일</b><small>이 안내서도 파일 하나야</small></div>
+    <svg class="parrow" viewBox="0 0 64 24" aria-hidden="true"><path class="ln coral draw" pathLength="1" d="M4 12 H52 M44 4 L56 12 L44 20" style="stroke-width:3.5;--d:.8s;--dur:.6s"/></svg>
+    <div class="card pnode pop" style="--d:1.1s"><span class="em">📦</span><b>GitHub 저장소</b><small>세이브 포인트와 함께 보관</small></div>
+    <svg class="parrow" viewBox="0 0 64 24" aria-hidden="true"><path class="ln coral draw" pathLength="1" d="M4 12 H52 M44 4 L56 12 L44 20" style="stroke-width:3.5;--d:1.5s;--dur:.6s"/></svg>
+    <div class="card pnode pop" style="--d:1.8s"><span class="em">🌐</span><b>누구나 여는 웹사이트</b><small>아이디.github.io</small></div>
+  </div>
+  <div class="urlbar rise" style="--d:2.1s" aria-label="이 페이지의 주소"><span class="lock">🔒</span><span class="typed" id="typed"></span><span class="caret"></span></div>
+  <div class="chips rise" style="--d:2.4s">
+    <span class="chip hot">발표 자료 (바로 이것처럼!)</span><span class="chip">내 포트폴리오</span><span class="chip">동아리 홈페이지</span><span class="chip">여행 기록 블로그</span><span class="chip">과제 결과물 공유</span>
+  </div>
+</div></section>
+
+<!-- 11 -->
+<section class="slide" id="grass" data-title="잔디"><div class="inner">
+  <span class="kicker rise">GitHub 사람들이 ‘잔디’라고 부르는 것</span>
+  <h2 class="rise" style="--d:.1s">꾸준함이 눈에 보이는 곳</h2>
+  <p class="lede rise" style="--d:.2s">GitHub 프로필에는 세이브 포인트를 찍은 날이 초록 칸으로 채워져. 1년이 모이면 이렇게 잔디밭이 돼. (아래는 새내기 1년을 상상한 예시)</p>
+  <div class="card grass-card rise" style="--d:.3s">
+    <div class="grass-wrap">
+      <div class="months" id="months"></div>
+      <div class="grass" id="grassGrid" aria-label="1년 동안 커밋한 날을 초록색으로 칠한 달력 예시"></div>
+      <div class="terms" id="terms"></div>
+      <div class="legend">적음 <i style="background:var(--g0)"></i><i style="background:var(--g1)"></i><i style="background:var(--g2)"></i><i style="background:var(--g3)"></i><i style="background:var(--g4)"></i> 많음</div>
+    </div>
+  </div>
+  <div class="grid g2">
+    <p class="note rise" style="--d:1.4s">잔디는 숫자 경쟁이 아니야. “내가 뭔가를 꾸준히 만들어 왔다”는 일기장 같은 거야.</p>
+    <p class="rise" style="--d:1.5s"><b>작은 팁:</b> 아이디와 똑같은 이름으로 저장소를 만들고 README(설명 파일)를 쓰면, 그게 프로필 맨 위에 자기소개로 떠. 나만의 명함이 생기는 거지.</p>
+  </div>
+</div></section>
+
+<!-- 12 -->
+<section class="slide" id="fork" data-title="Star와 Fork"><div class="inner">
+  <span class="kicker rise">세상에서 제일 큰 공개 노트 도서관</span>
+  <h2 class="rise" style="--d:.1s">남의 레시피를 가져와서, 내 식대로</h2>
+  <p class="lede rise" style="--d:.2s">GitHub에는 1억 명이 넘는 사람이 프로젝트를 올려 둬. 공개된 저장소는 누구나 보고 배울 수 있어. 레시피로 비유해 볼게. 버튼을 <b>왼쪽부터 차례로</b> 눌러 봐.</p>
+  <div class="fork-stage rise" style="--d:.3s">
+    <div class="card repo" id="orig">
+      <div class="repo-top"><span class="name">chef-hana / 김치볶음밥</span><button class="star" id="starBtn" aria-pressed="false">⭐ <span id="starN">1,204</span></button><small>공개 저장소 · 요리 동아리 선배</small></div>
+      <ol class="recipe"><li>밥 한 공기</li><li>잘 익은 김치</li><li>스팸 조금</li><li>달걀 프라이</li><li class="add hide" id="origAdd">모차렐라 치즈 한 줌</li></ol>
+      <p class="reply hide" id="reply">💬 chef-hana: “오, 치즈 좋은데? 합칠게!”</p>
+    </div>
+    <div class="fork-arrow hide" id="forkArrow"><svg viewBox="0 0 70 24" aria-hidden="true"><path class="ln coral" d="M4 12 H58 M50 4 L62 12 L50 20" style="stroke-width:3.5"/></svg>fork</div>
+    <div class="card repo mine hide" id="mine">
+      <div class="repo-top"><span class="name">나 / 김치볶음밥</span><small>chef-hana/김치볶음밥에서 fork함</small></div>
+      <ol class="recipe"><li>밥 한 공기</li><li>잘 익은 김치</li><li>스팸 조금</li><li>달걀 프라이</li><li class="add hide" id="mineAdd">모차렐라 치즈 한 줌</li></ol>
+    </div>
+  </div>
+  <p class="status" id="forkMsg" aria-live="polite"></p>
+  <div class="btns">
+    <button class="btn" id="fStar">⭐ Star: 즐겨찾기</button>
+    <button class="btn primary nudge" id="fFork">⑂ Fork: 내 계정으로 복사</button>
+    <button class="btn" id="fEdit" disabled>✏️ 내 식대로 고치기</button>
+    <button class="btn" id="fPR" disabled>📨 원작자에게 제안 (PR)</button>
+    <button class="btn ghost" id="fReset">↺</button>
+  </div>
+</div></section>
+
+<!-- 13 -->
+<section class="slide" id="fear" data-title="걱정 말고, 사실"><div class="inner">
+  <span class="kicker rise">무서운 건 몰라서 그래</span>
+  <h2 class="rise" style="--d:.1s">걱정을 뒤집으면 사실이 나와</h2>
+  <p class="rise small" style="--d:.15s">카드를 눌러서 뒤집어 봐.</p>
+  <div class="grid g3">
+    <button class="flip rise" style="--d:.2s" aria-pressed="false"><span class="face front"><span class="q">“잘못 누르면 다 날아가는 거 아냐?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>거꾸로야.</b><p>모든 순간이 기록돼서 되돌릴 수 있어. Git은 오히려 <b>망쳐도 되는 자유</b>를 주는 도구야.</p></span></button>
+    <button class="flip rise" style="--d:.3s" aria-pressed="false"><span class="face front"><span class="q">“코딩하는 사람만 쓰는 거지?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>아니야.</b><p>글, 논문, 공부 노트, 디자인 파일도 다 돼. 메모장으로 여는 글 파일이면 어느 줄이 바뀌었는지까지 보여 주고, 한글·워드 파일은 버전 보관만 해 줘.</p></span></button>
+    <button class="flip rise" style="--d:.4s" aria-pressed="false"><span class="face front"><span class="q">“까만 화면에 명령어 외워야 하지?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>처음엔 필요 없어.</b><p>GitHub 웹사이트, GitHub Desktop 앱, VS Code에서 버튼으로 다 할 수 있어. 명령어는 나중에 궁금해지면 그때.</p></span></button>
+    <button class="flip rise" style="--d:.5s" aria-pressed="false"><span class="face front"><span class="q">“내 과제가 전 세계에 공개돼?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>네가 고르는 거야.</b><p>저장소마다 공개(Public)·비공개(Private)를 정할 수 있고, 비공개도 무료야. 비공개는 초대한 사람만 봐.</p></span></button>
+    <button class="flip rise" style="--d:.6s" aria-pressed="false"><span class="face front"><span class="q">“온통 영어라 겁나…”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>단어 몇 개면 돼.</b><p>다음 장 단어장에 있는 열두 개만 알면 화면의 거의 모든 버튼이 읽혀.</p></span></button>
+    <button class="flip rise" style="--d:.7s" aria-pressed="false"><span class="face front"><span class="q">“다들 잘하는데 나만 모르면 어떡해?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>다들 처음엔 몰랐어.</b><p>지금 GitHub를 매일 쓰는 개발자도 첫 커밋은 떨면서 했어. 모르는 건 물어보면 되는 거야.</p></span></button>
+  </div>
+  <div class="caution rise" style="--d:.8s">
+    <h3>⚠️ 딱 두 가지만 조심하자</h3>
+    <ul>
+      <li><b>공개 저장소에는 비밀번호·학번·주소 같은 개인정보를 올리지 않기.</b> 한 번 공개된 건 누가 이미 봤을 수 있어.</li>
+      <li><b>과제는 비공개로.</b> 공개해 두면 다른 학생이 베껴 갈 수 있고, 수업 규정에 걸릴 수도 있어.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- 14 -->
+<section class="slide" id="words" data-title="단어장"><div class="inner">
+  <span class="kicker rise">GitHub 화면이 읽히는 단어장</span>
+  <h2 class="rise" style="--d:.1s">이 열두 단어만 알면 돼</h2>
+  <div class="grid g4">
+    <div class="card term rise" style="--d:.15s"><div class="top"><span class="em">📦</span><span class="en">Repository</span></div><span class="ko">저장소</span><p>프로젝트 하나를 담는 폴더. 그 폴더의 모든 역사까지 함께 들어 있어. 줄여서 repo.</p></div>
+    <div class="card term rise" style="--d:.2s"><div class="top"><span class="em">💾</span><span class="en">Commit</span></div><span class="ko">세이브 포인트</span><p>지금 상태를 메모와 함께 기록하기.</p></div>
+    <div class="card term rise" style="--d:.25s"><div class="top"><span class="em">🌱</span><span class="en">Branch</span></div><span class="ko">연습장 · 옆길</span><p>본문을 건드리지 않고 따로 실험하는 길.</p></div>
+    <div class="card term rise" style="--d:.3s"><div class="top"><span class="em">🔀</span><span class="en">Merge</span></div><span class="ko">합치기</span><p>옆길에서 한 작업을 본문에 합치기.</p></div>
+    <div class="card term rise" style="--d:.35s"><div class="top"><span class="em">📘</span><span class="en">main</span></div><span class="ko">본문</span><p>모두가 “이게 진짜”라고 약속한 기본 브랜치.</p></div>
+    <div class="card term rise" style="--d:.4s"><div class="top"><span class="em">🔄</span><span class="en">Push / Pull</span></div><span class="ko">올리기 / 받아오기</span><p>내 컴퓨터와 GitHub 사이를 맞추기.</p></div>
+    <div class="card term rise" style="--d:.45s"><div class="top"><span class="em">📥</span><span class="en">Clone</span></div><span class="ko">통째로 받아오기</span><p>GitHub의 저장소를 기록째 내 컴퓨터로 복사.</p></div>
+    <div class="card term rise" style="--d:.5s"><div class="top"><span class="em">⑂</span><span class="en">Fork</span></div><span class="ko">내 계정으로 복사</span><p>남의 저장소를 내 GitHub로 가져와 마음대로 고치기.</p></div>
+    <div class="card term rise" style="--d:.55s"><div class="top"><span class="em">🙋</span><span class="en">Pull Request</span></div><span class="ko">검토 요청</span><p>내 변경을 합쳐 달라고 부탁하고 의견 받기. 줄여서 PR.</p></div>
+    <div class="card term rise" style="--d:.6s"><div class="top"><span class="em">📌</span><span class="en">Issue</span></div><span class="ko">할 일 · 질문 쪽지</span><p>고칠 것, 아이디어, 질문을 적어 두는 게시판.</p></div>
+    <div class="card term rise" style="--d:.65s"><div class="top"><span class="em">📖</span><span class="en">README</span></div><span class="ko">표지 · 설명서</span><p>저장소에 들어오면 제일 먼저 보이는 소개 글.</p></div>
+    <div class="card term rise" style="--d:.7s"><div class="top"><span class="em">⭐</span><span class="en">Star</span></div><span class="ko">즐겨찾기</span><p>마음에 드는 저장소에 별을 달아 두기. ‘좋아요’ 같은 것.</p></div>
+  </div>
+</div></section>
+
+<!-- 15 -->
+<section class="slide" id="start" data-title="첫 주에 해 볼 것"><div class="inner">
+  <span class="kicker rise">명령어 하나 없이 시작하기</span>
+  <h2 class="rise" style="--d:.1s">첫 주에 해 볼 것</h2>
+  <div class="grid split todo-split">
+    <ol class="todo" id="todo">
+      <li class="rise" style="--d:.2s"><label><input type="checkbox"><span><b>github.com에 가입하기</b><small>아이디는 오래 쓸 거라 깔끔하게. 나중에 포트폴리오 주소가 돼.</small></span></label></li>
+      <li class="rise" style="--d:.27s"><label><input type="checkbox"><span><b>학교 이메일로 학생 인증 신청하기</b><small>GitHub Education에서 신청해. 학생 혜택이 열려.</small></span></label></li>
+      <li class="rise" style="--d:.34s"><label><input type="checkbox"><span><b>웹사이트에서 저장소 하나 만들기</b><small>“Add a README file”에 체크하고 비공개(Private)로 시작해도 좋아.</small></span></label></li>
+      <li class="rise" style="--d:.41s"><label><input type="checkbox"><span><b>README에 자기소개 쓰고 저장하기</b><small>연필 모양 버튼으로 고치고 저장 버튼(Commit changes)을 누르면, 그게 너의 첫 커밋이야!</small></span></label></li>
+      <li class="rise" style="--d:.48s"><label><input type="checkbox"><span><b>기록(History) 눌러서 타임머신 구경하기</b><small>방금 찍은 세이브 포인트가 보일 거야.</small></span></label></li>
+      <li class="rise" style="--d:.55s"><label><input type="checkbox"><span><b>GitHub Desktop 설치하기</b><small>내 컴퓨터 폴더와 GitHub 저장소를 버튼으로 이어 주는 앱이야.</small></span></label></li>
+      <li class="rise" style="--d:.62s"><label class="bonus"><input type="checkbox"><span><b>보너스: 나만의 홈페이지 열기</b><small>저장소 이름을 “아이디.github.io”로 만들면 그 주소로 웹사이트가 열려.</small></span></label></li>
+    </ol>
+    <div class="meter pop" style="--d:.4s">
+      <svg viewBox="0 0 200 200" role="img" aria-label="체크리스트 진행률"><circle class="track" cx="100" cy="100" r="80"/><circle class="val" id="meterVal" cx="100" cy="100" r="80" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1"/><text x="100" y="108" text-anchor="middle" id="meterTxt">0/7</text><text class="sub" x="100" y="132" text-anchor="middle">해 봤어요</text></svg>
+      <p class="note" id="meterNote">하나씩 체크해 봐. 이 브라우저가 기억해 둘게.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 16 -->
+<section class="slide" id="end" data-title="마무리"><div class="inner">
+  <span class="kicker rise">오늘 기억할 한 문장</span>
+  <h2 class="rise" style="--d:.1s">망쳐도 괜찮아.<br><span>다 기록돼 있으니까.</span></h2>
+  <svg class="end-graph" viewBox="0 0 1000 200" aria-hidden="true">
+    <path class="ln ink draw" pathLength="1" d="M20 140 H980" style="--d:.4s;--dur:2.2s"/>
+    <path class="ln coral draw" pathLength="1" d="M160 140 C200 140 195 60 235 60 H330 C370 60 365 140 405 140" style="--d:1s;--dur:1.2s"/>
+    <path class="ln blue draw" pathLength="1" d="M470 140 C510 140 505 60 545 60 H640 C680 60 675 140 715 140" style="--d:1.6s;--dur:1.2s"/>
+    <path class="ln green draw" pathLength="1" d="M470 140 C510 140 505 190 545 190 H760 C800 190 795 140 835 140" style="--d:2s;--dur:1.2s"/>
+    <circle class="cm ink pop" cx="60" cy="140" r="10" style="--d:.5s"/><circle class="cm ink pop" cx="110" cy="140" r="10" style="--d:.7s"/><circle class="cm ink pop" cx="160" cy="140" r="10" style="--d:.9s"/>
+    <circle class="cm coral pop" cx="255" cy="60" r="10" style="--d:1.5s"/><circle class="cm coral pop" cx="315" cy="60" r="10" style="--d:1.7s"/><circle class="cm merge pop" cx="405" cy="140" r="11" style="--d:2s"/>
+    <circle class="cm ink pop" cx="470" cy="140" r="10" style="--d:2.1s"/>
+    <circle class="cm blue pop" cx="565" cy="60" r="10" style="--d:2.2s"/><circle class="cm blue pop" cx="625" cy="60" r="10" style="--d:2.4s"/><circle class="cm merge pop" cx="715" cy="140" r="11" style="--d:2.7s"/>
+    <circle class="cm green pop" cx="660" cy="190" r="10" style="--d:2.6s"/><circle class="cm green pop" cx="740" cy="190" r="10" style="--d:2.8s"/><circle class="cm merge pop" cx="835" cy="140" r="11" style="--d:3.1s"/>
+    <circle class="ring pulse" cx="920" cy="140" r="12"/>
+    <circle class="cm coral pop" cx="920" cy="140" r="12" style="--d:3.3s"/>
+    <text class="hand fade" x="920" y="100" text-anchor="middle" style="--d:3.5s">다음은 너의 차례</text>
+  </svg>
+  <p class="lede rise" style="--d:.4s">Git은 실수를 막는 도구가 아니라, <b>실수해도 돌아올 수 있게</b> 해 주는 도구야. GitHub는 그 기록을 안전하게 보관하고, 친구들과 나누고, 세상에 보여 주는 곳이고.</p>
+  <p class="note rise" style="--d:.6s">궁금한 게 생기면 언제든 물어봐. 첫 커밋, 같이 해 보자!</p>
+  <p class="repo-link rise" style="--d:.8s">이 안내서도 Git으로 만들었어. 고칠 때마다 찍은 세이브 포인트는 <a href="https://github.com/jemings/tip/commits/main/git-github-first-steps" target="_blank" rel="noopener">여기</a>서 볼 수 있어.</p>
+</div></section>
+
+</main>
+
+<nav class="nav" aria-label="슬라이드 이동">
+  <button class="arrow" id="prev" aria-label="이전 슬라이드">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="count" id="count"></span>
+  <button class="arrow" id="next" aria-label="다음 슬라이드">→</button>
+</nav>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const scenes = {};
+function timers() {
+  let ids = [];
+  return {
+    after(ms, fn) { ids.push(setTimeout(fn, reduce ? 0 : ms)); },
+    clear() { ids.forEach(clearTimeout); ids = []; }
+  };
+}
+
+/* ---------- 덱 이동 ---------- */
+const slides = $$('.slide');
+const dots = $('#dots');
+let cur = -1;
+slides.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.setAttribute('aria-label', `${i + 1}. ${s.dataset.title}`);
+  b.addEventListener('click', () => go(i));
+  dots.appendChild(b);
+});
+function go(i) {
+  i = Math.max(0, Math.min(slides.length - 1, i));
+  if (i === cur) return;
+  if (cur >= 0) { slides[cur].classList.remove('active'); scenes[slides[cur].id]?.leave?.(); }
+  cur = i;
+  slides.forEach((s, j) => s.classList.toggle('before', j < i));
+  const s = slides[i];
+  s.classList.add('active');
+  s.scrollTop = 0;
+  scenes[s.id]?.enter?.();
+  $$('button', dots).forEach((b, j) => b.setAttribute('aria-current', j === i));
+  $('#count').textContent = `${String(i + 1).padStart(2, '0')} / ${slides.length}`;
+  $('#where').textContent = s.dataset.title;
+  $('#progress').style.setProperty('--p', (i + 1) / slides.length);
+  $('#prev').disabled = i === 0;
+  $('#next').disabled = i === slides.length - 1;
+  history.replaceState(null, '', '#' + s.id);
+}
+$('#prev').addEventListener('click', () => go(cur - 1));
+$('#next').addEventListener('click', () => go(cur + 1));
+addEventListener('keydown', e => {
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  const onControl = e.target.closest('button,input,label,a');
+  if (['ArrowRight', 'PageDown'].includes(e.key) || (e.key === ' ' && !onControl)) { e.preventDefault(); go(cur + 1); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End') go(slides.length - 1);
+});
+let tx = 0, ty = 0;
+addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(cur + (dx < 0 ? 1 : -1));
+}, { passive: true });
+addEventListener('hashchange', () => { const i = slides.findIndex(s => '#' + s.id === location.hash); if (i >= 0) go(i); });
+
+/* ---------- 03 세이브 포인트 타임라인 ---------- */
+(() => {
+  const tl = $('#tl'), body = $('#docBody'), info = $('#tlInfo'), T = timers();
+  const steps = [
+    ['목차 잡기', '3월 10일 오후 9:04'],
+    ['초안 쓰기', '3월 12일 오후 11:40'],
+    ['그래프 추가', '3월 15일 오후 4:22'],
+    ['결론 갈아엎기', '3월 18일 새벽 1:13'],
+    ['맞춤법 정리', '3월 19일 오전 10:05'],
+  ];
+  function doc(i) {
+    const n = k => (i === k ? ' new' : '');
+    let h = '<h4>도시 열섬 현상 리포트</h4>';
+    if (i === 0) return h + `<ol class="new"><li>서론</li><li>본론: 원인과 자료</li><li>결론</li></ol><p class="ghost">(아직 목차만 있어)</p>`;
+    const q = i < 4 ? '<span class="typo">무었일까</span>' : `<span class="${n(4).trim()}">무엇일까</span>`;
+    h += `<p class="${n(1).trim()}"><b>서론.</b> 여름 낮, 도심이 교외보다 더 뜨거운 이유는 ${q}? 이 리포트는 그 원인을 자료로 살펴본다.</p>`;
+    h += i >= 2
+      ? `<div class="chart-wrap"><div class="chart${n(2)}"><div><i style="--h:45%"></i><span>교외</span></div><div><i style="--h:88%"></i><span>도심</span></div><div><i style="--h:60%"></i><span>공원</span></div><em>그림 1. 여름 낮 기온 비교 (예시)</em></div></div>`
+      : '<p class="ghost">본론: 자료 찾는 중…</p>';
+    h += i >= 3
+      ? `<p class="${n(3).trim()}"><b>결론.</b> 나무 한 그루보다, 녹지·옥상 정원·밝은 지붕을 함께 쓸 때 효과가 크다.</p>`
+      : `<p class="${n(1).trim()}"><b>결론.</b> 나무를 많이 심자.</p>`;
+    return h;
+  }
+  function show(k) {
+    tl.style.setProperty('--p', k / 4);
+    $$('button', tl).forEach((b, j) => { b.classList.toggle('on', j === k); b.classList.toggle('past', j < k); b.setAttribute('aria-pressed', j === k); });
+    body.innerHTML = doc(k);
+    info.innerHTML = `<span class="pill open">지금 보는 순간</span> <b>${k + 1}. ${steps[k][0]}</b> <span class="small">${steps[k][1]}</span>`;
+  }
+  tl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; T.clear(); show(+b.dataset.i); });
+  show(4);
+  scenes.timeline = {
+    enter() { T.clear(); if (reduce) return show(4); show(0); for (let k = 1; k < 5; k++) T.after(1100 + (k - 1) * 1600, () => show(k)); },
+    leave() { T.clear(); }
+  };
+})();
+
+/* ---------- 05 브랜치 ---------- */
+(() => {
+  const svg = $('#branchSvg'), msg = $('#branchMsg');
+  const bTry = $('#bTry'), bMerge = $('#bMerge'), bDrop = $('#bDrop');
+  const text = {
+    base: '지금은 본문(main) 한 줄기뿐이야.',
+    branch: '본문은 그대로 두고, 옆길에서 과감하게 실험 중…',
+    merged: '실험이 마음에 들어서 본문에 합쳤어. 보라색 점이 합친 순간이야.',
+    dropped: '실험은 버렸어. 본문은 아무 일도 없었던 것처럼 멀쩡해.'
+  };
+  function set(s) {
+    svg.classList.toggle('s-branch', s !== 'base');
+    svg.classList.toggle('s-merged', s === 'merged');
+    svg.classList.toggle('s-dropped', s === 'dropped');
+    bTry.disabled = s !== 'base';
+    bMerge.disabled = bDrop.disabled = s !== 'branch';
+    bMerge.classList.toggle('nudge', s === 'branch');
+    msg.textContent = text[s];
+  }
+  bTry.onclick = () => set('branch');
+  bMerge.onclick = () => set('merged');
+  bDrop.onclick = () => set('dropped');
+  $('#bReset').onclick = () => set('base');
+  set('base');
+  scenes.branch = { enter() { set('base'); } };
+})();
+
+/* ---------- 06 push / pull 흐름 ---------- */
+(() => {
+  const pPush = $('#pPush'), pPull = $('#pPull'), pcLine = $('#pcLine');
+  const ds = $$('#flowDots circle');
+  const L1 = pPush.getTotalLength(), L2 = pPull.getTotalLength();
+  const CYCLE = 4600, LEG = 1300, GAP = 230;
+  let raf = 0, t0 = 0;
+  const ease = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+  function place(d, path, len, x) { const p = path.getPointAtLength(ease(x) * len); d.setAttribute('cx', p.x); d.setAttribute('cy', p.y); d.style.opacity = 1; }
+  function frame(now) {
+    const t = (now - t0) % CYCLE;
+    ds.forEach((d, k) => {
+      const lt = t - k * GAP;
+      if (lt >= 0 && lt < LEG) place(d, pPush, L1, lt / LEG);
+      else if (lt >= LEG + 400 && lt < 2 * LEG + 400) place(d, pPull, L2, (lt - LEG - 400) / LEG);
+      else d.style.opacity = 0;
+    });
+    pcLine.style.opacity = t > 2 * LEG + 400 + 2 * GAP ? 1 : .25;
+    raf = requestAnimationFrame(frame);
+  }
+  scenes.hub = {
+    enter() { cancelAnimationFrame(raf); if (reduce) { pcLine.style.opacity = 1; return; } t0 = performance.now() + 900; raf = requestAnimationFrame(frame); },
+    leave() { cancelAnimationFrame(raf); }
+  };
+})();
+
+/* ---------- 08 Pull Request ---------- */
+(() => {
+  const items = $$('#prEvents li'), state = $('#prState'), T = timers();
+  function step(n) {
+    items.forEach((li, i) => li.classList.toggle('on', i < n));
+    const merged = n >= items.length;
+    state.className = 'pill ' + (merged ? 'merged' : 'open');
+    state.textContent = merged ? '⑂ 합쳐짐' : '● 검토 중';
+  }
+  function play() { T.clear(); if (reduce) return step(items.length); step(0); items.forEach((_, i) => T.after(700 + i * 1500, () => step(i + 1))); }
+  $('#prReplay').onclick = play;
+  step(items.length);
+  scenes.pr = { enter: play, leave() { T.clear(); } };
+})();
+
+/* ---------- 10 주소창 타이핑 ---------- */
+(() => {
+  const el = $('#typed'), T = timers();
+  const url = location.protocol.startsWith('http')
+    ? (location.host + location.pathname).replace(/\/$/, '')
+    : '아이디.github.io/내-사이트';
+  scenes.pages = {
+    enter() {
+      T.clear(); el.textContent = '';
+      if (reduce) { el.textContent = url; return; }
+      [...url].forEach((c, i) => T.after(2300 + i * 45, () => { el.textContent += c; }));
+    },
+    leave() { T.clear(); }
+  };
+})();
+
+/* ---------- 11 잔디 ---------- */
+(() => {
+  let seed = 20260302;
+  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const W = 52;
+  const base = w => {
+    if (w < 16) return [7, 15].includes(w) ? .95 : w < 3 ? .3 : .55;   // 1학기 (적응기 → 시험)
+    if (w < 26) return w >= 20 && w <= 23 ? .5 : .15;                 // 여름방학 (중간에 작은 프로젝트)
+    if (w < 42) return [33, 41].includes(w) ? .95 : .65;              // 2학기
+    return .28;                                                       // 겨울방학
+  };
+  const grid = $('#grassGrid');
+  let html = '';
+  for (let w = 0; w < W; w++) for (let d = 0; d < 7; d++) {
+    const p = base(w) * (d === 0 || d === 6 ? .55 : 1), v = rnd();
+    const lv = v > p ? 0 : v > p * .55 ? 1 : v > p * .25 ? 2 : v > p * .08 ? 3 : 4;
+    html += `<i class="l${lv}" style="--d:${(w * 22 + d * 8) / 1000}s"></i>`;
+  }
+  grid.innerHTML = html;
+  const months = ['3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월', '1월', '2월'];
+  $('#months').innerHTML = months.map((m, i) => `<span style="grid-column:${Math.round(i * W / 12) + 1}/span 4">${m}</span>`).join('');
+  const terms = [['1학기', 1, 16, 1], ['여름방학', 17, 10, 0], ['2학기', 27, 16, 1], ['겨울방학', 43, 10, 0]];
+  $('#terms').innerHTML = terms.map(([t, s, n, sem]) => `<span class="${sem ? 'sem' : ''}" style="grid-column:${s}/span ${n}">${t}</span>`).join('');
+})();
+
+/* ---------- 12 Star / Fork ---------- */
+(() => {
+  const starBtn = $('#starBtn'), starN = $('#starN'), msg = $('#forkMsg');
+  const mine = $('#mine'), arrow = $('#forkArrow'), mineAdd = $('#mineAdd'), origAdd = $('#origAdd'), reply = $('#reply');
+  const fFork = $('#fFork'), fEdit = $('#fEdit'), fPR = $('#fPR');
+  let starred = false;
+  function star() {
+    starred = !starred;
+    starN.textContent = starred ? '1,205' : '1,204';
+    starBtn.classList.toggle('on', starred);
+    starBtn.setAttribute('aria-pressed', starred);
+    starBtn.classList.remove('bump'); void starBtn.offsetWidth; starBtn.classList.add('bump');
+    msg.textContent = starred ? 'Star는 즐겨찾기야. 나중에 다시 찾아보기 쉽고, 만든 사람에겐 응원이 돼.' : '별을 뗐어. 언제든 다시 달 수 있어.';
+  }
+  starBtn.onclick = star; $('#fStar').onclick = star;
+  function show(el, on) { el.classList.toggle('hide', !on); if (on) { el.classList.remove('show'); void el.offsetWidth; el.classList.add('show'); } }
+  function stage(n) {
+    mine.classList.toggle('hide', n < 1);
+    arrow.classList.toggle('hide', n < 1);
+    show(mineAdd, n >= 2);
+    show(origAdd, n >= 3);
+    show(reply, n >= 3);
+    fFork.disabled = n !== 0; fEdit.disabled = n !== 1; fPR.disabled = n !== 2;
+    [fFork, fEdit, fPR].forEach((b, i) => b.classList.toggle('nudge', i === n));
+    msg.textContent = [
+      '선배가 올린 레시피 저장소야. 누구나 볼 수 있는 공개 저장소지.',
+      'Fork 완료! 선배 저장소를 내 계정으로 통째로 복사했어. 이제 내 거라서 마음대로 고쳐도 원본은 그대로야.',
+      '내 복사본에 치즈를 넣었어. 원본은 여전히 치즈 없는 버전이지.',
+      'Pull Request로 “치즈 넣으면 더 맛있어요” 하고 제안했더니 선배가 받아 줬어. 이게 오픈소스에 기여하는 방식이야.'
+    ][n];
+  }
+  fFork.onclick = () => stage(1); fEdit.onclick = () => stage(2); fPR.onclick = () => stage(3);
+  $('#fReset').onclick = () => stage(0);
+  stage(0);
+  scenes.fork = { enter() { stage(0); } };
+})();
+
+/* ---------- 13 뒤집는 카드 ---------- */
+$$('.flip').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true')));
+
+/* ---------- 15 체크리스트 ---------- */
+(() => {
+  const KEY = 'git-github-first-steps:todo';
+  const boxes = $$('#todo input');
+  const val = $('#meterVal'), txt = $('#meterTxt'), note = $('#meterNote');
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
+  boxes.forEach((b, i) => { b.checked = !!saved[i]; b.addEventListener('change', update); });
+  function update() {
+    const done = boxes.filter(b => b.checked).length;
+    val.style.strokeDashoffset = 1 - done / boxes.length;
+    txt.textContent = `${done}/${boxes.length}`;
+    note.textContent = done === 0 ? '하나씩 체크해 봐. 이 브라우저가 기억해 둘게.'
+      : done < 4 ? '좋아, 시작이 반이야!'
+      : done < boxes.length ? '벌써 GitHub 사용자야. 조금만 더!'
+      : '전부 해냈어! 이제 너도 GitHub 쓰는 사람이야 🎉';
+    try { localStorage.setItem(KEY, JSON.stringify(boxes.map(b => b.checked))); } catch (e) {}
+  }
+  update();
+})();
+
+/* ---------- 시작 ---------- */
+const start = slides.findIndex(s => '#' + s.id === location.hash);
+go(start >= 0 ? start : 0);
+})();
+</script>
+</body>
+</html>
