@@ -265,7 +265,10 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
 .slide.active .use .em{animation:bob 2.6s ease-in-out infinite;animation-delay:var(--b,0s)}
 .use h3{font-size:1.15rem}
 .use p{font-size:.93rem}
-.use .see{font-size:.78rem;font-weight:700;color:var(--coral)}
+.use .see{justify-self:start;margin-top:2px;padding:.2em 0;font-size:.8rem;font-weight:700;color:var(--coral);text-decoration:none;border-bottom:1.5px solid transparent;transition:border-color .2s}
+.use .see::before{content:"→ "}
+.use .see:hover,.use .see:focus-visible{border-bottom-color:currentColor}
+.use .see:focus-visible{outline:2px solid var(--coral);outline-offset:3px;border-radius:2px}
 
 /* ---------- 10 Pages ---------- */
 .pages-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center}
@@ -688,12 +691,12 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
   <span class="kicker rise">그래서, 대학생인 너는</span>
   <h2 class="rise" style="--d:.1s">GitHub로 이런 걸 할 수 있어</h2>
   <div class="grid g3">
-    <article class="card use rise" style="--d:.2s;--b:0s"><span class="em">📝</span><h3>과제·리포트 타임머신</h3><p>리포트, 코딩 과제, 졸업 논문까지. 언제든 그 시점으로 돌아가고, 노트북이 망가져도 안전해.</p></article>
-    <article class="card use rise" style="--d:.3s;--b:.3s"><span class="em">👯</span><h3>팀플 본부</h3><p>Issue(할 일 쪽지)로 일을 나누고, Pull Request로 서로 검토해. 카톡 파일 지옥 끝.</p></article>
-    <article class="card use rise" style="--d:.4s;--b:.6s"><span class="em">🌐</span><h3>공짜 홈페이지</h3><p>GitHub Pages로 포트폴리오·동아리 소개 페이지를 무료로 열 수 있어.</p><span class="see">→ 다음 장: 이 페이지도 그렇게 열렸어</span></article>
-    <article class="card use rise" style="--d:.5s;--b:.9s"><span class="em">🌱</span><h3>나를 보여 주는 기록</h3><p>뭘 만들어 왔는지가 그대로 남아. 인턴·대학원에 지원할 때 링크 하나로 보여 줄 수 있어.</p><span class="see">→ 잔디 이야기</span></article>
-    <article class="card use rise" style="--d:.6s;--b:1.2s"><span class="em">🔍</span><h3>세상의 노트 구경</h3><p>강의 자료, 공부 노트, 논문 코드… 다른 사람이 공개한 걸 보고 배우고 가져다 써.</p><span class="see">→ Star와 Fork</span></article>
-    <article class="card use rise" style="--d:.7s;--b:1.5s"><span class="em">🎓</span><h3>학생 혜택</h3><p>학교 이메일로 학생 인증(GitHub Education)을 받으면 유료 기능과 여러 개발 도구를 무료로 써. AI 도우미 Copilot도 포함이야.</p></article>
+    <article class="card use rise" style="--d:.2s;--b:0s"><span class="em">📝</span><h3>과제·리포트 타임머신</h3><p>리포트, 코딩 과제, 졸업 논문까지. 언제든 그 시점으로 돌아가고, 노트북이 망가져도 안전해.</p><a class="see" href="#timeline">세이브 포인트 다시 보기</a></article>
+    <article class="card use rise" style="--d:.3s;--b:.3s"><span class="em">👯</span><h3>팀플 본부</h3><p>Issue(할 일 쪽지)로 일을 나누고, Pull Request로 서로 검토해. 카톡 파일 지옥 끝.</p><a class="see" href="#team">팀플 이야기</a></article>
+    <article class="card use rise" style="--d:.4s;--b:.6s"><span class="em">🌐</span><h3>공짜 홈페이지</h3><p>GitHub Pages로 포트폴리오·동아리 소개 페이지를 무료로 열 수 있어.</p><a class="see" href="#pages">다음 장: 이 페이지도 그렇게 열렸어</a></article>
+    <article class="card use rise" style="--d:.5s;--b:.9s"><span class="em">🌱</span><h3>나를 보여 주는 기록</h3><p>뭘 만들어 왔는지가 그대로 남아. 인턴·대학원에 지원할 때 링크 하나로 보여 줄 수 있어.</p><a class="see" href="#grass">잔디 이야기</a></article>
+    <article class="card use rise" style="--d:.6s;--b:1.2s"><span class="em">🔍</span><h3>세상의 노트 구경</h3><p>강의 자료, 공부 노트, 논문 코드… 다른 사람이 공개한 걸 보고 배우고 가져다 써.</p><a class="see" href="#fork">Star와 Fork</a></article>
+    <article class="card use rise" style="--d:.7s;--b:1.5s"><span class="em">🎓</span><h3>학생 혜택</h3><p>학교 이메일로 학생 인증(GitHub Education)을 받으면 유료 기능과 여러 개발 도구를 무료로 써. AI 도우미 Copilot도 포함이야.</p><a class="see" href="#start">신청 버튼은 첫 주 할 일에</a></article>
   </div>
 </div></section>
 
@@ -930,6 +933,15 @@ addEventListener('touchend', e => {
   const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
   if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(cur + (dx < 0 ? 1 : -1));
 }, { passive: true });
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  const i = slides.findIndex(s => '#' + s.id === a.getAttribute('href'));
+  if (i < 0) return;
+  e.preventDefault();
+  if (i !== cur) history.pushState(null, '', a.getAttribute('href'));
+  go(i);
+});
 addEventListener('hashchange', () => { const i = slides.findIndex(s => '#' + s.id === location.hash); if (i >= 0) go(i); });
 
 /* ---------- 03 세이브 포인트 타임라인 ---------- */
