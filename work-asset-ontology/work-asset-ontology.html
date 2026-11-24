@@ -128,6 +128,7 @@ td code,th code{white-space:nowrap}
   .loop{grid-template-columns:1fr;gap:1.6rem}.loop li::after{content:"↓"!important;right:auto!important;left:50%;top:auto!important;bottom:-1.45rem;transform:translateX(-50%)!important}.loop li:nth-last-child(2)::after{content:""!important}}
 @media(max-width:620px){.g2,.g3,.g4,.lanes,.qa,.fix,.todo,.rules,.road{grid-template-columns:1fr}.hint{display:none}}
 @media print{.rail,.hint{display:none}.slide{padding:1.5cm;break-after:page}.slide>.inner{min-height:0}}
+td.none{color:var(--muted,#6b7280);vertical-align:middle;border-right:1px solid var(--line,#e5e7eb)}td.none small{display:block;margin-top:.2em;font-size:.82em}
 </style>
 <style>
 /* 터미널 */
@@ -546,9 +547,9 @@ matches("주간보고")  → <span class="bad">[]</span></pre>
       <tr><td>상위어·하위어 (BT / NT)</td><td class="we"><code>is-a</code>, <code>part-of</code></td><td>주간 보고 is-a 보고서</td></tr>
       <tr><td>관련어 (RT)</td><td class="we"><code>related-to</code></td><td>주간 보고 ↔ 월간 실적</td></tr>
       <tr><td>개정판 표시</td><td class="we"><code>supersedes</code> (파일 → 파일)</td><td>올해 <code>workflow.md</code>가 작년 판을 대체</td></tr>
-      <tr><td>— <span class="tag amber">워크에셋 v1 반영</span></td><td class="we"><code>derived-from</code> (파일 → 파일, 갈래)</td><td>팀B 폴더가 공통 폴더를 복사해 시작, 둘 다 유효</td></tr>
-      <tr><td>—</td><td class="we"><code>conflicts-with</code> (파일 ↔ 파일)</td><td>두 <code>policy.md</code>가 어긋남</td></tr>
-      <tr><td>—</td><td class="we"><code>applies-to</code> (파일 → 용어)</td><td>보고서 공통 <code>policy.md</code> → 보고서</td></tr>
+      <tr><td rowspan="3" class="none">도서관 목록에는 없다<br><small>업무 문서 때문에 더한 관계</small></td><td class="we"><code>derived-from</code> (파일 → 파일, 갈래) <span class="tag amber">워크에셋 v1 반영</span></td><td>팀B 폴더가 공통 폴더를 복사해 시작, 둘 다 유효</td></tr>
+      <tr><td class="we"><code>conflicts-with</code> (파일 ↔ 파일)</td><td>두 <code>policy.md</code>가 어긋남</td></tr>
+      <tr><td class="we"><code>applies-to</code> (파일 → 용어)</td><td>보고서 공통 <code>policy.md</code> → 보고서</td></tr>
     </tbody>
   </table></div>
   <p class="easy"><b>닫힌 어휘</b>용어 유형 <b>다섯</b>, 관계 <b>일곱</b>뿐. 모델이 지어낸 유형·관계는 버린다. 워크에셋 v1의 <code>asset_type</code>(workflow·policy…)은 <b>파일의 역할</b>이지 용어가 아니다 — "policy"라는 용어가 파일 수백 개에 걸려 있으면 아무것도 구별해 주지 못한다.</p>
@@ -906,10 +907,10 @@ work_asset_kind: criterion</span>
     <thead><tr><th>과제</th><th class="we">온톨로지가 맡는 것</th><th>워크에셋 v1이 맡을 것</th></tr></thead>
     <tbody>
       <tr><td><b>과제 1</b> 복사</td><td class="we">복사를 <b>갈래</b>(<code>derived-from</code>)라는 기록된 관계로. 저장할 때 비슷한 기존 폴더를 먼저 보이고, 탐색기 복사는 "폴더 복사본 의심"으로 잡는다. 원본이 바뀌면 "원본 바뀜"</td><td>사본 때문에 원본 실행이 멈추지 않게(#2444)</td></tr>
-      <tr><td><b>과제 2</b> 넓은 연결</td><td class="we">기준 예산 게이지(현황 1차), 상·하위 폴더 겹침 신호(2단계), <code>workflow</code>·<code>verify</code> 기준을 요청에 맞을 때만 싣는 조건부 적용(3단계). <code>policy.md</code>는 워크에셋 v1 뜻대로 늘 적용</td><td>—</td></tr>
+      <tr><td><b>과제 2</b> 넓은 연결</td><td class="we">기준 예산 게이지(현황 1차), 상·하위 폴더 겹침 신호(2단계), <code>workflow</code>·<code>verify</code> 기준을 요청에 맞을 때만 싣는 조건부 적용(3단계). <code>policy.md</code>는 워크에셋 v1 뜻대로 늘 적용</td><td class="none">따로 할 일 없음<small>온톨로지 쪽에서 끝난다</small></td></tr>
       <tr><td><b>과제 3</b> 범위 값</td><td class="we">범위 값을 용어로 정규화해 "범위 값 불일치 의심"(D20)을 현황 1차에 보인다. 값을 고치지는 않는다</td><td>빠진 필수 기준을 실행 전에 알릴지(#2444)</td></tr>
       <tr><td><b>과제 4</b> 비표준</td><td class="we">색인하지 않는다(워크에셋 v1의 결정을 존중). 대신 현황에 비표준 문서 수를 사유별로 보인다</td><td>그 수를 보고 표준 유형을 넓힐지</td></tr>
-      <tr><td><b>과제 5</b> 다른 이름</td><td class="we">용어·동의어 우선 검색, 글자 2-gram 색인(띄어쓰기·조사 무관), 0건이면 가까운 용어, 찾기에 실패한 말을 [동의어로 추가]</td><td>—</td></tr>
+      <tr><td><b>과제 5</b> 다른 이름</td><td class="we">용어·동의어 우선 검색, 글자 2-gram 색인(띄어쓰기·조사 무관), 0건이면 가까운 용어, 찾기에 실패한 말을 [동의어로 추가]</td><td class="none">따로 할 일 없음<small>온톨로지 쪽에서 끝난다</small></td></tr>
     </tbody>
   </table></div>
   <p class="easy"><b>역할 구분</b>실행이 멈추거나 기준이 빠지는 <b>동작 자체</b>는 워크에셋 v1 쪽에서 고칠 부분이다(#2444). 온톨로지는 그 위에서 <b>관계를 기록하고 어긋난 곳을 보여 주는 층</b>이다. 한쪽이 다른 쪽을 대신하지 않는다.</p>
