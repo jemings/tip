@@ -93,7 +93,7 @@ svg .pop,svg .pulse{transform-box:fill-box;transform-origin:center}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .split{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);align-items:center;gap:clamp(18px,3.5vw,48px)}
-.split.todo-split{grid-template-columns:minmax(0,1.6fr) minmax(0,.8fr)}
+.split.todo-split{grid-template-columns:minmax(0,1.6fr) minmax(0,.8fr);align-items:start}
 .stack{display:grid;gap:clamp(12px,2vh,20px);align-content:start}
 .card{background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
 .card p{color:var(--ink2)}
@@ -344,8 +344,8 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
 .term p{font-size:.86rem;line-height:1.5}
 
 /* ---------- 15 체크리스트 ---------- */
-.todo{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.todo label{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:12px 16px;cursor:pointer;transition:border-color .2s,background .2s}
+.todo{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.todo label{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:9px 14px;cursor:pointer;transition:border-color .2s,background .2s}
 .todo input{appearance:none;-webkit-appearance:none;width:28px;height:28px;border-radius:8px;border:2.5px solid var(--line);margin:0;display:grid;place-items:center;cursor:pointer;transition:all .25s cubic-bezier(.3,1.6,.5,1);background:var(--panel)}
 .todo input::after{content:"✓";color:#fff;font-weight:900;transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
 .todo input:checked{background:var(--green);border-color:var(--green)}
@@ -353,10 +353,28 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
 .todo label:has(input:checked){border-color:var(--green);background:color-mix(in srgb,var(--green-soft) 60%,var(--panel))}
 .todo label:has(input:checked) b{text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:2px}
 .todo b{display:block}
-.todo span small{display:block;color:var(--muted);font-size:.85rem;line-height:1.45;margin-top:2px}
+.todo span small{display:block;color:var(--muted);font-size:.83rem;line-height:1.4;margin-top:1px}
 .todo .bonus{border-style:dashed}
+.todo small .inline,.where-chip .inline{display:inline;font-weight:700;color:var(--ink2)}
+.todo .links{display:flex;gap:6px;justify-content:flex-end;align-self:center}
+.go{display:inline-flex;align-items:center;gap:.25em;padding:.4em .85em;border-radius:999px;background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);font-size:.82rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:transform .15s,background .2s}
+.go:hover{transform:translateY(-2px);background:var(--coral);border-color:var(--coral);color:#fff}
+.go.sub{background:transparent;color:var(--ink2);border-color:var(--line)}
+.go.sub:hover{background:var(--panel2);color:var(--ink);border-color:var(--ink)}
+.go.demo{padding:.1em .6em;font-size:.78rem;vertical-align:1px;pointer-events:none}
+.todo-lead{font-size:.9rem;color:var(--ink2);line-height:1.55}
+.where-chip{font-size:.8rem;color:var(--ink2);background:var(--panel2);border-radius:10px;padding:.35em .7em;max-width:15em;line-height:1.4;text-align:left}
+.todo-side{gap:12px}
+.todo-side .note{font-size:1.15rem}
+.stuck{border:1.5px dashed var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:4px}
+.stuck h3{font-size:1rem}
+.stuck a{display:grid;gap:1px;text-decoration:none;color:var(--blue);padding:.45em .6em;border-radius:10px;transition:background .2s}
+.stuck a:hover{background:var(--blue-soft)}
+.stuck a b{font-size:.9rem}
+.stuck a small{color:var(--muted);font-size:.8rem;line-height:1.4}
+.stuck .ask{color:var(--coral);font-size:1.15rem;line-height:1.3}
 .meter{display:grid;gap:8px;justify-items:center;text-align:center}
-.meter svg{width:min(200px,50vw)}
+.meter svg{width:min(150px,45vw)}
 .meter .track{fill:none;stroke:var(--line);stroke-width:14}
 .meter .val{fill:none;stroke:var(--green);stroke-width:14;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
 .meter text{font-size:34px;font-weight:850;fill:var(--ink)}
@@ -385,6 +403,8 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
   .dots{display:none}
   .tl .lbl{font-size:.7rem}
   .crow{grid-template-columns:1fr;gap:4px}
+  .todo label{grid-template-columns:30px minmax(0,1fr)}
+  .todo .links{grid-column:2;display:flex;flex-wrap:wrap;justify-items:start}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
@@ -710,7 +730,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
   </div>
   <div class="grid g2">
     <p class="note rise" style="--d:1.4s">잔디는 숫자 경쟁이 아니야. “내가 뭔가를 꾸준히 만들어 왔다”는 일기장 같은 거야.</p>
-    <p class="rise" style="--d:1.5s"><b>작은 팁:</b> 아이디와 똑같은 이름으로 저장소를 만들고 README(설명 파일)를 쓰면, 그게 프로필 맨 위에 자기소개로 떠. 나만의 명함이 생기는 거지.</p>
+    <p class="rise" style="--d:1.5s"><b>작은 팁:</b> 아이디와 똑같은 이름으로 저장소를 만들고 README(설명 파일)를 쓰면, 그게 프로필 맨 위에 자기소개로 떠. 나만의 명함이 생기는 거지. <a class="go sub" href="https://docs.github.com/ko/account-and-profile/how-tos/profile-customization/managing-your-profile-readme" target="_blank" rel="noopener">만드는 법 ↗</a></p>
   </div>
 </div></section>
 
@@ -789,17 +809,33 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
   <h2 class="rise" style="--d:.1s">첫 주에 해 볼 것</h2>
   <div class="grid split todo-split">
     <ol class="todo" id="todo">
-      <li class="rise" style="--d:.2s"><label><input type="checkbox"><span><b>github.com에 가입하기</b><small>아이디는 오래 쓸 거라 깔끔하게. 나중에 포트폴리오 주소가 돼.</small></span></label></li>
-      <li class="rise" style="--d:.27s"><label><input type="checkbox"><span><b>학교 이메일로 학생 인증 신청하기</b><small>GitHub Education에서 신청해. 학생 혜택이 열려.</small></span></label></li>
-      <li class="rise" style="--d:.34s"><label><input type="checkbox"><span><b>웹사이트에서 저장소 하나 만들기</b><small>“Add a README file”에 체크하고 비공개(Private)로 시작해도 좋아.</small></span></label></li>
-      <li class="rise" style="--d:.41s"><label><input type="checkbox"><span><b>README에 자기소개 쓰고 저장하기</b><small>연필 모양 버튼으로 고치고 저장 버튼(Commit changes)을 누르면, 그게 너의 첫 커밋이야!</small></span></label></li>
-      <li class="rise" style="--d:.48s"><label><input type="checkbox"><span><b>기록(History) 눌러서 타임머신 구경하기</b><small>방금 찍은 세이브 포인트가 보일 거야.</small></span></label></li>
-      <li class="rise" style="--d:.55s"><label><input type="checkbox"><span><b>GitHub Desktop 설치하기</b><small>내 컴퓨터 폴더와 GitHub 저장소를 버튼으로 이어 주는 앱이야.</small></span></label></li>
-      <li class="rise" style="--d:.62s"><label class="bonus"><input type="checkbox"><span><b>보너스: 나만의 홈페이지 열기</b><small>저장소 이름을 “아이디.github.io”로 만들면 그 주소로 웹사이트가 열려.</small></span></label></li>
+      <li class="rise" style="--d:.2s"><label><input type="checkbox"><span><b>github.com에 가입하기</b><small>화면은 영어지만 이메일·비밀번호·아이디만 넣으면 돼. 아이디는 나중에 포트폴리오 주소가 되니까 깔끔하게.</small></span>
+        <span class="links"><a class="go" href="https://github.com/signup" target="_blank" rel="noopener">가입 화면 열기 ↗</a></span></label></li>
+      <li class="rise" style="--d:.27s"><label><input type="checkbox"><span><b>학교 이메일로 학생 인증 신청하기</b><small>학생증 사진을 내라고 할 수 있으니 옆에 두고 시작해. 승인까지 며칠 걸릴 수 있어.</small></span>
+        <span class="links"><a class="go" href="https://education.github.com/discount_requests/application" target="_blank" rel="noopener">신청 화면 열기 ↗</a><a class="go sub" href="https://education.github.com/pack" target="_blank" rel="noopener">혜택 보기 ↗</a></span></label></li>
+      <li class="rise" style="--d:.34s"><label><input type="checkbox"><span><b>웹사이트에서 저장소 하나 만들기</b><small>이름은 <span class="mono">my-first-repo</span>처럼 영어로. “Add a README file”에 체크하고, 비공개(Private)로 시작해도 좋아.</small></span>
+        <span class="links"><a class="go" href="https://github.com/new" target="_blank" rel="noopener">새 저장소 만들기 ↗</a></span></label></li>
+      <li class="rise" style="--d:.41s"><label><input type="checkbox"><span><b>README에 자기소개 쓰고 저장하기</b><small>README 파일을 열고 연필 모양 버튼 → 자기소개 쓰기 → 초록색 <b class="inline">Commit changes</b>. 그게 너의 첫 커밋이야!</small></span>
+        <span class="links"><a class="go" href="https://docs.github.com/ko/get-started/using-github/hello-world" target="_blank" rel="noopener">한국어로 따라 하기 ↗</a></span></label></li>
+      <li class="rise" style="--d:.48s"><label><input type="checkbox"><span><b>커밋 기록 눌러서 타임머신 구경하기</b><small>방금 찍은 세이브 포인트가 메모와 함께 보일 거야.</small></span>
+        <span class="links"><span class="where-chip">📍 저장소 첫 화면, 파일 목록 오른쪽 위 🕒 <b class="inline">Commits</b></span></span></label></li>
+      <li class="rise" style="--d:.55s"><label><input type="checkbox"><span><b>GitHub Desktop 설치하기</b><small>내 컴퓨터 폴더와 GitHub 저장소를 버튼으로 이어 주는 앱이야. Windows·Mac 둘 다 돼.</small></span>
+        <span class="links"><a class="go" href="https://desktop.github.com/download/" target="_blank" rel="noopener">내려받기 ↗</a><a class="go sub" href="https://docs.github.com/ko/desktop/overview/getting-started-with-github-desktop" target="_blank" rel="noopener">사용 안내 ↗</a></span></label></li>
+      <li class="rise" style="--d:.62s"><label class="bonus"><input type="checkbox"><span><b>보너스: 나만의 홈페이지 열기</b><small>저장소 이름을 “아이디.github.io”로 만들면 그 주소로 웹사이트가 열려. 단계별 안내가 그림과 함께 있어.</small></span>
+        <span class="links"><a class="go" href="https://pages.github.com/" target="_blank" rel="noopener">따라 하기 ↗</a></span></label></li>
     </ol>
-    <div class="meter pop" style="--d:.4s">
-      <svg viewBox="0 0 200 200" role="img" aria-label="체크리스트 진행률"><circle class="track" cx="100" cy="100" r="80"/><circle class="val" id="meterVal" cx="100" cy="100" r="80" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1"/><text x="100" y="108" text-anchor="middle" id="meterTxt">0/7</text><text class="sub" x="100" y="132" text-anchor="middle">해 봤어요</text></svg>
-      <p class="note" id="meterNote">하나씩 체크해 봐. 이 브라우저가 기억해 둘게.</p>
+    <div class="stack todo-side">
+      <p class="todo-lead rise" style="--d:.3s">항목마다 있는 <span class="go demo">열기 ↗</span> 버튼을 누르면 해당 화면이 <b>새 탭</b>으로 열려. 이 안내서는 그대로 남아 있으니, 왔다 갔다 하면서 하나씩 해 봐.</p>
+      <div class="meter pop" style="--d:.4s">
+        <svg viewBox="0 0 200 200" role="img" aria-label="체크리스트 진행률"><circle class="track" cx="100" cy="100" r="80"/><circle class="val" id="meterVal" cx="100" cy="100" r="80" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1"/><text x="100" y="108" text-anchor="middle" id="meterTxt">0/7</text><text class="sub" x="100" y="132" text-anchor="middle">해 봤어요</text></svg>
+        <p class="note" id="meterNote">하나씩 체크해 봐. 이 브라우저가 기억해 둘게.</p>
+      </div>
+      <div class="stuck rise" style="--d:.7s">
+        <h3>🧭 막히면 여기부터</h3>
+        <a href="https://github.com/skills/introduction-to-github" target="_blank" rel="noopener"><b>GitHub Skills: Introduction to GitHub ↗</b><small>GitHub 안에서 직접 해 보며 배우는 무료 코스. 영어지만 한 시간이면 끝나.</small></a>
+        <a href="https://docs.github.com/ko/get-started/using-github/hello-world" target="_blank" rel="noopener"><b>공식 문서 「Hello World」 ↗</b><small>위 3~4번을 한국어 그림 설명으로 따라 할 수 있어.</small></a>
+        <p class="hand ask">그래도 막히면 화면 캡처해서 보내 줘. 같이 보자!</p>
+      </div>
     </div>
   </div>
 </div></section>
