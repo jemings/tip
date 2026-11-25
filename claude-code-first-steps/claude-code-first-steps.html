@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>손이 생긴 Claude — 처음 만나는 Claude Code</title>
+<meta name="description" content="채팅으로만 Claude를 써 본 사람을 위한 Claude Code 첫걸음 안내서. 명령어 없이 Windows 데스크톱 앱에서 폴더를 열어 주고, 부탁하고, 허락하고, 확인하는 흐름을 비유와 직접 눌러 보는 장면으로 설명한다.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbf6ee; --panel:#fff; --panel2:#f4ede1; --ink:#1f2433; --ink2:#454c5e; --muted:#7b8294; --line:#e6dccb;
+  --coral:#ef5b3a; --coral-soft:#ffe5dc; --green:#1f9154; --green-soft:#dcf3e5; --blue:#3567d8; --blue-soft:#e2eaff;
+  --purple:#7a4bd9; --purple-soft:#eee6ff; --yellow:#e9a70c; --yellow-soft:#ffefc2; --red:#cf3b3b; --red-soft:#fde3e3;
+  --term:#1b1f2a; --term-ink:#e6e9f2; --term-dim:#8a93a8; --term-green:#7ee2a2; --term-yellow:#ffd479;
+  --shadow:0 1px 2px rgba(31,36,51,.06),0 12px 32px rgba(31,36,51,.08);
+  --sans:"Pretendard Variable",Pretendard,system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --hand:"Gaegu","Pretendard Variable",cursive;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){:root{
+  --paper:#161922; --panel:#1f2330; --panel2:#282d3b; --ink:#eef0f6; --ink2:#c3c8d4; --muted:#8f96a6; --line:#343a4b;
+  --coral:#ff8466; --coral-soft:#3f2720; --green:#4cc485; --green-soft:#16321f; --blue:#82a6ff; --blue-soft:#1d2848;
+  --purple:#ad90ff; --purple-soft:#2a2145; --yellow:#ffcf5a; --yellow-soft:#3d3214; --red:#ff7b7b; --red-soft:#3d1f22;
+  --term:#0f1218;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35); color-scheme:dark;
+}}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:clamp(15px,.85rem + .3vw,18px);line-height:1.62;word-break:keep-all;overflow-wrap:break-word;overflow:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);background-size:24px 24px;opacity:.55;pointer-events:none}
+h1,h2,h3,h4{margin:0;line-height:1.22;letter-spacing:-.025em;text-wrap:balance}
+h1{font-size:clamp(2.5rem,6vw,5rem);font-weight:850}
+h2{font-size:clamp(1.75rem,3.4vw,2.8rem);font-weight:800}
+h3{font-size:1.12rem;font-weight:750}
+p{margin:0}
+b,strong{font-weight:750}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:6px}
+.hand{font-family:var(--hand);font-weight:700}
+.kicker{font-family:var(--hand);font-size:clamp(1.15rem,1rem + .5vw,1.45rem);font-weight:700;color:var(--coral);line-height:1.2}
+.lede{font-size:clamp(1.05rem,.98rem + .45vw,1.32rem);color:var(--ink2);max-width:58ch;line-height:1.6}
+.note{font-family:var(--hand);font-weight:700;font-size:clamp(1.15rem,1rem + .5vw,1.45rem);color:var(--coral);line-height:1.3}
+.small{font-size:.88rem;color:var(--muted)}
+.mono{font-family:var(--mono);font-size:.9em}
+code{font-family:var(--mono);font-size:.85em;background:var(--yellow-soft);padding:.08em .4em;border-radius:5px}
+mark{color:inherit;background:linear-gradient(transparent 55%,var(--yellow-soft) 55%) no-repeat;background-size:100% 100%;padding:0 .08em}
+.slide.active mark{animation:hl .9s ease .55s both}
+@keyframes hl{from{background-size:0 100%}}
+a.inline-link{color:var(--blue);font-weight:700;text-underline-offset:3px}
+
+/* ---------- 덱 골격 ---------- */
+.progress{position:fixed;top:0;left:0;height:4px;width:calc(var(--p,0)*100%);background:var(--coral);z-index:40;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.topbar{position:fixed;top:0;left:0;right:0;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,40px);z-index:30;background:linear-gradient(var(--paper) 55%,transparent);pointer-events:none}
+.brand{font-family:var(--hand);font-weight:700;font-size:1.2rem;display:flex;align-items:center;gap:.45rem;pointer-events:auto;color:var(--ink);text-decoration:none}
+.brand svg{width:22px;height:22px}
+.topbar .where{font-size:.85rem;color:var(--muted)}
+.deck{position:fixed;inset:0;z-index:1}
+.slide{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:76px clamp(18px,5vw,64px) 104px;opacity:0;visibility:hidden;transform:translateX(48px);transition:opacity .45s ease,transform .6s cubic-bezier(.2,.8,.2,1),visibility 0s linear .6s}
+.slide.before{transform:translateX(-48px)}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .6s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.inner{max-width:1120px;margin:0 auto;min-height:calc(100svh - 180px);display:grid;align-content:center;gap:clamp(14px,2.4vh,26px)}
+.nav{position:fixed;left:0;right:0;bottom:0;height:78px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:30;background:linear-gradient(transparent,var(--paper) 45%)}
+.nav .arrow{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:var(--panel);font-size:1.15rem;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,border-color .2s}
+.nav .arrow:hover{transform:translateY(-2px);border-color:var(--ink)}
+.nav .arrow:disabled{opacity:.3;cursor:default;transform:none}
+.dots{display:flex;gap:6px;align-items:center}
+.dots button{width:9px;height:9px;border-radius:5px;border:0;padding:0;background:var(--line);cursor:pointer;transition:width .3s,background .3s}
+.dots button[aria-current="true"]{width:26px;background:var(--coral)}
+.count{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:4.2em;text-align:center}
+
+/* ---------- 모션 유틸 ---------- */
+.slide.active .rise{animation:rise .7s cubic-bezier(.2,.8,.2,1) var(--d,0s) both}
+.slide.active .pop{animation:pop .55s cubic-bezier(.3,1.6,.5,1) var(--d,0s) both}
+.slide.active .fade{animation:fade .8s ease var(--d,0s) both}
+.slide.active .drop{animation:drop .6s cubic-bezier(.3,1.4,.5,1) var(--d,0s) both}
+.slide.active .draw{stroke-dasharray:1;animation:draw var(--dur,1.2s) cubic-bezier(.5,0,.3,1) var(--d,0s) both}
+svg .pop,svg .pulse{transform-box:fill-box;transform-origin:center}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}}
+@keyframes pop{from{opacity:0;transform:scale(.3)}}
+@keyframes fade{from{opacity:0}}
+@keyframes drop{from{opacity:0;transform:translateY(-60px)}}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes pulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(2.6)}}
+@keyframes bob{50%{transform:translateY(-6px)}}
+@keyframes nudge{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--coral) 55%,transparent)}50%{box-shadow:0 0 0 10px transparent}}
+@keyframes flash{from{background:var(--green-soft);box-shadow:0 0 0 6px var(--green-soft)}}
+.flash{animation:flash 1.4s ease both}
+
+/* ---------- 공통 부품 ---------- */
+.grid{display:grid;gap:clamp(12px,1.6vw,20px)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.split{grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);align-items:center;gap:clamp(18px,3.5vw,48px)}
+.split.todo-split{grid-template-columns:minmax(0,1.6fr) minmax(0,.8fr);align-items:start}
+.stack{display:grid;gap:clamp(12px,2vh,20px);align-content:start}
+.card{background:var(--panel);border:1.5px solid var(--line);border-radius:18px;padding:18px 20px;box-shadow:var(--shadow)}
+.card p{color:var(--ink2)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn{font-weight:700;font-size:.93rem;padding:.6em 1.1em;border-radius:999px;border:1.5px solid var(--ink);background:var(--panel);cursor:pointer;transition:transform .15s,opacity .2s,background .2s;text-align:left}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.ghost{border-color:var(--line);color:var(--muted)}
+.btn.nudge:not(:disabled){animation:nudge 1.6s ease-in-out infinite}
+.status{min-height:1.6em;font-weight:600;color:var(--ink2)}
+.pill{display:inline-flex;align-items:center;gap:.35em;padding:.12em .7em;border-radius:999px;font-size:.82rem;font-weight:700;white-space:nowrap}
+.pill.open{background:var(--green-soft);color:var(--green)}
+.pill.merged{background:var(--purple-soft);color:var(--purple)}
+.pill.hot{background:var(--coral-soft);color:var(--coral)}
+.big-line{font-size:clamp(1.15rem,1rem + .6vw,1.5rem);font-weight:700;line-height:1.5;max-width:46ch}
+.big-line b{color:var(--coral)}
+.answer{border-left:5px solid var(--coral);padding:.2em 0 .2em 1rem}
+
+/* 창 모형 */
+.win{padding:0;overflow:hidden;display:grid}
+.win-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1.5px solid var(--line);font-size:.8rem;color:var(--muted);background:var(--panel2)}
+.win-bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.win-bar span{margin-left:8px;font-family:var(--mono)}
+.win-body{padding:16px 18px 18px;display:grid;gap:12px;align-content:start}
+.mock-note{font-size:.75rem;color:var(--muted);text-align:right}
+
+/* SVG 공통 */
+svg{display:block;width:100%;height:auto;overflow:visible}
+svg text{font-family:var(--sans);fill:var(--ink2);font-size:14px;font-weight:600}
+svg text.hand{font-family:var(--hand);font-weight:700;fill:var(--coral);font-size:24px}
+svg text.muted{fill:var(--muted);font-weight:500}
+.ln{fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.ln.ink{stroke:var(--ink)} .ln.coral{stroke:var(--coral)} .ln.blue{stroke:var(--blue)} .ln.green{stroke:var(--green)} .ln.dash{stroke:var(--muted);stroke-width:2.5;stroke-dasharray:6 7}
+.ring{fill:none;stroke:var(--coral);stroke-width:3;opacity:0}
+.slide.active .ring.pulse{animation:pulse 1.8s ease-out 2.4s infinite}
+
+/* ---------- 01 표지 ---------- */
+#cover .inner{gap:clamp(16px,3vh,30px)}
+#cover h1 .accent{color:var(--coral)}
+.cover-graph{max-width:900px}
+.bubble-shape{fill:var(--panel);stroke:var(--ink);stroke-width:3}
+.folder-shape{fill:var(--yellow-soft);stroke:var(--yellow);stroke-width:3}
+.fileic{fill:var(--panel);stroke:var(--blue);stroke-width:2.5}
+.hint{display:inline-flex;gap:.5em;align-items:center;font-size:.9rem;color:var(--muted)}
+kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:.05em .45em;background:var(--panel);color:var(--ink2)}
+
+/* ---------- 02 복붙 지옥 ---------- */
+.chat{display:grid;gap:10px;align-content:start}
+.msg{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:start}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:800;color:#fff;background:var(--c,var(--muted));flex:none}
+.msg .b{background:var(--panel2);border-radius:4px 16px 16px 16px;padding:.45em .8em;font-size:.93rem;justify-self:start;max-width:100%}
+.msg.me{grid-template-columns:1fr 34px}
+.msg.me .b{background:var(--coral-soft);border-radius:16px 4px 16px 16px;justify-self:end;grid-column:1;grid-row:1}
+.msg.me .av{grid-column:2}
+.codeblk{display:block;margin-top:6px;font-family:var(--mono);font-size:.76rem;line-height:1.5;background:var(--term);color:var(--term-ink);border-radius:10px;padding:8px 12px;white-space:pre;overflow:hidden}
+.codeblk .dim{color:var(--term-dim)}
+.copy{display:inline-block;margin-top:6px;font-size:.75rem;font-weight:700;color:var(--muted);border:1.5px solid var(--line);border-radius:8px;padding:.05em .5em}
+.thoughts{display:flex;flex-wrap:wrap;gap:14px}
+.thought{font-family:var(--hand);font-weight:700;font-size:clamp(1.1rem,1rem + .45vw,1.35rem);background:var(--panel2);border-radius:22px;padding:.45em 1em;position:relative}
+.thought::after{content:"";position:absolute;left:26px;bottom:-9px;width:16px;height:16px;border-radius:50%;background:var(--panel2)}
+
+/* ---------- 03 손이 생긴 Claude ---------- */
+.vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:stretch}
+.vs .card{display:grid;gap:8px;align-content:start}
+.vs .tagline{font-size:.82rem;font-weight:700;color:var(--muted)}
+.vs h3{font-size:1.5rem}
+.vs .chatc h3{color:var(--blue)} .vs .codec h3{color:var(--coral)}
+.vs .codec{border-color:var(--coral)}
+.vs .ne{align-self:center;font-family:var(--hand);font-size:2rem;font-weight:700;color:var(--muted)}
+.vs .friend{font-family:var(--hand);font-weight:700;font-size:1.3rem;line-height:1.25}
+.vs ul{margin:0;padding-left:1.2em;display:grid;gap:3px;color:var(--ink2);font-size:.95rem}
+.analogy{display:flex;flex-wrap:wrap;align-items:center;gap:.6em 1em;font-weight:700;font-size:1.05rem;background:var(--panel2);border-radius:16px;padding:12px 18px}
+.analogy .eq{font-family:var(--hand);font-size:1.5rem;color:var(--coral)}
+.analogy small{flex-basis:100%;font-weight:500;color:var(--ink2);font-size:.92rem}
+
+/* ---------- 04 폴더 ---------- */
+.explorer{display:grid;gap:6px;font-size:.95rem}
+.xrow{display:flex;align-items:center;gap:.6em;padding:.45em .8em;border-radius:10px;border:1.5px solid transparent;transition:opacity .45s ease,background .3s,border-color .3s}
+.xrow .ico{font-size:1.15rem;width:1.4em;text-align:center}
+.xrow .nm{font-weight:600}
+.xrow .tag{margin-left:auto;font-size:.78rem;font-weight:700;color:var(--muted);opacity:0;transition:opacity .3s}
+.xrow.child{margin-left:1.6em}
+.xrow.child2{margin-left:3.2em}
+.explorer.opened .xrow.work{background:var(--coral-soft);border-color:var(--coral)}
+.explorer.opened .xrow.work .tag{opacity:1;color:var(--coral)}
+.explorer.opened .xrow.out{opacity:.38}
+.explorer.opened .xrow.out .tag{opacity:1}
+.explorer.asking .xrow.photo{opacity:1;border-color:var(--yellow);background:var(--yellow-soft)}
+.ask-bubble{display:none;background:var(--yellow-soft);border:2px solid var(--yellow);border-radius:14px;padding:10px 14px;font-size:.93rem}
+.ask-bubble.on{display:grid;gap:8px;animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.ask-bubble .mini{display:flex;gap:8px;flex-wrap:wrap}
+.ask-bubble .mini span{font-size:.8rem;font-weight:700;border:1.5px solid var(--ink);border-radius:999px;padding:.1em .7em;background:var(--panel)}
+
+/* ---------- 05 일하는 순서 / 이벤트 목록 ---------- */
+.events{list-style:none;margin:0;padding:0 0 0 4px;display:grid;gap:10px;position:relative}
+.events::before{content:"";position:absolute;left:20px;top:10px;bottom:10px;width:2px;background:var(--line)}
+.events li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;position:relative;opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.events li.on{opacity:1;transform:none}
+.events .av{font-size:1rem}
+.events .say{font-family:var(--hand);font-weight:700;font-size:1.18rem;color:var(--ink);line-height:1.3}
+.events .sys{background:var(--panel2);color:var(--ink2);border:2px solid var(--line)}
+.events .done{background:var(--green);border:0}
+.events p{font-size:.93rem}
+.events .plus{color:var(--green);font-weight:800}
+.loop-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-weight:700;font-size:.95rem}
+.loop-chips span{background:var(--panel);border:1.5px solid var(--line);border-radius:999px;padding:.25em .8em}
+.loop-chips i{font-style:normal;color:var(--muted)}
+.loop-chips .back{font-family:var(--hand);color:var(--coral);font-size:1.15rem}
+
+/* ---------- 06 허락 ---------- */
+.perm{display:grid;gap:12px;border-color:var(--yellow)}
+.perm-head{display:flex;align-items:center;gap:.5em;font-weight:800;font-size:1.05rem}
+.diff{font-family:var(--mono);font-size:.85rem;line-height:1.55;display:grid;gap:3px;background:var(--panel2);border-radius:10px;padding:10px 12px}
+.diff .ctx{color:var(--muted)}
+.diff .del{background:var(--red-soft);color:var(--red);padding:.1em .5em;border-radius:6px}
+.diff .add{background:var(--green-soft);color:var(--green);padding:.1em .5em;border-radius:6px}
+.swatch-row{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted)}
+.swatch{width:84px;height:48px;border-radius:10px;border:1.5px solid var(--line);background:#fff;display:grid;place-items:center;font-size:.72rem;font-weight:700;color:#454c5e;transition:background .6s ease}
+.swatch.lav{background:#e6dcff}
+.modes{display:grid;gap:10px}
+.mode{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start;padding:12px 16px}
+.mode .em{font-size:1.6rem;grid-row:span 2;line-height:1.2}
+.mode .nm{display:flex;align-items:center;gap:.5em;flex-wrap:wrap}
+.mode .nm b{font-family:var(--mono);font-size:.95rem}
+.mode p{font-size:.9rem}
+.mode.rec{border-color:var(--coral)}
+
+/* ---------- 07 세이브 포인트 ---------- */
+.commits{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.commits li{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:.45em .7em;border-radius:12px;border:1.5px solid var(--line);background:var(--panel);font-size:.92rem;font-weight:600}
+.commits li .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:3px solid var(--ink);font-size:.78rem;font-weight:800}
+.commits li.rv .n{border-color:var(--purple);color:var(--purple)}
+.commits li .h{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.commits li.new{animation:rise .5s cubic-bezier(.2,.8,.2,1) both,flash 1.4s ease both}
+.minipage{border-radius:12px;border:1.5px solid var(--line);padding:14px 16px;display:grid;gap:6px;background:#ffffff;color:#1f2433;transition:background .6s ease}
+.minipage h4{font-size:1.25rem;transition:font-family .2s}
+.minipage p{font-size:.85rem;color:#454c5e}
+.minipage.sky{background:#dcefff}
+.minipage.handfont h4{font-family:var(--hand);font-size:1.55rem}
+.req{font-size:.88rem;padding:.5em 1em}
+.req .bub{font-family:var(--hand);font-size:1.05rem}
+
+/* ---------- 08 세 개의 문 ---------- */
+.door{display:grid;gap:8px;align-content:start;position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1),border-color .25s}
+.door:hover{transform:translateY(-4px)}
+.door .em{font-size:2.2rem;line-height:1;display:inline-block}
+.slide.active .door .em{animation:bob 2.6s ease-in-out infinite;animation-delay:var(--b,0s)}
+.door h3{font-size:1.2rem}
+.door p{font-size:.93rem}
+.door .where{font-family:var(--mono);font-size:.82rem;color:var(--muted)}
+.door.ours{border-color:var(--coral);border-width:2.5px}
+.door .pill{justify-self:start}
+
+/* ---------- 09 터미널 ---------- */
+.terminal{background:var(--term);color:var(--term-ink);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;font-family:var(--mono);font-size:clamp(.78rem,.72rem + .25vw,.92rem)}
+.terminal .tbar{display:flex;align-items:center;gap:6px;padding:9px 14px;background:color-mix(in srgb,var(--term) 80%,#fff 8%);color:var(--term-dim);font-size:.78rem}
+.terminal .tbar i{width:10px;height:10px;border-radius:50%;background:#3a4150}
+.terminal pre{margin:0;padding:14px 16px 18px;min-height:220px;white-space:pre-wrap;word-break:break-all;line-height:1.7}
+.terminal .ps{color:var(--term-green)}
+.terminal .cmt{color:var(--term-yellow)}
+.terminal .out{color:var(--term-dim)}
+.terminal .caret{display:inline-block;width:.55em;height:1.1em;background:var(--term-ink);vertical-align:-.15em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.map{display:grid;gap:8px}
+.map div{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,.8fr);gap:10px;align-items:center;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;padding:.45em .9em;font-size:.92rem}
+.map .eq{font-family:var(--hand);font-weight:700;color:var(--coral);font-size:1.2rem}
+.map code{justify-self:start}
+
+/* ---------- 10 첫 작품 ---------- */
+.build{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start}
+.steps{display:grid;gap:10px}
+.steps .btn{width:100%}
+.promptbox{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1.5px solid var(--ink);border-radius:14px;padding:10px 14px;font-size:.93rem}
+.promptbox .lbl{font-size:.75rem;font-weight:800;color:var(--muted);white-space:nowrap;padding-top:.15em}
+.promptbox .txt{font-weight:600}
+.stage{display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1fr);gap:12px}
+.stage .win-body{padding:12px 14px}
+.files{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:.88rem;min-height:120px;align-content:start}
+.files li{display:flex;align-items:center;gap:.5em;padding:.3em .5em;border-radius:8px;font-weight:600}
+.files li.ghost{color:var(--muted);border:1.5px dashed var(--line);font-weight:500}
+.files li.new{animation:flash 1.4s ease both}
+.files .empty{color:var(--muted);font-size:.82rem;font-style:italic}
+.browser-body{min-height:200px;display:grid;place-items:center;padding:0}
+.browser-body .blank{color:var(--muted);font-size:.85rem;padding:20px;text-align:center}
+.mypage{width:100%;height:100%;min-height:200px;padding:18px;display:grid;gap:10px;align-content:center;justify-items:center;text-align:center;background:#fdf8ff;color:#1f2433;transition:background .8s ease}
+.mypage.sunset{background:linear-gradient(160deg,#ffd3a5,#fd9f9f 55%,#c59bff)}
+.mypage h4{font-size:1.35rem}
+.mypage p{font-size:.85rem;color:#454c5e}
+.mypage .likes{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.mypage .likes span{background:#ffffffcc;border:1.5px solid #e6dccb;border-radius:999px;padding:.15em .7em;font-size:.82rem;font-weight:700;color:#1f2433}
+.mypage .likes .new{animation:flash 1.4s ease both}
+.urlmini{flex:1;margin-left:8px;background:var(--panel);border-radius:999px;padding:.1em .8em;font-family:var(--mono);font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- 11 잘 부탁하는 법 ---------- */
+.pairs{display:grid;gap:12px}
+.pair{display:grid;gap:6px}
+.pair div{display:flex;align-items:flex-start;gap:.6em;padding:.5em .9em;border-radius:12px;background:var(--panel);border:1.5px solid var(--line);font-weight:600;font-size:.93rem}
+.pair .bad{color:var(--muted)} .pair .bad::before{content:"✗";color:var(--red);font-weight:900}
+.pair .good{border-color:var(--green)} .pair .good::before{content:"✓";color:var(--green);font-weight:900}
+.tip{display:grid;gap:4px;align-content:start;padding:14px 16px}
+.tip .em{font-size:1.5rem;line-height:1}
+.tip h3{font-size:1rem}
+.tip p{font-size:.88rem}
+
+/* ---------- 12 CLAUDE.md ---------- */
+.mdfile .win-body{font-family:var(--mono);font-size:.86rem;line-height:1.7;gap:2px;color:var(--ink2)}
+.mdfile .h{color:var(--coral);font-weight:800}
+.toggle{display:inline-flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden;justify-self:start}
+.toggle button{border:0;background:var(--panel);padding:.5em 1.1em;font-weight:700;font-size:.9rem;cursor:pointer;transition:background .2s,color .2s}
+.toggle button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.reply-card{display:grid;gap:10px}
+.reply-card .q{font-size:.88rem;color:var(--muted)}
+.reply-card .r{font-size:.98rem;line-height:1.6;border-radius:4px 16px 16px 16px;background:var(--panel2);padding:.7em 1em}
+.reply-card .r.anim{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.reply-card .r.jargon{font-size:.92rem;color:var(--ink2)}
+.reply-card .verdict{font-family:var(--hand);font-weight:700;font-size:1.15rem}
+
+/* ---------- 13 걱정 vs 사실 ---------- */
+.flip{perspective:1000px;background:none;border:0;padding:0;cursor:pointer;text-align:left;display:grid}
+.flip .face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;padding:18px 20px;border:1.5px solid var(--line);box-shadow:var(--shadow);transition:transform .7s cubic-bezier(.3,1.3,.5,1);display:flex;flex-direction:column;gap:8px;min-height:150px}
+.flip .front{background:var(--panel)}
+.flip .back{background:var(--green-soft);border-color:var(--green);transform:rotateY(180deg)}
+.flip[aria-pressed="true"] .front{transform:rotateY(-180deg)}
+.flip[aria-pressed="true"] .back{transform:rotateY(0)}
+.flip .q{font-family:var(--hand);font-weight:700;font-size:1.35rem;line-height:1.3}
+.flip .tap{font-size:.78rem;color:var(--muted);margin-top:auto}
+.flip .back b{color:var(--green)}
+.flip .back p{font-size:.93rem;color:var(--ink)}
+.caution{border:2px solid var(--yellow);background:var(--yellow-soft);border-radius:18px;padding:16px 20px;display:grid;gap:6px}
+.caution h3{display:flex;align-items:center;gap:.4em}
+.caution ul{margin:0;padding-left:1.2em;display:grid;gap:3px;font-size:.95rem}
+
+/* ---------- 14 단어장 ---------- */
+.term{display:grid;gap:4px;align-content:start;padding:14px 16px}
+.term .top{display:flex;align-items:center;gap:.5em}
+.term .em{font-size:1.4rem}
+.term .en{font-family:var(--mono);font-weight:700;font-size:.92rem}
+.term .ko{font-family:var(--hand);font-weight:700;font-size:1.3rem;color:var(--coral);line-height:1.1}
+.term p{font-size:.86rem;line-height:1.5}
+
+/* ---------- 15 체크리스트 ---------- */
+.todo{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.todo label{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:9px 14px;cursor:pointer;transition:border-color .2s,background .2s}
+.todo input{appearance:none;-webkit-appearance:none;width:28px;height:28px;border-radius:8px;border:2.5px solid var(--line);margin:0;display:grid;place-items:center;cursor:pointer;transition:all .25s cubic-bezier(.3,1.6,.5,1);background:var(--panel)}
+.todo input::after{content:"✓";color:#fff;font-weight:900;transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.todo input:checked{background:var(--green);border-color:var(--green)}
+.todo input:checked::after{transform:scale(1)}
+.todo label:has(input:checked){border-color:var(--green);background:color-mix(in srgb,var(--green-soft) 60%,var(--panel))}
+.todo label:has(input:checked) b{text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:2px}
+.todo b{display:block}
+.todo span small{display:block;color:var(--muted);font-size:.83rem;line-height:1.4;margin-top:1px}
+.todo .bonus{border-style:dashed}
+.todo small .inline,.where-chip .inline{display:inline;font-weight:700;color:var(--ink2)}
+.todo .links{display:flex;gap:6px;justify-content:flex-end;align-self:center;flex-wrap:wrap}
+.go{display:inline-flex;align-items:center;gap:.25em;padding:.4em .85em;border-radius:999px;background:var(--ink);color:var(--paper);border:1.5px solid var(--ink);font-size:.82rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:transform .15s,background .2s}
+.go:hover{transform:translateY(-2px);background:var(--coral);border-color:var(--coral);color:#fff}
+.go.sub{background:transparent;color:var(--ink2);border-color:var(--line)}
+.go.sub:hover{background:var(--panel2);color:var(--ink);border-color:var(--ink)}
+.go.demo{padding:.1em .6em;font-size:.78rem;vertical-align:1px;pointer-events:none}
+.todo-lead{font-size:.9rem;color:var(--ink2);line-height:1.55}
+.where-chip{font-size:.8rem;color:var(--ink2);background:var(--panel2);border-radius:10px;padding:.35em .7em;max-width:16em;line-height:1.4;text-align:left}
+.todo-side{gap:12px}
+.todo-side .note{font-size:1.15rem}
+.stuck{border:1.5px dashed var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:4px}
+.stuck h3{font-size:1rem}
+.stuck a,.stuck .tipline{display:grid;gap:1px;text-decoration:none;color:var(--blue);padding:.45em .6em;border-radius:10px;transition:background .2s}
+.stuck a:hover{background:var(--blue-soft)}
+.stuck .tipline{color:var(--ink)}
+.stuck b{font-size:.9rem}
+.stuck small{color:var(--muted);font-size:.8rem;line-height:1.4}
+.stuck .ask{color:var(--coral);font-size:1.15rem;line-height:1.3}
+.meter{display:grid;gap:8px;justify-items:center;text-align:center}
+.meter svg{width:min(150px,45vw)}
+.meter .track{fill:none;stroke:var(--line);stroke-width:14}
+.meter .val{fill:none;stroke:var(--green);stroke-width:14;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1)}
+.meter text{font-size:34px;font-weight:850;fill:var(--ink)}
+.meter text.sub{font-size:13px;font-weight:600;fill:var(--muted)}
+
+/* ---------- 16 마무리 ---------- */
+#end h2{font-size:clamp(2.1rem,5vw,4rem);font-weight:850}
+#end h2 span{color:var(--coral)}
+.end-graph{max-width:980px}
+.end-graph .node{fill:var(--panel);stroke:var(--ink);stroke-width:3}
+.end-graph .node.c{stroke:var(--coral)}
+.end-graph .emo{font-size:30px}
+.teaser{display:flex;gap:14px;align-items:center;border:2px dashed var(--purple);background:var(--purple-soft);border-radius:18px;padding:14px 18px;max-width:760px}
+.teaser .em{font-size:2rem}
+.teaser b{color:var(--purple)}
+.teaser p{font-size:.95rem;color:var(--ink2)}
+.repo-link{font-size:.92rem;color:var(--ink2)}
+.repo-link a{color:var(--blue);font-weight:700;text-underline-offset:3px}
+
+/* ---------- 반응형 ---------- */
+@media(max-width:920px){
+  .split,.split.todo-split,.vs,.build{grid-template-columns:1fr}
+  .vs .ne{justify-self:center}
+  .g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .topbar .where{display:none}
+}
+@media(max-width:600px){
+  .g2,.g3,.g4,.stage{grid-template-columns:1fr}
+  .dots{display:none}
+  .map div{grid-template-columns:1fr;gap:2px}
+  .map .eq{display:none}
+  .todo label{grid-template-columns:30px minmax(0,1fr)}
+  .todo .links{grid-column:2;justify-content:flex-start}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
+}
+@media print{
+  body{overflow:visible}
+  .deck{position:static}
+  .slide{position:relative;opacity:1;visibility:visible;transform:none;break-after:page;overflow:visible}
+  .nav,.topbar,.progress{display:none}
+  .events li{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<header class="topbar">
+  <span class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4A2.5 2.5 0 0 1 4 13.5z" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/><path d="M12 6.2l1.1 2.7 2.7 1.1-2.7 1.1L12 13.8l-1.1-2.7L8.2 10l2.7-1.1z" fill="var(--coral)"/></svg>
+    Claude Code 첫걸음
+  </span>
+  <span class="where" id="where"></span>
+</header>
+
+<main class="deck" id="deck">
+
+<!-- 01 -->
+<section class="slide" id="cover" data-title="표지"><div class="inner">
+  <span class="kicker rise">채팅만 해 본 너를 위한 안내서</span>
+  <h1 class="rise" style="--d:.1s">Claude에게<br><span class="accent">손</span>이 생겼어</h1>
+  <p class="lede rise" style="--d:.25s">명령어도, 까만 화면도 몰라도 괜찮아. 오늘은 Claude Code가 <mark>지금까지 쓰던 Claude와 무엇이 다르고, 그걸로 뭘 만들 수 있는지</mark>만 알아 가자.</p>
+  <svg class="cover-graph" viewBox="0 0 700 240" role="img" aria-label="말풍선으로 한 부탁이 폴더 안의 진짜 파일로 바뀌는 그림">
+    <g class="pop" style="--d:.5s">
+      <path class="bubble-shape" d="M30 50 h230 a18 18 0 0 1 18 18 v44 a18 18 0 0 1 -18 18 h-170 l-26 22 v-22 h-34 a18 18 0 0 1 -18 -18 v-44 a18 18 0 0 1 18 -18z"/>
+      <text x="145" y="96" text-anchor="middle" style="font-size:17px;fill:var(--ink)">내 소개 페이지 만들어 줘</text>
+    </g>
+    <path class="ln coral draw" pathLength="1" d="M290 92 C340 92 350 150 410 150" style="--d:1s;--dur:.9s;stroke-dasharray:1"/>
+    <path class="ln coral draw" pathLength="1" d="M398 138 L412 150 L397 162" style="stroke-width:4;--d:1.7s;--dur:.3s"/>
+    <g class="pop" style="--d:1.6s">
+      <path class="folder-shape" d="M430 88 h70 l16 18 h150 a10 10 0 0 1 10 10 v96 a10 10 0 0 1 -10 10 h-236 a10 10 0 0 1 -10 -10 v-114 a10 10 0 0 1 10 -10z"/>
+      <text x="446" y="80" class="muted" style="font-size:13px">claude-practice</text>
+    </g>
+    <g class="pop" style="--d:2.1s"><rect class="fileic" x="448" y="124" width="62" height="74" rx="8"/><text x="479" y="170" text-anchor="middle" style="font-size:11px">index.html</text></g>
+    <g class="pop" style="--d:2.35s"><rect class="fileic" x="522" y="124" width="62" height="74" rx="8"/><text x="553" y="170" text-anchor="middle" style="font-size:11px">style.css</text></g>
+    <g class="pop" style="--d:2.6s"><rect class="fileic" x="596" y="124" width="62" height="74" rx="8" style="stroke:var(--coral)"/><text x="627" y="170" text-anchor="middle" style="font-size:11px">CLAUDE.md</text></g>
+    <circle class="ring pulse" cx="479" cy="161" r="30"/>
+    <text class="hand fade" x="560" y="34" text-anchor="middle" style="--d:2.9s">진짜 파일이 생겼어!</text>
+  </svg>
+  <p class="hint rise" style="--d:.5s"><kbd>→</kbd> 키나 아래 버튼으로 넘겨. 휴대폰이면 옆으로 밀면 돼.</p>
+</div></section>
+
+<!-- 02 -->
+<section class="slide" id="pain" data-title="이런 적 있지?"><div class="inner">
+  <span class="kicker rise">시작하기 전에, 이런 적 있지?</span>
+  <h2 class="rise" style="--d:.1s">복사하고, 붙이고, 또 복사하고</h2>
+  <div class="grid split">
+    <div class="card chat rise" style="--d:.2s" aria-label="채팅 Claude와 주고받은 대화 예시">
+      <div class="msg me rise" style="--d:.35s"><span class="b">내 소개 웹페이지 하나 만들어 줘!</span><span class="av" style="--c:var(--coral)">나</span></div>
+      <div class="msg rise" style="--d:.7s"><span class="av" style="--c:var(--ink2)">C</span><span class="b">좋아! 아래 코드를 <b>index.html</b>로 저장해서 열어 봐.<span class="codeblk">&lt;!doctype html&gt;
+&lt;h1&gt;안녕, 나는 지우야&lt;/h1&gt;
+<span class="dim">… (40줄 더) …</span></span><span class="copy">⧉ 복사</span></span></div>
+      <div class="msg me rise" style="--d:1.1s"><span class="b">메모장에 붙여서 저장했는데 <b>index.html.txt</b>가 됐어…?</span><span class="av" style="--c:var(--coral)">나</span></div>
+      <div class="msg rise" style="--d:1.45s"><span class="av" style="--c:var(--ink2)">C</span><span class="b">저장할 때 ‘파일 형식’을 <b>모든 파일</b>로 바꿔서…</span></div>
+      <div class="msg me rise" style="--d:1.8s"><span class="b">배경색만 바꾸고 싶은데, 또 전체를 복사해야 돼?</span><span class="av" style="--c:var(--coral)">나</span></div>
+    </div>
+    <div class="stack">
+      <div class="thoughts">
+        <span class="thought pop" style="--d:2.2s">“23번째 줄을 바꾸라고…? 어디가 23번째야?”</span>
+        <span class="thought pop" style="--d:2.6s">“아까 버전이 더 나았는데 덮어써 버렸네…”</span>
+      </div>
+      <p class="big-line answer rise" style="--d:3s">채팅 Claude는 답을 <b>말로만</b> 줄 수 있어. 저장하고, 붙이고, 고치는 심부름은 전부 네 몫이었지. Claude Code는 이 심부름을 <b>Claude가 직접</b> 해.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 03 -->
+<section class="slide" id="hands" data-title="손이 생긴 Claude"><div class="inner">
+  <span class="kicker rise">한 줄로 말하면</span>
+  <h2 class="rise" style="--d:.1s">같은 Claude인데, <mark>손이 있느냐</mark>가 달라</h2>
+  <div class="vs">
+    <div class="card chatc rise" style="--d:.25s">
+      <span class="tagline">브라우저에서 대화하는</span>
+      <h3>💬 채팅 Claude</h3>
+      <p class="friend">전화로 레시피를 알려 주는 친구</p>
+      <ul><li>방법을 <b>말로</b> 설명해 줘.</li><li>내 컴퓨터 파일은 못 봐. 붙여 넣어 줘야 알아.</li><li>실제로 만들고 고치는 건 <b>너</b>.</li></ul>
+    </div>
+    <span class="ne pop" style="--d:.45s">≠</span>
+    <div class="card codec rise" style="--d:.35s">
+      <span class="tagline">내 컴퓨터 폴더에서 같이 일하는</span>
+      <h3>🛠️ Claude Code</h3>
+      <p class="friend">부엌에 같이 서서 요리하는 친구</p>
+      <ul><li>폴더 안 파일을 <b>직접 열어 보고</b>,</li><li>새로 <b>만들고 고치고</b>,</li><li>잘 됐는지 <b>확인까지</b> 해.</li></ul>
+    </div>
+  </div>
+  <div class="analogy rise" style="--d:.6s">
+    <span>채팅 Claude</span><span class="eq">:</span><span>Claude Code</span><span class="eq">=</span><span>레시피 알려 주는 친구</span><span class="eq">:</span><span>같이 칼 잡는 친구</span>
+    <small>같이 칼을 잡는 친구라서, 썰기 전에 꼭 “이거 썰어도 돼?” 하고 물어봐. 그 이야기는 조금 뒤에 나와.</small>
+  </div>
+</div></section>
+
+<!-- 04 -->
+<section class="slide" id="folder" data-title="폴더가 작업 공간"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">Claude의 부엌은 어디야?</span>
+      <h2 class="rise" style="--d:.1s">네가 열어 준 <mark>폴더 하나</mark>가 작업 공간이야</h2>
+      <p class="lede rise" style="--d:.2s">Claude Code를 시작할 때 폴더를 하나 골라 줘. Claude는 그 폴더 안에서 파일을 읽고 만들고 고쳐.</p>
+      <p class="rise" style="--d:.3s">폴더 밖은 함부로 건드리지 않아. 꼭 봐야 하면 <b>먼저 물어봐.</b> 그러니까 처음엔 중요한 파일이 없는 <b>빈 연습용 폴더</b>를 만들어서 열어 주면 제일 안심이야.</p>
+      <p class="note rise" style="--d:.45s">오른쪽 버튼을 차례로 눌러 봐 →</p>
+    </div>
+    <div class="card win pop" style="--d:.25s">
+      <div class="win-bar"><i></i><i></i><i></i><span>파일 탐색기</span></div>
+      <div class="win-body">
+        <div class="explorer" id="explorer">
+          <div class="xrow out"><span class="ico">💻</span><span class="nm">내 PC</span></div>
+          <div class="xrow child out"><span class="ico">📁</span><span class="nm">문서</span></div>
+          <div class="xrow child2 work"><span class="ico">📂</span><span class="nm">claude-practice</span><span class="tag">✨ Claude 작업 공간</span></div>
+          <div class="xrow child2 out"><span class="ico">📁</span><span class="nm">학교 과제</span><span class="tag">🔒 밖</span></div>
+          <div class="xrow child out photo"><span class="ico">🖼️</span><span class="nm">사진</span><span class="tag">🔒 밖</span></div>
+          <div class="xrow child out"><span class="ico">📥</span><span class="nm">다운로드</span><span class="tag">🔒 밖</span></div>
+        </div>
+        <div class="ask-bubble" id="askBubble"><span>🙋 <b>Claude:</b> ‘사진’ 폴더는 작업 공간 밖이야. 안에 있는 파일을 읽어 봐도 될까?</span><span class="mini"><span>허락</span><span>거절</span></span></div>
+        <p class="status" id="folderMsg" aria-live="polite"></p>
+        <div class="btns">
+          <button class="btn primary nudge" id="fOpen">📂 이 폴더를 Claude에게 열어 주기</button>
+          <button class="btn" id="fAsk" disabled>🖼️ Claude가 사진 폴더를 보고 싶다면?</button>
+          <button class="btn ghost" id="fReset">↺</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 05 -->
+<section class="slide" id="loop" data-title="Claude가 일하는 순서"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">Claude Code가 일하는 순서</span>
+      <h2 class="rise" style="--d:.1s">말만 하는 게 아니라 <mark>끝까지</mark> 해</h2>
+      <p class="lede rise" style="--d:.2s">부탁 하나를 받으면 Claude는 스스로 살펴보고, 계획하고, 만들고, 확인해. 확인하다 문제가 보이면 다시 고치고.</p>
+      <div class="loop-chips rise" style="--d:.3s"><span>👀 살펴보기</span><i>→</i><span>📝 계획</span><i>→</i><span>✏️ 만들기</span><i>→</i><span>🔍 확인</span><span class="back">↺ 다시</span></div>
+      <p class="rise" style="--d:.4s">이렇게 여러 단계를 스스로 이어 가는 AI를 <b>에이전트(agent)</b>라고 불러. 채팅 Claude가 “한 번 묻고 한 번 답하기”라면, 에이전트는 “맡기면 끝까지 해 오기”야.</p>
+      <div class="btns rise" style="--d:.5s"><button class="btn" id="loopReplay">▶ 처음부터 다시 보기</button></div>
+    </div>
+    <div class="card win pop" style="--d:.25s">
+      <div class="win-bar"><i></i><i></i><i></i><span>Claude Code · claude-practice</span></div>
+      <div class="win-body">
+        <ol class="events" id="loopEvents">
+          <li><span class="av" style="--c:var(--coral);font-size:.8rem">나</span><p class="say">“내 소개 페이지 만들어 줘. 좋아하는 건 고양이, 떡볶이, 피아노야.”</p></li>
+          <li><span class="av sys">👀</span><p><b>살펴보기</b> · 폴더를 열어 봤어. 아직 비어 있네.</p></li>
+          <li><span class="av sys">📝</span><p><b>계획</b> · <code>index.html</code> 하나에 인사말과 좋아하는 것 세 가지를 넣을게.</p></li>
+          <li><span class="av sys">✏️</span><p><b>만들기</b> · <code>index.html</code> 새로 만듦 <span class="plus">+38줄</span> <span class="pill open">허락받음</span></p></li>
+          <li><span class="av sys">🔍</span><p><b>확인</b> · 만든 파일을 다시 읽어 보고, 빠진 게 없는지 확인했어.</p></li>
+          <li><span class="av done">✅</span><p class="say">“다 됐어! 탐색기에서 index.html을 더블클릭하면 열려.”</p></li>
+        </ol>
+        <p class="mock-note">설명용 그림이야. 실제 화면 모양은 조금 달라.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 06 -->
+<section class="slide" id="permission" data-title="“이거 해도 돼?”"><div class="inner">
+  <span class="kicker rise">같이 칼 잡는 친구의 예의</span>
+  <h2 class="rise" style="--d:.1s">손대기 전에 <mark>“이거 해도 돼?”</mark> 하고 물어봐</h2>
+  <div class="grid split">
+    <div class="card perm pop" style="--d:.25s">
+      <div class="perm-head">🔐 허락이 필요해</div>
+      <p>Claude가 <b>index.html</b>의 배경색을 바꾸려고 해.</p>
+      <div class="diff" aria-label="바뀌는 부분">
+        <span class="ctx">body {</span>
+        <span class="del">−   background: white;</span>
+        <span class="add">+   background: lavender;</span>
+        <span class="ctx">}</span>
+      </div>
+      <div class="swatch-row">지금 페이지 <span class="swatch" id="swatch">흰색</span></div>
+      <p class="status" id="permMsg" aria-live="polite"></p>
+      <div class="btns">
+        <button class="btn primary nudge" id="pAllow">✅ 허락</button>
+        <button class="btn" id="pDeny">🙅 거절</button>
+        <button class="btn ghost" id="pReset">↺</button>
+      </div>
+    </div>
+    <div class="stack">
+      <p class="rise" style="--d:.3s">빨간 줄은 <b>지워질 부분</b>, 초록 줄은 <b>새로 들어갈 부분</b>이야. 허락하기 전에 무엇이 바뀌는지 먼저 보여 줘. 얼마나 자주 물어볼지는 입력창 아래 <b>모드</b> 버튼에서 네가 정해.</p>
+      <div class="modes">
+        <div class="card mode rec rise" style="--d:.4s"><span class="em">🙋</span><span class="nm"><b>Manual</b><span class="pill hot">처음엔 이거!</span></span><p>파일을 고치거나 명령을 실행할 때마다 하나하나 물어봐.</p></div>
+        <div class="card mode rise" style="--d:.5s"><span class="em">✍️</span><span class="nm"><b>Accept edits</b></span><p>파일 고치기·폴더 만들기 같은 건 알아서 하고, 그 밖의 일은 물어봐.</p></div>
+        <div class="card mode rise" style="--d:.6s"><span class="em">🗺️</span><span class="nm"><b>Plan</b></span><p>계획만 세워서 보여 주고 파일엔 손대지 않아. 큰일 맡기기 전에 좋아.</p></div>
+      </div>
+      <p class="note rise" style="--d:.75s">하다가 아니다 싶으면 ■ 멈춤 버튼이나 Esc 키로 언제든 세워.</p>
+      <p class="small rise" style="--d:.8s">예전 버전에서는 Manual이 <span class="mono">Ask permissions</span>라는 이름으로 보이기도 해.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 07 -->
+<section class="slide" id="save" data-title="Claude도 세이브 포인트를"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">Git 안내서에서 본 그거</span>
+      <h2 class="rise" style="--d:.1s">Claude도 <mark>세이브 포인트</mark>를 찍어</h2>
+      <p class="lede rise" style="--d:.2s">“세이브해 줘”라고 하면 Claude가 커밋을 찍고 메모까지 써 줘. “아까로 돌려 줘”라고 하면 되돌려 주고.</p>
+      <div class="btns rise" style="--d:.3s">
+        <button class="btn req primary nudge" id="sv1"><span class="bub">💬 “배경을 하늘색으로 바꾸고 세이브해 줘”</span></button>
+        <button class="btn req" id="sv2" disabled><span class="bub">💬 “제목을 손글씨체로 바꾸고 세이브해 줘”</span></button>
+        <button class="btn req" id="sv3" disabled><span class="bub">💬 “손글씨체로 바꾸기 전으로 돌려 줘”</span></button>
+        <button class="btn ghost" id="svReset">↺</button>
+      </div>
+      <p class="small rise" style="--d:.45s">Claude가 세이브 포인트를 찍으려면 컴퓨터에 Git이 깔려 있어야 해. 첫 주 체크리스트 마지막 칸을 봐. 세이브 포인트가 가물가물하면 <a class="inline-link" href="../git-github-first-steps/git-github-first-steps.html#timeline" target="_blank" rel="noopener">Git 안내서 3장 ↗</a></p>
+    </div>
+    <div class="card stack pop" style="--d:.25s">
+      <div class="minipage" id="svPage"><h4>안녕! 나는 지우야 👋</h4><p>고양이 · 떡볶이 · 피아노를 좋아해.</p></div>
+      <ol class="commits" id="svList" aria-live="polite"></ol>
+      <p class="status" id="svMsg" aria-live="polite"></p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 08 -->
+<section class="slide" id="doors" data-title="세 개의 문"><div class="inner">
+  <span class="kicker rise">Claude Code를 만나는 곳</span>
+  <h2 class="rise" style="--d:.1s">문은 여러 개, 안에 있는 Claude는 하나</h2>
+  <div class="grid g3">
+    <div class="card door rise" style="--d:.2s;--b:0s"><span class="em">🌐</span><h3>웹</h3><span class="where">claude.ai/code</span><p>설치 없이 브라우저에서. 내 컴퓨터가 아니라 <b>GitHub 저장소</b>를 연결해서 인터넷 너머 컴퓨터에서 일해.</p></div>
+    <div class="card door ours rise" style="--d:.3s;--b:.4s"><span class="pill hot">⭐ 우리가 들어갈 문</span><span class="em">🖥️</span><h3>데스크톱 앱</h3><span class="where">Claude 앱 → Code 탭</span><p><b>내 컴퓨터 폴더</b>에서 일해. 허락은 버튼으로, 바뀐 내용은 눈으로 보면서. 처음 시작하기 딱 좋아.</p></div>
+    <div class="card door rise" style="--d:.4s;--b:.8s"><span class="em">⌨️</span><h3>터미널</h3><span class="where">까만 화면에 <span class="mono">claude</span></span><p>개발자들이 많이 쓰는 문. 버튼 대신 글자로 주고받아. 다음 장에서 살짝 구경해 보자.</p></div>
+  </div>
+  <div class="analogy rise" style="--d:.55s">
+    <span>문만 다르고, 일하는 방식은 똑같아.</span>
+    <small>폴더를 열어 주고 → 부탁하고 → 허락하고 → 확인하기. 데스크톱 앱에서 익힌 이 흐름은 나중에 어느 문으로 들어가도 그대로 통해. (코드 편집기 VS Code 안에서 여는 문도 있어.)</small>
+  </div>
+</div></section>
+
+<!-- 09 -->
+<section class="slide" id="terminal" data-title="까만 화면은 뭐야?"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">한 번쯤 궁금했던 그것</span>
+      <h2 class="rise" style="--d:.1s">까만 화면은 <mark>글로 말 거는 창</mark>이야</h2>
+      <p class="lede rise" style="--d:.2s">평소엔 마우스로 폴더를 열고 파일을 더블클릭하지? 터미널에서는 같은 일을 <b>글자 한 줄</b>로 시켜. 그 한 줄을 <b>명령어</b>라고 해.</p>
+      <div class="map rise" style="--d:.3s">
+        <div><span>📂 폴더 더블클릭해서 들어가기</span><span class="eq">=</span><code>cd 폴더이름</code></div>
+        <div><span>👀 폴더 안 파일 보기</span><span class="eq">=</span><code>dir</code></div>
+        <div><span>🌐 파일 더블클릭해서 열기</span><span class="eq">=</span><code>start 파일이름</code></div>
+      </div>
+      <p class="rise" style="--d:.4s">사실 Claude Code도 뒤에서 이런 명령을 써. Claude가 <b>“이 명령 실행해도 돼?”</b>라고 물을 때 보이는 게 바로 이런 한 줄이야. 모르는 명령이면 “이게 뭐 하는 거야?”라고 되물으면 돼.</p>
+    </div>
+    <div class="stack">
+      <div class="terminal pop" style="--d:.25s" aria-label="터미널에서 명령어 세 줄을 실행하는 예시">
+        <div class="tbar"><i></i><i></i><i></i><span style="margin-left:8px">Windows PowerShell</span></div>
+        <pre id="termOut"></pre>
+      </div>
+      <p class="small rise" style="--d:.5s">데스크톱 앱 안에도 터미널 창이 숨어 있어. <kbd>Ctrl</kbd> + <kbd>`</kbd>(숫자 1 왼쪽 키)로 열어 봐. 구경만 해도 돼.</p>
+      <p class="note rise" style="--d:.6s">개발자들은 이 창에 claude라고 쳐서 Claude Code를 불러. 그 이야기는 다음 편에서!</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 10 -->
+<section class="slide" id="build" data-title="첫 작품: 내 소개 페이지"><div class="inner">
+  <span class="kicker rise">드디어 직접 해 보기</span>
+  <h2 class="rise" style="--d:.1s">첫 작품: <mark>내 소개 페이지</mark></h2>
+  <div class="grid build">
+    <div class="stack">
+      <div class="promptbox rise" style="--d:.2s"><span class="lbl">입력창</span><span class="txt" id="bPrompt">내 소개 페이지 만들어 줘. 이름은 지우, 좋아하는 건 고양이·떡볶이·피아노야.</span></div>
+      <div class="steps rise" style="--d:.3s">
+        <button class="btn primary nudge" id="b1">① 💬 부탁 보내기</button>
+        <button class="btn" id="b2" disabled>② ✅ “index.html 만들어도 돼?” → 허락</button>
+        <button class="btn" id="b3" disabled>③ 🖱️ 생긴 파일 더블클릭해서 열기</button>
+        <button class="btn" id="b4" disabled>④ 💬 “배경은 노을 색으로, 좋아하는 것에 여행도 추가해 줘”</button>
+        <button class="btn ghost" id="bReset">↺ 처음부터</button>
+      </div>
+      <p class="status" id="bMsg" aria-live="polite"></p>
+    </div>
+    <div class="stage pop" style="--d:.25s">
+      <div class="card win">
+        <div class="win-bar"><i></i><i></i><span>📂 claude-practice</span></div>
+        <div class="win-body"><ul class="files" id="bFiles"></ul></div>
+      </div>
+      <div class="card win">
+        <div class="win-bar"><i></i><i></i><i></i><span class="urlmini" id="bUrl">　</span></div>
+        <div class="win-body browser-body" id="bBrowser"></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 11 -->
+<section class="slide" id="ask" data-title="잘 부탁하는 법"><div class="inner">
+  <span class="kicker rise">같은 Claude, 다른 결과</span>
+  <h2 class="rise" style="--d:.1s">부탁을 잘하면 결과가 달라져</h2>
+  <div class="grid split" style="align-items:start">
+    <div class="pairs">
+      <div class="pair rise" style="--d:.2s"><div class="bad">웹사이트 만들어 줘</div><div class="good">나를 소개하는 한 페이지짜리 웹페이지를 만들어 줘. 이름, 좋아하는 것 세 가지, 인사말을 넣고 파스텔 톤으로.</div></div>
+      <div class="pair rise" style="--d:.35s"><div class="bad">이상해. 고쳐.</div><div class="good">사진이 너무 커서 화면을 꽉 채워. 화면 너비의 절반쯤으로 줄여 줘.</div></div>
+      <div class="pair rise" style="--d:.5s"><div class="bad">블로그에 로그인에 댓글까지 한 번에 다 만들어 줘</div><div class="good">먼저 글 목록 페이지만 만들자. 그게 되면 다음 걸 하자.</div></div>
+    </div>
+    <div class="grid g2">
+      <div class="card tip rise" style="--d:.3s"><span class="em">🎯</span><h3>구체적으로</h3><p>무엇을, 어디에, 어떤 느낌으로. 머릿속 그림을 말로 꺼내 줘.</p></div>
+      <div class="card tip rise" style="--d:.4s"><span class="em">🧩</span><h3>작게 나눠서</h3><p>한 번에 하나씩. 되는 걸 확인하고 다음으로 가면 덜 꼬여.</p></div>
+      <div class="card tip rise" style="--d:.5s"><span class="em">🤔</span><h3>“헷갈리면 먼저 물어봐”</h3><p>이 한마디를 붙이면 Claude가 짐작으로 밀어붙이지 않고 되물어 줘.</p></div>
+      <div class="card tip rise" style="--d:.6s"><span class="em">🧑‍🏫</span><h3>“왜 이렇게 했어?”</h3><p>만든 걸 설명해 달라고 해 봐. 이게 바로 공부야. 모르는 줄은 “이 줄 무슨 뜻이야?”</p></div>
+    </div>
+  </div>
+  <p class="note rise" style="--d:.7s">큰일을 맡길 땐 Plan 모드로 “먼저 계획만 보여 줘”부터. 계획이 마음에 들면 그때 만들라고 하면 돼.</p>
+</div></section>
+
+<!-- 12 -->
+<section class="slide" id="memo" data-title="CLAUDE.md"><div class="inner">
+  <div class="grid split">
+    <div class="stack">
+      <span class="kicker rise">Claude에게 남기는 쪽지</span>
+      <h2 class="rise" style="--d:.1s">CLAUDE.md에 적어 두면 <mark>매번 말 안 해도 돼</mark></h2>
+      <p class="lede rise" style="--d:.2s">새 대화를 시작하면 Claude는 앞 대화를 다 기억하지 못한 채 시작해. 그래서 폴더에 <b>CLAUDE.md</b>라는 쪽지를 두면, 대화를 시작할 때마다 그걸 먼저 읽어.</p>
+      <p class="rise" style="--d:.3s">Git 안내서의 README가 <b>사람을 위한</b> 표지라면, CLAUDE.md는 <b>Claude를 위한</b> 쪽지야. 직접 쓰기 어려우면 “나에 대해 알려 줄 테니 CLAUDE.md 만들어 줘”라고 부탁해.</p>
+      <div class="card win rise mdfile" style="--d:.4s">
+        <div class="win-bar"><i></i><i></i><i></i><span>CLAUDE.md</span></div>
+        <div class="win-body">
+          <span class="h"># 나에 대해</span>
+          <span>- 코딩을 처음 배우는 대학생이야.</span>
+          <span>- 설명은 쉬운 한국어 반말로 해 줘.</span>
+          <span>- 파일을 바꾸면 무엇을 왜 바꿨는지 한 줄로 알려 줘.</span>
+          <span class="h"># 이 폴더</span>
+          <span>- 내 소개 웹페이지를 만드는 곳이야.</span>
+        </div>
+      </div>
+    </div>
+    <div class="card reply-card pop" style="--d:.3s">
+      <div class="toggle" role="group" aria-label="CLAUDE.md가 있을 때와 없을 때 비교">
+        <button id="mdOff" aria-pressed="true">CLAUDE.md 없을 때</button>
+        <button id="mdOn" aria-pressed="false">있을 때</button>
+      </div>
+      <p class="q">💬 “제목을 가운데로 옮겨 줘.”</p>
+      <p class="r" id="mdReply"></p>
+      <p class="verdict" id="mdVerdict"></p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 13 -->
+<section class="slide" id="fear" data-title="걱정 말고, 사실"><div class="inner">
+  <span class="kicker rise">무서운 건 몰라서 그래</span>
+  <h2 class="rise" style="--d:.1s">걱정을 뒤집으면 사실이 나와</h2>
+  <p class="rise small" style="--d:.15s">카드를 눌러서 뒤집어 봐.</p>
+  <div class="grid g3">
+    <button class="flip rise" style="--d:.2s" aria-pressed="false"><span class="face front"><span class="q">“AI가 다 하면 난 뭘 배워?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>보고, 묻는 게 공부야.</b><p>살펴보고 → 계획하고 → 고치고 → 확인하는 건 개발자가 일하는 순서 그대로야. 옆자리에서 그걸 지켜보며 “왜?”를 묻는 셈이지.</p></span></button>
+    <button class="flip rise" style="--d:.3s" aria-pressed="false"><span class="face front"><span class="q">“내 컴퓨터를 망가뜨리면 어떡해?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>열어 준 폴더에서, 물어보고 해.</b><p>Manual 모드면 손대기 전마다 허락을 구해. 빈 연습용 폴더에서 시작하면 더 안심이고.</p></span></button>
+    <button class="flip rise" style="--d:.4s" aria-pressed="false"><span class="face front"><span class="q">“코딩을 하나도 모르는데?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>한국어로 부탁하면 돼.</b><p>채팅 Claude한테 말하던 그대로. 코드는 Claude가 쓰고, 너는 결과를 보고 “이건 이렇게 바꿔 줘”라고 하면 돼.</p></span></button>
+    <button class="flip rise" style="--d:.5s" aria-pressed="false"><span class="face front"><span class="q">“Claude도 틀리지 않아?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>틀려. 그래서 확인이 네 몫이야.</b><p>만든 걸 직접 열어 보고, 이상하면 이상하다고 말해. Claude는 그 말을 듣고 다시 고쳐.</p></span></button>
+    <button class="flip rise" style="--d:.6s" aria-pressed="false"><span class="face front"><span class="q">“영어 버튼이 많아서 겁나…”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>단어 몇 개면 돼.</b><p>다음 장 단어장에 있는 열두 개면 화면 대부분이 읽혀. 모르는 버튼은 Claude한테 “이 버튼 뭐야?”라고 물어봐도 되고.</p></span></button>
+    <button class="flip rise" style="--d:.7s" aria-pressed="false"><span class="face front"><span class="q">“채팅 Claude는 이제 안 써?”</span><span class="tap">눌러서 뒤집기 ↻</span></span><span class="face back"><b>둘 다 써.</b><p>아이디어를 고민하고 공부할 땐 채팅, 뭔가를 실제로 만들 땐 Claude Code. 도구가 하나 늘어난 거야.</p></span></button>
+  </div>
+  <div class="caution rise" style="--d:.8s">
+    <h3>⚠️ 딱 세 가지만 조심하자</h3>
+    <ul>
+      <li><b>사진·과제 원본이 든 폴더 말고, 빈 연습용 폴더를 열어 주기.</b></li>
+      <li><b>비밀번호·주민번호 같은 개인정보는 파일에도 대화에도 넣지 않기.</b></li>
+      <li><b>허락 버튼은 읽고 누르기.</b> 뭘 하려는지 모르겠으면 거절하고 “이게 뭐 하는 거야?”부터 물어봐.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- 14 -->
+<section class="slide" id="words" data-title="단어장"><div class="inner">
+  <span class="kicker rise">Claude Code 화면이 읽히는 단어장</span>
+  <h2 class="rise" style="--d:.1s">이 열두 단어만 알면 돼</h2>
+  <div class="grid g4">
+    <div class="card term rise" style="--d:.15s"><div class="top"><span class="em">🤖</span><span class="en">Agent</span></div><span class="ko">에이전트</span><p>맡기면 여러 단계를 스스로 이어서 해 오는 AI. Claude Code가 바로 이것.</p></div>
+    <div class="card term rise" style="--d:.2s"><div class="top"><span class="em">💬</span><span class="en">Prompt</span></div><span class="ko">부탁 · 프롬프트</span><p>Claude에게 보내는 말. 구체적일수록 결과가 좋아.</p></div>
+    <div class="card term rise" style="--d:.25s"><div class="top"><span class="em">🗂️</span><span class="en">Session</span></div><span class="ko">대화 한 판</span><p>시작부터 끝까지의 대화 하나. 사이드바에 남아서 나중에 다시 열 수 있어.</p></div>
+    <div class="card term rise" style="--d:.3s"><div class="top"><span class="em">📂</span><span class="en">Folder · Project</span></div><span class="ko">작업 폴더</span><p>Claude가 일하는 공간. 시작할 때 네가 골라 줘.</p></div>
+    <div class="card term rise" style="--d:.35s"><div class="top"><span class="em">🔐</span><span class="en">Permission</span></div><span class="ko">허락</span><p>파일을 고치거나 명령을 실행하기 전에 Claude가 묻는 것.</p></div>
+    <div class="card term rise" style="--d:.4s"><div class="top"><span class="em">🧭</span><span class="en">Mode</span></div><span class="ko">얼마나 물어볼지</span><p>Manual · Accept edits · Plan. 입력창 아래에서 바꿔.</p></div>
+    <div class="card term rise" style="--d:.45s"><div class="top"><span class="em">🟩</span><span class="en">Changes · Diff</span></div><span class="ko">바뀐 부분</span><p>초록은 더한 줄, 빨강은 뺀 줄. <span class="mono">+12 −1</span>처럼 숫자로도 보여.</p></div>
+    <div class="card term rise" style="--d:.5s"><div class="top"><span class="em">⌨️</span><span class="en">Terminal</span></div><span class="ko">까만 화면</span><p>글자로 컴퓨터에 명령하는 창.</p></div>
+    <div class="card term rise" style="--d:.55s"><div class="top"><span class="em">▶️</span><span class="en">Command</span></div><span class="ko">명령어</span><p>터미널에 치는 한 줄. <span class="mono">cd</span>, <span class="mono">dir</span> 같은 것.</p></div>
+    <div class="card term rise" style="--d:.6s"><div class="top"><span class="em">📝</span><span class="en">CLAUDE.md</span></div><span class="ko">Claude용 쪽지</span><p>대화를 시작할 때마다 Claude가 먼저 읽는 안내문.</p></div>
+    <div class="card term rise" style="--d:.65s"><div class="top"><span class="em">🧠</span><span class="en">Model</span></div><span class="ko">두뇌 종류</span><p>Claude에도 여러 버전이 있어. 입력창 아래에서 고를 수 있어.</p></div>
+    <div class="card term rise" style="--d:.7s"><div class="top"><span class="em">📏</span><span class="en">Context</span></div><span class="ko">지금 기억하는 범위</span><p>Claude가 한꺼번에 보고 있는 대화·파일의 양. 너무 길어지면 새 대화로.</p></div>
+  </div>
+</div></section>
+
+<!-- 15 -->
+<section class="slide" id="start" data-title="첫 주에 해 볼 것"><div class="inner">
+  <span class="kicker rise">명령어 하나 없이 시작하기</span>
+  <h2 class="rise" style="--d:.1s">첫 주에 해 볼 것</h2>
+  <div class="grid split todo-split">
+    <ol class="todo" id="todo">
+      <li class="rise" style="--d:.2s"><label><input type="checkbox"><span><b>Claude 데스크톱 앱 설치하기</b><small>Windows용을 내려받아 설치하고, 시작 메뉴에서 Claude를 열어 로그인해. 로그인은 같이 쓰기로 한 계정으로.</small></span>
+        <span class="links"><a class="go" href="https://claude.ai/download" target="_blank" rel="noopener">내려받기 ↗</a><a class="go sub" href="https://code.claude.com/docs/en/desktop-quickstart" target="_blank" rel="noopener">설치 안내 ↗</a></span></label></li>
+      <li class="rise" style="--d:.27s"><label><input type="checkbox"><span><b>빈 연습용 폴더 만들기</b><small>이름은 <span class="mono">claude-practice</span>처럼 영어로. 중요한 파일이 없는 새 폴더가 제일 좋아.</small></span>
+        <span class="links"><span class="where-chip">📍 파일 탐색기 → <b class="inline">문서</b> → 빈 곳에서 마우스 오른쪽 → <b class="inline">새로 만들기 → 폴더</b></span></span></label></li>
+      <li class="rise" style="--d:.34s"><label><input type="checkbox"><span><b>Code 탭에서 그 폴더 열기</b><small>입력창 아래 첫 버튼에서 <b class="inline">Local</b>을 고르고, 그 옆 폴더 버튼 → <b class="inline">Open folder…</b>로 방금 만든 폴더를 골라.</small></span>
+        <span class="links"><span class="where-chip">📍 앱 왼쪽 사이드바 맨 위 <b class="inline">Code</b></span></span></label></li>
+      <li class="rise" style="--d:.41s"><label><input type="checkbox"><span><b>첫 부탁: 내 소개 페이지</b><small>모드는 <b class="inline">Manual</b> 그대로. 허락 버튼이 나올 때마다 뭘 하려는지 읽고 눌러 봐.</small></span>
+        <span class="links"><a class="go sub" href="#build">예시 다시 보기</a></span></label></li>
+      <li class="rise" style="--d:.48s"><label><input type="checkbox"><span><b>두 번 더 고쳐 달라고 하고, 한 번은 “왜?” 묻기</b><small>“이 줄은 무슨 뜻이야?”도 좋아. 그게 진짜 공부야.</small></span>
+        <span class="links"><a class="go sub" href="#ask">부탁 요령 보기</a></span></label></li>
+      <li class="rise" style="--d:.55s"><label><input type="checkbox"><span><b>CLAUDE.md 만들기</b><small>“나에 대해 알려 줄 테니 CLAUDE.md 만들어 줘”라고 부탁해 봐. 다음 대화부터 말투가 달라질 거야.</small></span>
+        <span class="links"><a class="go sub" href="#memo">쪽지 예시 보기</a></span></label></li>
+      <li class="rise" style="--d:.62s"><label class="bonus"><input type="checkbox"><span><b>보너스: GitHub에 올려서 진짜 주소 만들기</b><small>먼저 Git을 설치해. 그다음 “이 폴더를 GitHub에 올려서 GitHub Pages로 열고 싶어. 하나씩 알려 줘”라고 부탁하면 필요한 준비를 차례로 알려 줘.</small></span>
+        <span class="links"><a class="go" href="https://git-scm.com/downloads/win" target="_blank" rel="noopener">Git 내려받기 ↗</a><a class="go sub" href="../git-github-first-steps/git-github-first-steps.html#pages" target="_blank" rel="noopener">Pages 다시 보기 ↗</a></span></label></li>
+    </ol>
+    <div class="stack todo-side">
+      <p class="todo-lead rise" style="--d:.3s"><span class="go demo">열기 ↗</span> 버튼은 해당 화면을 <b>새 탭</b>으로 열어. 테두리만 있는 버튼은 이 안내서의 해당 장으로 넘어가.</p>
+      <div class="meter pop" style="--d:.4s">
+        <svg viewBox="0 0 200 200" role="img" aria-label="체크리스트 진행률"><circle class="track" cx="100" cy="100" r="80"/><circle class="val" id="meterVal" cx="100" cy="100" r="80" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1"/><text x="100" y="108" text-anchor="middle" id="meterTxt">0/7</text><text class="sub" x="100" y="132" text-anchor="middle">해 봤어요</text></svg>
+        <p class="note" id="meterNote">하나씩 체크해 봐. 이 브라우저가 기억해 둘게.</p>
+      </div>
+      <div class="stuck rise" style="--d:.7s">
+        <h3>🧭 막히면 여기부터</h3>
+        <span class="tipline"><b>Claude에게 그대로 물어보기</b><small>이상한 화면을 캡처해서 입력창에 끌어다 놓고 “이게 무슨 뜻이야?”라고 물어봐.</small></span>
+        <a href="https://code.claude.com/docs/en/desktop-quickstart" target="_blank" rel="noopener"><b>공식 시작 안내 ↗</b><small>영어지만 브라우저 번역으로 읽으면 충분해.</small></a>
+        <a href="../git-github-first-steps/git-github-first-steps.html" target="_blank" rel="noopener"><b>Git & GitHub 안내서 ↗</b><small>세이브 포인트, GitHub Pages가 헷갈리면.</small></a>
+        <p class="hand ask">그래도 막히면 화면 캡처해서 보내 줘. 같이 보자!</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 16 -->
+<section class="slide" id="end" data-title="마무리"><div class="inner">
+  <span class="kicker rise">오늘 기억할 한 문장</span>
+  <h2 class="rise" style="--d:.1s">부탁은 말로,<br><span>확인은 네 눈으로.</span></h2>
+  <svg class="end-graph" viewBox="0 0 1000 240" aria-hidden="true">
+    <path class="ln ink draw" pathLength="1" d="M155 80 H325" style="--d:.6s;--dur:.6s"/>
+    <path class="ln ink draw" pathLength="1" d="M415 80 H585" style="--d:1s;--dur:.5s"/>
+    <path class="ln ink draw" pathLength="1" d="M675 80 H845" style="--d:1.4s;--dur:.6s"/>
+    <path class="ln coral draw" pathLength="1" d="M890 125 C870 195 150 195 120 125" style="--d:1.9s;--dur:1.3s;stroke-width:3.5;stroke-dasharray:1"/>
+    <g class="pop" style="--d:.4s"><circle class="node c" cx="110" cy="80" r="44"/><text class="emo" x="110" y="91" text-anchor="middle">💬</text></g>
+    <g class="pop" style="--d:.8s"><circle class="node" cx="370" cy="80" r="44"/><text class="emo" x="370" y="91" text-anchor="middle">🛠️</text></g>
+    <g class="pop" style="--d:1.2s"><circle class="node" cx="630" cy="80" r="44"/><text class="emo" x="630" y="91" text-anchor="middle">👀</text></g>
+    <g class="pop" style="--d:1.6s"><circle class="node c" cx="890" cy="80" r="44"/><text class="emo" x="890" y="91" text-anchor="middle">🙋</text></g>
+    <text x="110" y="18" text-anchor="middle" class="fade" style="--d:.5s">네가 부탁</text>
+    <text x="370" y="18" text-anchor="middle" class="fade" style="--d:.9s">Claude가 만들기</text>
+    <text x="630" y="18" text-anchor="middle" class="fade" style="--d:1.3s">네가 확인</text>
+    <text x="890" y="18" text-anchor="middle" class="fade" style="--d:1.7s">모르면 질문</text>
+    <text class="hand fade" x="500" y="232" text-anchor="middle" style="--d:2.6s">이걸 반복하면 뭐든 만들 수 있어</text>
+  </svg>
+  <p class="lede rise" style="--d:.4s">Claude Code는 <b>손이 생긴 Claude</b>야. 무엇을 만들지 정하고, 결과를 확인하고, 모르는 걸 묻는 건 너의 몫이고. 그 세 가지는 개발자가 매일 하는 일이기도 해.</p>
+  <div class="teaser rise" style="--d:.6s"><span class="em">🔭</span><p><b>다음 편 예고 — 까만 화면 속 개발자 동네</b><br>터미널에서 Claude Code를 부르는 법, 그리고 개발자들이 왜 Windows 안에 Linux(WSL)를 들여놓는지.</p></div>
+  <p class="note rise" style="--d:.75s">첫 작품, 같이 만들어 보자!</p>
+  <p class="repo-link rise" style="--d:.9s">이 안내서도 Claude Code로 만들었어. 고칠 때마다 찍은 세이브 포인트는 <a href="https://github.com/jemings/tip/commits/main/claude-code-first-steps" target="_blank" rel="noopener">여기</a>서 볼 수 있어.</p>
+</div></section>
+
+</main>
+
+<nav class="nav" aria-label="슬라이드 이동">
+  <button class="arrow" id="prev" aria-label="이전 슬라이드">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="count" id="count"></span>
+  <button class="arrow" id="next" aria-label="다음 슬라이드">→</button>
+</nav>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const scenes = {};
+function timers() {
+  let ids = [];
+  return {
+    after(ms, fn) { ids.push(setTimeout(fn, reduce ? 0 : ms)); },
+    clear() { ids.forEach(clearTimeout); ids = []; }
+  };
+}
+function replay(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+
+/* ---------- 덱 이동 ---------- */
+const slides = $$('.slide');
+const dots = $('#dots');
+let cur = -1;
+slides.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.setAttribute('aria-label', `${i + 1}. ${s.dataset.title}`);
+  b.addEventListener('click', () => go(i));
+  dots.appendChild(b);
+});
+function go(i) {
+  i = Math.max(0, Math.min(slides.length - 1, i));
+  if (i === cur) return;
+  if (cur >= 0) { slides[cur].classList.remove('active'); scenes[slides[cur].id]?.leave?.(); }
+  cur = i;
+  slides.forEach((s, j) => s.classList.toggle('before', j < i));
+  const s = slides[i];
+  s.classList.add('active');
+  s.scrollTop = 0;
+  scenes[s.id]?.enter?.();
+  $$('button', dots).forEach((b, j) => b.setAttribute('aria-current', j === i));
+  $('#count').textContent = `${String(i + 1).padStart(2, '0')} / ${slides.length}`;
+  $('#where').textContent = s.dataset.title;
+  $('#progress').style.setProperty('--p', (i + 1) / slides.length);
+  $('#prev').disabled = i === 0;
+  $('#next').disabled = i === slides.length - 1;
+  history.replaceState(null, '', '#' + s.id);
+}
+$('#prev').addEventListener('click', () => go(cur - 1));
+$('#next').addEventListener('click', () => go(cur + 1));
+addEventListener('keydown', e => {
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  const onControl = e.target.closest('button,input,label,a');
+  if (['ArrowRight', 'PageDown'].includes(e.key) || (e.key === ' ' && !onControl)) { e.preventDefault(); go(cur + 1); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+  else if (e.key === 'Home') go(0);
+  else if (e.key === 'End') go(slides.length - 1);
+});
+let tx = 0, ty = 0;
+addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) go(cur + (dx < 0 ? 1 : -1));
+}, { passive: true });
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  const i = slides.findIndex(s => '#' + s.id === a.getAttribute('href'));
+  if (i < 0) return;
+  e.preventDefault();
+  if (i !== cur) history.pushState(null, '', a.getAttribute('href'));
+  go(i);
+});
+addEventListener('hashchange', () => { const i = slides.findIndex(s => '#' + s.id === location.hash); if (i >= 0) go(i); });
+
+/* ---------- 04 작업 폴더 ---------- */
+(() => {
+  const ex = $('#explorer'), bubble = $('#askBubble'), msg = $('#folderMsg');
+  const bOpen = $('#fOpen'), bAsk = $('#fAsk');
+  const text = {
+    base: '지금은 그냥 평범한 내 컴퓨터 폴더들이야.',
+    opened: 'claude-practice 폴더를 열어 줬어. Claude는 이 안에서 마음껏 만들고 고쳐. 나머지는 작업 공간 밖이야.',
+    asking: '밖에 있는 폴더가 필요하면 이렇게 먼저 물어봐. 거절하면 안 봐.'
+  };
+  function set(s) {
+    ex.classList.toggle('opened', s !== 'base');
+    ex.classList.toggle('asking', s === 'asking');
+    bubble.classList.toggle('on', s === 'asking');
+    bOpen.disabled = s !== 'base';
+    bAsk.disabled = s !== 'opened';
+    bAsk.classList.toggle('nudge', s === 'opened');
+    msg.textContent = text[s];
+  }
+  bOpen.onclick = () => set('opened');
+  bAsk.onclick = () => set('asking');
+  $('#fReset').onclick = () => set('base');
+  set('base');
+  scenes.folder = { enter() { set('base'); } };
+})();
+
+/* ---------- 05 일하는 순서 ---------- */
+(() => {
+  const items = $$('#loopEvents li'), T = timers();
+  const step = n => items.forEach((li, i) => li.classList.toggle('on', i < n));
+  function play() { T.clear(); if (reduce) return step(items.length); step(0); items.forEach((_, i) => T.after(600 + i * 1300, () => step(i + 1))); }
+  $('#loopReplay').onclick = play;
+  step(items.length);
+  scenes.loop = { enter: play, leave() { T.clear(); } };
+})();
+
+/* ---------- 06 허락 ---------- */
+(() => {
+  const sw = $('#swatch'), msg = $('#permMsg'), bA = $('#pAllow'), bD = $('#pDeny');
+  const text = {
+    base: 'Claude는 파일을 바꾸기 전에 이렇게 먼저 물어봐.',
+    allow: '허락했어. 배경이 연보라로 바뀌었고, 무엇이 바뀌었는지는 Changes에 그대로 남아.',
+    deny: '거절했어. 파일은 그대로야. Claude가 “그럼 어떤 색이 좋아?” 하고 다시 물어볼 거야.'
+  };
+  function set(s) {
+    sw.classList.toggle('lav', s === 'allow');
+    sw.textContent = s === 'allow' ? '연보라' : '흰색';
+    bA.disabled = bD.disabled = s !== 'base';
+    msg.textContent = text[s];
+  }
+  bA.onclick = () => set('allow');
+  bD.onclick = () => set('deny');
+  $('#pReset').onclick = () => set('base');
+  set('base');
+  scenes.permission = { enter() { set('base'); } };
+})();
+
+/* ---------- 07 세이브 포인트 ---------- */
+(() => {
+  const list = $('#svList'), page = $('#svPage'), msg = $('#svMsg');
+  const btns = [$('#sv1'), $('#sv2'), $('#sv3')];
+  const commits = [
+    ['자기소개 페이지 첫 버전', 'e41b0c2'],
+    ['배경을 하늘색으로 바꿈', '7c2d9fa'],
+    ['제목을 손글씨체로 바꿈', 'b83e115'],
+    ['손글씨체로 바꾼 것을 되돌림', '2f9a6d4', 'rv']
+  ];
+  const text = [
+    '지금은 세이브 포인트가 하나. 처음 만든 그대로야.',
+    'Claude가 배경을 바꾸고 메모를 붙여서 세이브했어.',
+    '제목 글씨체도 바꾸고 또 세이브. 그런데… 영 별로네?',
+    '되돌린 것도 지우는 게 아니라 새 세이브 포인트로 남아. 그래서 마음이 또 바뀌면 다시 돌아갈 수 있어.'
+  ];
+  function set(n, animate) {
+    list.innerHTML = commits.slice(0, n + 1).map(([m, h, c], i) =>
+      `<li class="${c || ''}${animate && i === n ? ' new' : ''}"><span class="n">${i + 1}</span><span>💬 ${m}</span><span class="h">${h}</span></li>`).join('');
+    page.classList.toggle('sky', n >= 1);
+    page.classList.toggle('handfont', n === 2);
+    btns.forEach((b, i) => { b.disabled = i !== n; b.classList.toggle('nudge', i === n); b.classList.toggle('primary', i === n); });
+    msg.textContent = text[n];
+  }
+  btns.forEach((b, i) => b.onclick = () => set(i + 1, true));
+  $('#svReset').onclick = () => set(0);
+  set(0);
+  scenes.save = { enter() { set(0); } };
+})();
+
+/* ---------- 09 터미널 타이핑 ---------- */
+(() => {
+  const out = $('#termOut'), T = timers();
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const script = [
+    ['ps', 'PS C:\\Users\\me> '], ['cmd', 'cd Documents\\claude-practice'], ['nl'],
+    ['ps', 'PS C:\\Users\\me\\Documents\\claude-practice> '], ['cmd', 'dir'], ['nl'],
+    ['out', '    Mode   Name\n    ----   ----\n    -a---  CLAUDE.md\n    -a---  index.html\n'],
+    ['ps', 'PS C:\\Users\\me\\Documents\\claude-practice> '], ['cmd', 'start index.html'], ['nl'],
+    ['cmt', '  # 브라우저에 내 소개 페이지가 열려!\n'],
+    ['ps', 'PS C:\\Users\\me\\Documents\\claude-practice> ']
+  ];
+  let html = '';
+  const render = caret => { out.innerHTML = html + (caret ? '<span class="caret"></span>' : ''); };
+  function play() {
+    T.clear(); html = '';
+    if (reduce) {
+      script.forEach(([k, s]) => { html += k === 'nl' ? '\n' : k === 'cmd' ? esc(s) : `<span class="${k}">${esc(s)}</span>`; });
+      return render(true);
+    }
+    let t = 700;
+    script.forEach(([k, s]) => {
+      if (k === 'cmd') {
+        [...s].forEach(c => { T.after(t, () => { html += esc(c); render(true); }); t += 70; });
+        t += 350;
+      } else {
+        T.after(t, () => { html += k === 'nl' ? '\n' : `<span class="${k}">${esc(s)}</span>`; render(true); });
+        t += k === 'out' || k === 'cmt' ? 500 : 120;
+      }
+    });
+  }
+  render(true);
+  scenes.terminal = { enter: play, leave() { T.clear(); } };
+})();
+
+/* ---------- 10 첫 작품 ---------- */
+(() => {
+  const files = $('#bFiles'), browser = $('#bBrowser'), url = $('#bUrl'), msg = $('#bMsg'), prompt = $('#bPrompt');
+  const btns = [$('#b1'), $('#b2'), $('#b3'), $('#b4')];
+  const P1 = '내 소개 페이지 만들어 줘. 이름은 지우, 좋아하는 건 고양이·떡볶이·피아노야.';
+  const P2 = '배경은 노을 색으로, 좋아하는 것에 여행도 추가해 줘.';
+  const text = [
+    '빈 폴더 하나와 빈 브라우저. 이제 입력창에 부탁을 보내 보자.',
+    'Claude가 폴더를 살펴보고 계획을 세웠어. 파일을 만들기 전에 허락을 기다리는 중이야.',
+    'index.html이 폴더에 진짜로 생겼어! 복사·붙여넣기는 한 번도 안 했지?',
+    '내가 말한 그대로 페이지가 떴어.',
+    '말 한마디로 고쳤어. 어디를 바꿨는지 찾을 필요도 없어. 이렇게 고쳐 가면서 키우는 거야.'
+  ];
+  function page(n) {
+    const likes = ['🐱 고양이', '🍢 떡볶이', '🎹 피아노'].map(x => `<span>${x}</span>`).join('') + (n >= 4 ? '<span class="new">✈️ 여행</span>' : '');
+    return `<div class="mypage${n >= 4 ? ' sunset' : ''}"><h4>안녕! 나는 지우야 👋</h4><p>새로운 걸 만들어 보는 중이야.</p><div class="likes">${likes}</div></div>`;
+  }
+  function set(n) {
+    files.innerHTML = n === 0 ? '<li class="empty">(비어 있음)</li>'
+      : n === 1 ? '<li class="ghost">📄 index.html · 허락 기다리는 중</li>'
+      : `<li class="${n === 2 ? 'new' : ''}">📄 index.html</li>`;
+    browser.innerHTML = n >= 3 ? page(n) : '<p class="blank">아직 열린 페이지가 없어</p>';
+    url.textContent = n >= 3 ? 'C:/Users/me/Documents/claude-practice/index.html' : '　';
+    prompt.textContent = n >= 4 ? P2 : P1;
+    if (n === 4) replay(prompt.parentElement, 'flash');
+    btns.forEach((b, i) => { b.disabled = i !== n; b.classList.toggle('nudge', i === n); b.classList.toggle('primary', i === n); });
+    msg.textContent = text[n];
+  }
+  btns.forEach((b, i) => b.onclick = () => set(i + 1));
+  $('#bReset').onclick = () => set(0);
+  set(0);
+  scenes.build = { enter() { set(0); } };
+})();
+
+/* ---------- 12 CLAUDE.md 비교 ---------- */
+(() => {
+  const off = $('#mdOff'), on = $('#mdOn'), r = $('#mdReply'), v = $('#mdVerdict');
+  function set(has) {
+    off.setAttribute('aria-pressed', !has); on.setAttribute('aria-pressed', has);
+    r.className = 'r anim' + (has ? '' : ' jargon');
+    r.innerHTML = has
+      ? '제목을 가운데로 옮겼어! 🙌<br>화면 크기가 바뀌어도 가운데에 있도록 <b>text-align</b>이라는 정렬 설정을 썼어. 바꾼 곳은 index.html 위쪽 한 줄이야.'
+      : 'h1 요소에 <code>text-align: center</code>를 적용했습니다. 또한 반응형 대응을 위해 viewport meta 태그를 추가하고 컨테이너에 max-width를 지정했습니다.';
+    v.textContent = has ? '내가 적어 둔 대로: 반말, 쉬운 말, 무엇을 왜 바꿨는지까지.' : '틀린 건 없는데… 무슨 말인지 하나도 모르겠어.';
+    v.style.color = has ? 'var(--green)' : 'var(--muted)';
+    void r.offsetWidth;
+  }
+  off.onclick = () => set(false);
+  on.onclick = () => set(true);
+  set(false);
+  scenes.memo = { enter() { set(false); } };
+})();
+
+/* ---------- 13 뒤집는 카드 ---------- */
+$$('.flip').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true')));
+
+/* ---------- 15 체크리스트 ---------- */
+(() => {
+  const KEY = 'claude-code-first-steps:todo';
+  const boxes = $$('#todo input');
+  const val = $('#meterVal'), txt = $('#meterTxt'), note = $('#meterNote');
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) {}
+  boxes.forEach((b, i) => { b.checked = !!saved[i]; b.addEventListener('change', update); });
+  function update() {
+    const done = boxes.filter(b => b.checked).length;
+    val.style.strokeDashoffset = 1 - done / boxes.length;
+    txt.textContent = `${done}/${boxes.length}`;
+    note.textContent = done === 0 ? '하나씩 체크해 봐. 이 브라우저가 기억해 둘게.'
+      : done < 4 ? '좋아, 시작이 반이야!'
+      : done < boxes.length ? '벌써 Claude Code 사용자야. 조금만 더!'
+      : '전부 해냈어! 이제 너도 Claude랑 같이 만드는 사람이야 🎉';
+    try { localStorage.setItem(KEY, JSON.stringify(boxes.map(b => b.checked))); } catch (e) {}
+  }
+  update();
+})();
+
+/* ---------- 시작 ---------- */
+const start = slides.findIndex(s => '#' + s.id === location.hash);
+go(start >= 0 ? start : 0);
+})();
+</script>
+</body>
+</html>
