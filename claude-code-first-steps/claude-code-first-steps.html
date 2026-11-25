@@ -462,7 +462,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
     <div class="card chat rise" style="--d:.2s" aria-label="채팅 Claude와 주고받은 대화 예시">
       <div class="msg me rise" style="--d:.35s"><span class="b">내 소개 웹페이지 하나 만들어 줘!</span><span class="av" style="--c:var(--coral)">나</span></div>
       <div class="msg rise" style="--d:.7s"><span class="av" style="--c:var(--ink2)">C</span><span class="b">좋아! 아래 코드를 <b>index.html</b>로 저장해서 열어 봐.<span class="codeblk">&lt;!doctype html&gt;
-&lt;h1&gt;안녕, 나는 지우야&lt;/h1&gt;
+&lt;h1&gt;안녕, 나는 예린이야&lt;/h1&gt;
 <span class="dim">… (40줄 더) …</span></span><span class="copy">⧉ 복사</span></span></div>
       <div class="msg me rise" style="--d:1.1s"><span class="b">메모장에 붙여서 저장했는데 <b>index.html.txt</b>가 됐어…?</span><span class="av" style="--c:var(--coral)">나</span></div>
       <div class="msg rise" style="--d:1.45s"><span class="av" style="--c:var(--ink2)">C</span><span class="b">저장할 때 ‘파일 형식’을 <b>모든 파일</b>로 바꿔서…</span></div>
@@ -615,7 +615,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
       <p class="small rise" style="--d:.45s">Claude가 세이브 포인트를 찍으려면 컴퓨터에 Git이 깔려 있어야 해. 첫 주 체크리스트 마지막 칸을 봐. 세이브 포인트가 가물가물하면 <a class="inline-link" href="../git-github-first-steps/git-github-first-steps.html#timeline" target="_blank" rel="noopener">Git 안내서 3장 ↗</a></p>
     </div>
     <div class="card stack pop" style="--d:.25s">
-      <div class="minipage" id="svPage"><h4>안녕! 나는 지우야 👋</h4><p>고양이 · 떡볶이 · 피아노를 좋아해.</p></div>
+      <div class="minipage" id="svPage"><h4>안녕! 나는 예린이야 👋</h4><p>고양이 · 떡볶이 · 피아노를 좋아해.</p></div>
       <ol class="commits" id="svList" aria-live="polite"></ol>
       <p class="status" id="svMsg" aria-live="polite"></p>
     </div>
@@ -668,7 +668,7 @@ kbd{font-family:var(--mono);font-size:.78rem;border:1.5px solid var(--line);bord
   <h2 class="rise" style="--d:.1s">첫 작품: <mark>내 소개 페이지</mark></h2>
   <div class="grid build">
     <div class="stack">
-      <div class="promptbox rise" style="--d:.2s"><span class="lbl">입력창</span><span class="txt" id="bPrompt">내 소개 페이지 만들어 줘. 이름은 지우, 좋아하는 건 고양이·떡볶이·피아노야.</span></div>
+      <div class="promptbox rise" style="--d:.2s"><span class="lbl">입력창</span><span class="txt" id="bPrompt">내 소개 페이지 만들어 줘. 이름은 예린, 좋아하는 건 고양이·떡볶이·피아노야.</span></div>
       <div class="steps rise" style="--d:.3s">
         <button class="btn primary nudge" id="b1">① 💬 부탁 보내기</button>
         <button class="btn" id="b2" disabled>② ✅ “index.html 만들어도 돼?” → 허락</button>
@@ -1053,7 +1053,7 @@ addEventListener('hashchange', () => { const i = slides.findIndex(s => '#' + s.i
 (() => {
   const files = $('#bFiles'), browser = $('#bBrowser'), url = $('#bUrl'), msg = $('#bMsg'), prompt = $('#bPrompt');
   const btns = [$('#b1'), $('#b2'), $('#b3'), $('#b4')];
-  const P1 = '내 소개 페이지 만들어 줘. 이름은 지우, 좋아하는 건 고양이·떡볶이·피아노야.';
+  const P1 = '내 소개 페이지 만들어 줘. 이름은 예린, 좋아하는 건 고양이·떡볶이·피아노야.';
   const P2 = '배경은 노을 색으로, 좋아하는 것에 여행도 추가해 줘.';
   const text = [
     '빈 폴더 하나와 빈 브라우저. 이제 입력창에 부탁을 보내 보자.',
@@ -1064,7 +1064,7 @@ addEventListener('hashchange', () => { const i = slides.findIndex(s => '#' + s.i
   ];
   function page(n) {
     const likes = ['🐱 고양이', '🍢 떡볶이', '🎹 피아노'].map(x => `<span>${x}</span>`).join('') + (n >= 4 ? '<span class="new">✈️ 여행</span>' : '');
-    return `<div class="mypage${n >= 4 ? ' sunset' : ''}"><h4>안녕! 나는 지우야 👋</h4><p>새로운 걸 만들어 보는 중이야.</p><div class="likes">${likes}</div></div>`;
+    return `<div class="mypage${n >= 4 ? ' sunset' : ''}"><h4>안녕! 나는 예린이야 👋</h4><p>새로운 걸 만들어 보는 중이야.</p><div class="likes">${likes}</div></div>`;
   }
   function set(n) {
     files.innerHTML = n === 0 ? '<li class="empty">(비어 있음)</li>'
